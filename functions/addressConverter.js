@@ -4,9 +4,10 @@ function toColNum(address) {
       .toUpperCase()
       .match(/[A-Z]/g)
       .join("")
-      .padStart(2, " ")
+      .padStart(2, "@")
       .split("")
-      .reduce((r, e) => r + e.charCodeAt(0) - 48, 0)
+      .reverse()
+      .reduce((r, e, i) => r + (e.charCodeAt(0) - 64) * Math.pow(26, i), 0)
     : 1;
   return col > 0
     ? col < 100
@@ -27,7 +28,8 @@ function toRowNum(address) {
 function toColAddr(coordArr) {
   return coordArr[0] > 0
     ? coordArr[0] < 100 
-      ? String.fromCharCode((coordArr[0] / 26) + 48) + String.fromCharCode((coordArr[0] % 26) + 48)
+      ? (coordArr[0] > 26 ? String.fromCharCode(Math.floor(coordArr[0] / 26) + 64) : "")
+        + String.fromCharCode((coordArr[0] % 26) + 64)
       : "CV"
     : "A";
 }
