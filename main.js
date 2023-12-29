@@ -1,4 +1,6 @@
-import './style.css'
+import './style.css';
+import { formulaBar } from "./components/formulaBar.js";
+import { sheet } from './components/sheet';
 // import javascriptLogo from './javascript.svg'
 // import viteLogo from '/vite.svg'
 // import { setupCounter } from './counter.js'
@@ -20,14 +22,13 @@ import './style.css'
     // </p>
   // </div>
 // `
+const size = 4;
+
 document.querySelector('#app').innerHTML = `
   <div>
-    <div id="formula">
-      <label for="f">f=</label>
-      <input type="text" id="formula" name="f" size="10" />
-    </div>
-    <div id="sheet"></div>
+    ${formulaBar(size)}
+    ${sheet(size)}
   </div>
-`
+`;
 
 // setupCounter(document.querySelector('#counter'));
