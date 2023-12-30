@@ -52,7 +52,6 @@ h1 {
 
 .sheet {
   display: grid;
-  /* grid-template-columns: var(--grid-size); */
   border: 1px solid #646464;
 }
 

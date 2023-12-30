@@ -25,21 +25,29 @@ function toRowNum(address) {
     : 1;
 }
 
-function toColAddr(coordArr) {
-  return coordArr[0] > 0
-    ? coordArr[0] < 100 
-      ? (coordArr[0] > 26 ? String.fromCharCode(Math.floor(coordArr[0] / 26) + 64) : "")
-        + String.fromCharCode((coordArr[0] % 26) + 64)
+export function linearToGrid(pos, size) {
+  return (pos % (size + 1) - 1).toString()
+    + "-"
+    + (Math.floor(pos / (size + 1)) - 1).toString();
+}
+
+export function toColAddr(colNum) {
+  return colNum > 0
+    ? colNum < 100 
+      ? (colNum > 26 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : "")
+        + String.fromCharCode((colNum % 26) + 64)
       : "CV"
     : "A";
 }
 
-function toRowAddr(coordArr) {
-  return coordArr[1] > 0
-    ? coordArr[1] < 100
-      ? coordArr[1].toString()
-      : "100"
-    : "1";
+export function toRowAddr(rowNum) {
+  if (!isNaN(Number(rowNum))) {
+    let rowInt = Math.floor(rowNum);
+    if (rowInt > 0) {
+      return rowInt < 100 ? rowInt.toString() : "100";
+    }
+    return "1";
+  }
 }
 
 export function isAddress(address) {
@@ -62,7 +70,7 @@ export function toCoords(address) {
 /** Converts a coordinate array e.g. [3, 31], to an alphanumeric address, e.g. "C31" */
 export function toAddress(coordArr) {
   return isCoordinates(coordArr)
-    ? (toColAddr(coordArr) + toRowAddr(coordArr)).toString()
+    ? (toColAddr(coordArr[0]) + toRowAddr(coordArr[1])).toString()
     : "A1";
 }
 

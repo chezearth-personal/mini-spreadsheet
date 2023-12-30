@@ -1,29 +1,20 @@
 import './style.css';
 import { formulaBar } from "./components/formulaBar.js";
 import { sheet } from './components/sheet';
+import { createStorage } from './functions/calculator';
 // import javascriptLogo from './javascript.svg'
 // import viteLogo from '/vite.svg'
 // import { setupCounter } from './counter.js'
 
-// document.querySelector('#app').innerHTML = `
-  // <div>
-    // <a href="https://vitejs.dev" target="_blank">
-      // <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    // </a>
-    // <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      // <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    // </a>
-    // <h1>Hello Vite!</h1>
-    // <div class="card">
-      // <button id="counter" type="button"></button>
-    // </div>
-    // <p class="read-the-docs">
-      // Click on the Vite logo to learn more
-    // </p>
-  // </div>
-// `
+/**
+  * Universal constant to determine the sheet size
+  */
 const size = 4;
 
+/**
+  * Creates the formula bar and grid on the page, with one additional row and column for the
+  * address heading
+  */
 document.querySelector('#app').innerHTML = `
   <div>
     ${formulaBar(size)}
@@ -31,4 +22,14 @@ document.querySelector('#app').innerHTML = `
   </div>
 `;
 
-// setupCounter(document.querySelector('#counter'));
+/**
+  * Creates an array (3 dimesions: `size` x `size` x 2) to store formulas and values
+  */
+const storageArr = createStorage(size);
+
+/**
+  * On entering text, check if the last caharcter entered is "\n", if so calculate the whole
+  * sheet and save the values.
+  */
+const checkEntry = (entry, address) => "Done";
+
