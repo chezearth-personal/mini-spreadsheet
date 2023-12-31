@@ -7,22 +7,22 @@ function toColNum(address) {
       .padStart(2, "@")
       .split("")
       .reverse()
-      .reduce((r, e, i) => r + (e.charCodeAt(0) - 64) * Math.pow(26, i), 0)
+      .reduce((r, e, i) => r + (e.charCodeAt(0) - 64) * Math.pow(26, i), -1)
     : 1;
   return col > 0
-    ? col < 100
+    ? col < 101
       ? col
       : 100
-    : 1;
+    : 0;
 }
 
 function toRowNum(address) {
   let row = address ? address.toString().match(/[0-9]/g).join("") : 1;
   return !isNaN(Number(row)) && row > 0
-    ? Number(row) < 100
-      ? Number(row)
+    ? Number(row) < 101
+      ? Number(row) - 1
       : 100
-    : 1;
+    : 0;
 }
 
 export function linearToGrid(pos, size) {
@@ -32,10 +32,10 @@ export function linearToGrid(pos, size) {
 }
 
 export function toColAddr(colNum) {
-  return colNum > 0
+  return colNum > -1
     ? colNum < 100 
       ? (colNum > 26 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : "")
-        + String.fromCharCode((colNum % 26) + 64)
+        + String.fromCharCode((colNum % 26) + 65)
       : "CV"
     : "A";
 }
@@ -44,7 +44,7 @@ export function toRowAddr(rowNum) {
   if (!isNaN(Number(rowNum))) {
     let rowInt = Math.floor(rowNum);
     if (rowInt > 0) {
-      return rowInt < 100 ? rowInt.toString() : "100";
+      return rowInt < 100 ? (rowInt + 1).toString() : "100";
     }
     return "1";
   }
@@ -63,8 +63,8 @@ export function isCoordinates(coordArr) {
 /** Converts addresses in the form "A23" or "AZ7" to arrays of coordinates, e.g. [1, 23] or [52, 7] */
 export function toCoords(address) {
   return isAddress(address)
-    ? Array.of(toColNum(address)).concat(toRowNum(address))
-    : [1, 1];
+    ? Array.of(toColNum(address), toRowNum(address))
+    : [0, 0];
 }
 
 /** Converts a coordinate array e.g. [3, 31], to an alphanumeric address, e.g. "C31" */

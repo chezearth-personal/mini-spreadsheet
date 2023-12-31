@@ -5,15 +5,19 @@ import { toRowAddr, toColAddr, linearToGrid } from '../functions/addressConverte
   */
 function makeHeader(pos, size) {
   return pos % (size + 1) === 0 && pos > size
-    ? toRowAddr(pos / (size + 1))
-    : pos === 0 ? '' : toColAddr(pos);
+    ? toRowAddr(pos / (size + 1) - 1)
+    : pos === 0 ? '' : toColAddr(pos - 1);
+}
+
+function makeAddressCell(pos) {
+  return pos === 0 ? ` id="address"` : ``;
 }
 
 function createCells(size) {
   return Array(Math.pow(size + 1, 2))
     .fill(`<input class=`)
     .map((e, i) => i % (size + 1) === 0 || i < size + 2
-      ? `${e}"grid-header" disabled="true" type="text" value="${makeHeader(i, size)}" />`
+      ? `${e}"grid-header"${makeAddressCell(i)} disabled="true" type="text" value="${makeHeader(i, size)}" />`
       : `${e}"cell" id=${linearToGrid(i, size)} type="text" />`
     )
     .join('\n');

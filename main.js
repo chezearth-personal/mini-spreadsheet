@@ -1,10 +1,10 @@
 import './style.css';
-import { createFormulaBar, updateFormulaBar } from "./components/formulaBar";
+import { createFormulaBar, setAddress, getAddress } from "./components/formulaBar";
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
 import { sheetSize } from './config.json';
-import { createStorage, saveFormula } from './controllers/storageManager';
+import { createStorage, getFormula, saveFormula } from './controllers/storageManager';
 import { parseFormula } from './functions/calculator';
-// import {toCoords} from './functions/addressConverter';
+import { toAddress } from './functions/addressConverter';
 
 /**
   * Creates the formula bar and grid on the page, with one additional row and column for the
@@ -23,11 +23,28 @@ document.querySelector('#app').innerHTML = `
 export const storageArr = createStorage(sheetSize);
 
 /**
-  * Update the formula in the storage array
+  * Update the formula and value in the storage array
   */
-const updateFormula = (event) => {
-  saveFormula(storageArr, event.target.id.split('-'), event.target.value);
-  event.target.value = parseFormula(event.target.value);
+const updateStorage = (event) => {
+  const coordsArr = event.target.id === 'formula-input'
+    ? getAddress()
+    : event.target.id.split('-');
+  if (event.target.value !== getFormula(storageArr, coordsArr)) {
+    saveFormula(storageArr, coordsArr, event.target.value);
+    document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value);
+  }
+}
+
+const updateFormulaBar = (event) => {
+  const value = getFormula(storageArr, event.target.id.split('-'));
+  setAddress(event.target.id.split('-'));
+  document.getElementById('formula-input').value = !value
+    ? event.target.value
+    : value || '';
+}
+
+const updateSheet = (event) => {
+  document.getElementById(getAddress().join('-')).value = event.target.value;
 }
 
 /**
@@ -48,10 +65,18 @@ const navigate = (event) => {
   document.getElementById(toId).focus();
 }
 
+const updateCell = (event) => {
+  document.getElementById('address').value = toAddress(event.target.id.split('-'))
+  updateFormulaBar(event);
+}
+
 /**
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
 const sheet = document.querySelectorAll('input.cell');
-sheet.forEach(cell => cell.addEventListener('change', updateFormula));
+sheet.forEach(cell => cell.addEventListener('change', updateStorage));
 sheet.forEach(cell => cell.addEventListener('keydown', navigate));
 sheet.forEach(cell => cell.addEventListener('input', updateFormulaBar));
+sheet.forEach(cell => cell.addEventListener('focus', updateCell));
+document.getElementById('formula-input').addEventListener('input', updateSheet);
+document.getElementById('formula-input').addEventListener('change', updateStorage);

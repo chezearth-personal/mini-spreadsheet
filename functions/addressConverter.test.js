@@ -77,55 +77,55 @@ describe("Test: addressConverter.js", () => {
   });
   describe("It should convert addresses to array coordinates (numbered from 1, column and row 0 for the headings", () => {
     describe("Bad addresses should default to [1, 1] ('A1')", () => {
-      describe("Null, undefined and empty addresses should go to [1, 1] ('A1')", () => {
-        it("should convert undefined to [1, 1]", () => {
-          expect(toCoords(undefined)).to.have.ordered.members([1, 1]);
+      describe("Null, undefined and empty addresses should go to [0, 0] ('A1')", () => {
+        it("should convert undefined to [0, 0]", () => {
+          expect(toCoords(undefined)).to.have.ordered.members([0, 0]);
         });
-        it("should convert null to [1, 1]", () => {
-          expect(toCoords(null)).to.have.ordered.members([1, 1]);
+        it("should convert null to [0, 0]", () => {
+          expect(toCoords(null)).to.have.ordered.members([0, 0]);
         });
-        it("should convert '' to [1, 1]", () => {
-          expect(toCoords(undefined)).to.have.ordered.members([1, 1]);
+        it("should convert '' to [0, 0]", () => {
+          expect(toCoords(undefined)).to.have.ordered.members([0, 0]);
         });
       });
       describe("Addresses that are missing either characters or numbers should go to the top-left [1, 1]", () => {
-        it("should convert a number only to column 1", () => {
-          expect(toCoords("20")).to.have.ordered.members([1, 1]);
+        it("should convert a number only to column 0", () => {
+          expect(toCoords("20")).to.have.ordered.members([0, 0]);
         });
-        it("should convert a character only to row 1", () => {
-          expect(toCoords("F")).to.have.ordered.members([1, 1]);
+        it("should convert a character only to row 0", () => {
+          expect(toCoords("F")).to.have.ordered.members([0, 0]);
         });
       });
       describe("An address that has 0 for its number must go to row 1", () => {
-        it("Should convert a zero row to 1, ie. 'C0' -> [3, 1]", () => {
-          expect(toCoords("C0")).to.have.ordered.members([3, 1]);
+        it("Should convert a zero row to 1, ie. 'C0' -> [2, 0]", () => {
+          expect(toCoords("C0")).to.have.ordered.members([2, 0]);
         });
       });
     });
     describe("Addresses that are out of range must betruncated to 100", () => {
       describe("When the column characters are too big, the first element must be 100", () => {
         it("should set the maximum column to 100, i.e. 'DX' -> 100, not 128", () => {
-          expect(toCoords("DX29")).to.have.ordered.members([100, 29]);
+          expect(toCoords("DX29")).to.have.ordered.members([100, 28]);
         });
       });
       describe("When the row number is too big, the second element must be 100", () => {
         it("should set the maximum row to 100, i.e. 'CM329' -> [91, 100]", () => {
-          expect(toCoords("CM329")).to.have.ordered.members([91, 100]);
+          expect(toCoords("CM329")).to.have.ordered.members([90, 100]);
         });
       });
     });
     describe("Addresses that are in range should be converted correctly", () => {
       describe("Single-character, single-digit addresses should convert correctly", () => {
-        it("should convert 'A2' to [1, 2]", () => {
-          expect(toCoords("A2")).to.have.ordered.members([1, 2]);
+        it("should convert 'A2' to [0, 1]", () => {
+          expect(toCoords("A2")).to.have.ordered.members([0, 1]);
         });
-        it("should convert 'a2' to [1, 2]", () => {
-          expect(toCoords("a2")).to.have.ordered.members([1, 2]);
+        it("should convert 'a2' to [0, 1]", () => {
+          expect(toCoords("a2")).to.have.ordered.members([0, 1]);
         });
       });
       describe("Double-character, double-digit addresses should convert correctly", () => {
-        it("should convert 'BL47' to [64, 47]", () => {
-          expect(toCoords("bL47")).to.have.ordered.members([64, 47]);
+        it("should convert 'BL47' to [63, 46]", () => {
+          expect(toCoords("bL47")).to.have.ordered.members([63, 46]);
         });
       });
     });
@@ -134,22 +134,22 @@ describe("Test: addressConverter.js", () => {
     describe("Coordinates that are out of range should be trancated to 'CV' and 100", () => {
       describe("Coordinates with large column numbers must be limited to 'CV'", () => {
         it("should truncate large column numbers over 100 to 'CV'", () => {
-          expect(toAddress([137, 43])).to.equal('CV43');
+          expect(toAddress([137, 42])).to.equal('CV43');
         });
       });
       describe("Coordinates with large row numbers must be limited to 100", () => {
         it("should truncate large row numbers over 100 to 100", () => {
-          expect(toAddress([91, 714])).to.equal('CM100');
+          expect(toAddress([90, 714])).to.equal('CM100');
         });
       });
     });
     describe("It should convert array coordinate in range correctly", () => {
       describe("Coordinates in-range should convert accurately", () => {
         it("should convert smaller in-range numbers to two-alphanumeric characters, e.g. [17, 8] to 'Q8'", () => {
-          expect(toAddress([17, 8])).to.equal("Q8");
+          expect(toAddress([16, 7])).to.equal("Q8");
         });
         it("should convert larger in-range numbers to four alphanumeric characters, e.g. [67, 73] to 'BO73'", () => {
-          expect(toAddress([67, 73])).to.equal("BO73");
+          expect(toAddress([66, 72])).to.equal("BO73");
         });
       });
     });
