@@ -1,28 +1,53 @@
+'use strict';
+
 import { parseFormula } from "../functions/calculator";
 
 function testArray(arr) {
   return Array.isArray(arr) && arr.length > 1
 }
 
-export const createStorage = (size) => Array
-  .from(Array(size), () => Array.from(Array(size), () => new Array(2)));
+/**
+  * Refresh the entire sheet
+  */
+export const refreshSheet = (storageArr, doc) => {
+  try {
+    if (storageArr && Array.isArray(storageArr) && doc) {
+      storageArr.forEach((colArr, i) => {
+        if (colArr && Array.isArray(colArr)) {
+          colArr.forEach((cellFormula, j) => {
+            if (cellFormula) {
+              const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
+              cellSheet.value = parseFormula(cellFormula);
+            }
+          });
+        }
+      });
+    }
+    return -1;
+  } catch (e) {
+    console.log(e);
+    return 0;
+  }
+}
 
-export const getFormula = (storage, address) => {
+export const createStorage = (size) => Array
+  .from(Array(size), () => Array.from(new Array(size)));
+
+export const getFormula = (storageArr, address) => {
   if (testArray(address)) {
     const col = address[0];
     const row = address[1];
-    return storage[col][row][0];
+    return storageArr[col][row];
   }
   return ''
 }
 
 export const saveFormula = (storage, address, formula) => {
-  if (Array.isArray(address) && address.length > 1) {
+  if (address && Array.isArray(address) && address.length > 1 && storage) {
     const col = address[0];
     const row = address[1];
-    storage[col][row][0] = formula;
+    storage[col][row] = formula;
     const result = parseFormula(formula);
-    storage[col][row][1] = result;
     return result;
   }
   return formula;

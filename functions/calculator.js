@@ -1,3 +1,5 @@
+'use strict';
+
 import { toCoords } from './addressConverter';
 
 const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
@@ -12,7 +14,7 @@ const parseRefs = (formula) => {
 }
 
 export const parseFormula = (formula) => {
-  return formula.toString().substring(0, 1) === "="
+  return (formula || '').toString().substring(0, 1) === "="
   ? calcFormula(parseRefs(formula.toString().substring(1)))
-  : formula.toString();
+  : (formula || '' || formula === 0 ? formula : '').toString();
 }

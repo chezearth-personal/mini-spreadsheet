@@ -1,3 +1,5 @@
+'use strict';
+
 import { toRowAddr, toColAddr, linearToGrid } from '../functions/addressConverter';
 
 /**

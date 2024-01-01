@@ -1,16 +1,17 @@
+'use strict';
 
 /**
   * For storing address state (could use grid element 0)
   */
-let currentCellAddress;
+let currentCellCoords;
 
 /**
   * Getting and setting the state
   */
-export const getAddress = () => currentCellAddress;
+export const getCoordsArr = () => currentCellCoords;
 
-export const setAddress = (coordArr) => {
-  currentCellAddress = coordArr;
+export const setCoordsArr = (coordArr) => {
+  currentCellCoords = coordArr;
 }
 
 /**

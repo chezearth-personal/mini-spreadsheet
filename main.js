@@ -1,8 +1,10 @@
+'use strict';
+
 import './style.css';
-import { createFormulaBar, setAddress, getAddress } from "./components/formulaBar";
+import { createFormulaBar, setCoordsArr, getCoordsArr } from "./components/formulaBar";
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
 import { sheetSize } from './config.json';
-import { createStorage, getFormula, saveFormula } from './controllers/storageManager';
+import { createStorage, getFormula, saveFormula, refreshSheet } from './controllers/storageManager';
 import { parseFormula } from './functions/calculator';
 import { toAddress } from './functions/addressConverter';
 
@@ -27,24 +29,23 @@ export const storageArr = createStorage(sheetSize);
   */
 const updateStorage = (event) => {
   const coordsArr = event.target.id === 'formula-input'
-    ? getAddress()
+    ? getCoordsArr()
     : event.target.id.split('-');
-  if (event.target.value !== getFormula(storageArr, coordsArr)) {
-    saveFormula(storageArr, coordsArr, event.target.value);
-    document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value);
-  }
+  saveFormula(storageArr, coordsArr, event.target.value);
+  document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value);
+  refreshSheet(storageArr, document);
 }
 
 const updateFormulaBar = (event) => {
   const value = getFormula(storageArr, event.target.id.split('-'));
-  setAddress(event.target.id.split('-'));
+  setCoordsArr(event.target.id.split('-'));
   document.getElementById('formula-input').value = !value
-    ? event.target.value
-    : value || '';
+    ? event.target.value || '' || event.target.value === 0 ? event.target.value : ''
+    : value || '' || value === 0 ? value : '';
 }
 
 const updateSheet = (event) => {
-  document.getElementById(getAddress().join('-')).value = event.target.value;
+  document.getElementById(getCoordsArr().join('-')).value = event.target.value;
 }
 
 /**
