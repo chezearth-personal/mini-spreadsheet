@@ -71,6 +71,11 @@ const updateCell = (event) => {
   updateFormulaBar(event);
 }
 
+const callRefresh = () => {
+  // console.log('Clicked refresh');
+  refreshSheet(storageArr, document);
+}
+
 /**
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
@@ -81,3 +86,4 @@ sheet.forEach(cell => cell.addEventListener('input', updateFormulaBar));
 sheet.forEach(cell => cell.addEventListener('focus', updateCell));
 document.getElementById('formula-input').addEventListener('input', updateSheet);
 document.getElementById('formula-input').addEventListener('change', updateStorage);
+document.getElementById('refresh-sheet').addEventListener('click', callRefresh);

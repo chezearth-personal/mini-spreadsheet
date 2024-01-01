@@ -23,7 +23,7 @@ a:hover {
 }
 
 body {
-  margin: 0;
+  margin: 0 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -38,7 +38,7 @@ h1 {
 
 #app {
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0 0;
   padding: 0.25rem;
   text-align: left;
 }
@@ -50,13 +50,27 @@ h1 {
   min-width: 100%;
 }
 
-.formula-bar-label {
-  margin-left: 3px;
+#refresh-sheet {
+  /* margin-left: 3px; */
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.9em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #7a7a7a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+#refresh-sheet:hover {
+  border-color: #646cff;
+}
+#refresh-sheet:focus,
+#refresh-sheet:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 .sheet {
   display: grid;
-  border: 1px solid #646464;
 }
 
 .grid-header {
@@ -66,51 +80,11 @@ h1 {
 }
 
 .cell {
-  border: 1px solid #646464;
+  border: 1px solid #545454;
   background-color: #f9f9f9;
-  size: 14;
+  size: 8;
   text-align: left;
 }
-
-/* .logo { */
-  /* height: 6em; */
-  /* padding: 1.5em; */
-  /* will-change: filter; */
-  /* transition: filter 300ms; */
-/* } */
-/* .logo:hover { */
-  /* filter: drop-shadow(0 0 2em #646cffaa); */
-/* } */
-/* .logo.vanilla:hover { */
-  /* filter: drop-shadow(0 0 2em #f7df1eaa); */
-/* } */
-
-/* .card { */
-  /* padding: 2em; */
-/* } */
-
-/* .read-the-docs { */
-  /* color: #888; */
-/* } */
-
-/* button { */
-  /* border-radius: 8px; */
-  /* border: 1px solid transparent; */
-  /* padding: 0.6em 1.2em; */
-  /* font-size: 1em; */
-  /* font-weight: 500; */
-  /* font-family: inherit; */
-  /* background-color: #1a1a1a; */
-  /* cursor: pointer; */
-  /* transition: border-color 0.25s; */
-/* } */
-/* button:hover { */
-  /* border-color: #646cff; */
-/* } */
-/* button:focus, */
-/* button:focus-visible { */
-  /* outline: 4px auto -webkit-focus-ring-color; */
-/* } */
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -120,7 +94,7 @@ h1 {
   a:hover {
     color: #747bff;
   }
-  button {
+  #refresh-sheet {
     background-color: #f9f9f9;
   }
 }

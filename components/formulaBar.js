@@ -19,9 +19,7 @@ export const setCoordsArr = (coordArr) => {
   */
 export const createFormulaBar = (size) => `
   <div id="formula-bar">
-    <label class="formula-bar-label">
-      = 
-      <input type="text" id="formula-input" name="f" size="${8 + (20 * size)}ch" />
-    </label>
+    <input type="button" id="refresh-sheet" value=" = " />
+    <input type="text" id="formula-input" name="f" size="${5 + (20 * size)}ch" />
   </div>
 `;
