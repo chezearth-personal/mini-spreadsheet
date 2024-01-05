@@ -67,19 +67,18 @@ const rangeListHandler = (rangeListFunc, funcName, doc) => {
 const funcRegexp = (f) => new RegExp(`${f.toUpperCase()}\(.+\)`, 'g');
 
 const parseFuncs = (formula, doc) => {
-  const result = funcsList.reduce((r, func) => {
-    const newFormula = r.toUpperCase().replaceAll(funcRegexp(func), (match) => {
-      const range = rangeListHandler(match, func, doc);
-      console.log('parseFuncs(): range =', range);
-      return range.toString();
-    });
-    return newFormula;
-  }, formula);
   const isFormula = funcsList.reduce((r, func) => {
     return r || funcRegexp(func).test(formula.toUpperCase());
   }, false);
-  // console.log('parseFormula(): isFormula? ', isFormula);
-  return isFormula ? result : '';
+  return isFormula 
+    ? funcsList.reduce((r, func) => {
+        const newFormula = r.toUpperCase().replaceAll(funcRegexp(func), (match) => {
+          const range = rangeListHandler(match, func, doc);
+          return range.toString();
+        });
+        return newFormula;
+      }, formula)
+    : '';
 }
 
 const parseRefs = (formula, doc) => {
@@ -90,9 +89,7 @@ const parseRefs = (formula, doc) => {
 }
 
 export const parseFormula = (formula, doc) => {
-  // console.log('parseFormula(): formula =', formula);
   const func = parseFuncs(formula, doc);
-  // console.log('parseFormula(): func = ', func);
   return !func && func !== 0
     ? (formula || '').toString().substring(0, 1) === "="
       ? calcFormula(parseRefs(formula.toString().substring(1), doc))
