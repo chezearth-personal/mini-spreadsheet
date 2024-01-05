@@ -82,7 +82,7 @@ const parseFuncs = (formula, doc) => {
     const regexp = new RegExp(`${func.toUpperCase()}\(.+\)`, 'g');
     const isFunc = regexp.test(formula);
     if (isFunc) {
-      const newFormula = formula.toUpperCase().replaceAll(regex, (match) => {
+      const newFormula = formula.toUpperCase().replaceAll(regexp, (match) => {
         // const funcsArr = match ? startArr.concat(match) : startArr;
         // console.log('parseFuncs(): match =', match);
         const range = rangeListHandler(match, func, doc);
