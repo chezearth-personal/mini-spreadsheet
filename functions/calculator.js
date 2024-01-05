@@ -43,7 +43,8 @@ const rangeHandler = (range) => {
 }
 
 const listHandler = (list) => {
-  return '0';
+  return list.split(',')
+    .map(item => toCoords(item.trim()));
 }
 
 const funcHandler = (listArr, funcName, doc) => {
@@ -79,7 +80,7 @@ const funcRegexp = (f) => new RegExp(`${f.toUpperCase()}\(.+\)`, 'g');
 const parseFuncs = (formula, doc) => {
   console.log('parseFuncs(): formula =', formula);
   const result = funcsList.reduce((r, func) => {
-    console.log('parseFuncs(): res = ', r, '; func = ', func);
+    // console.log('parseFuncs(): res = ', r, '; func = ', func);
     const newFormula = r.toUpperCase().replaceAll(funcRegexp(func), (match) => {
       // console.log('parseFuncs(): match =', match);
       const range = rangeListHandler(match, func, doc);
@@ -89,8 +90,8 @@ const parseFuncs = (formula, doc) => {
     return newFormula;
   }, formula);
   const isFormula = funcsList.reduce((r, func) => {
-    console.log('parseFuncs(): regexp =', funcRegexp(func), '; formula =', formula);
-    console.log('parseFuncs(): func =', func, '; funcRegexp(func).test(formula)? ', funcRegexp(func).test(formula.toUpperCase()));
+    // console.log('parseFuncs(): regexp =', funcRegexp(func), '; formula =', formula);
+    // console.log('parseFuncs(): func =', func, '; funcRegexp(func).test(formula)? ', funcRegexp(func).test(formula.toUpperCase()));
     return r || funcRegexp(func).test(formula.toUpperCase());
   }, false);
   console.log('parseFormula(): isFormula? ', isFormula);
