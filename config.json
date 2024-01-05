@@ -1,3 +1,4 @@
 {
-  "sheetSize" : 4
+  "sheetSize": 12,
+  "funcsList": ["SUM", "COUNT", "AVERAGE"]
 }

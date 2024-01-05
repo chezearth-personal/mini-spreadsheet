@@ -43,11 +43,13 @@ h1 {
   text-align: left;
 }
 
-.formula-bar {
+nav {
   display: flex;
   flex-direction: row;
-  flex-basis: left;
-  min-width: 100%;
+  /* flex-basis: left; */
+  width: 100%;
+  /* max-width: 100%; */
+  /* min-width: 100%; */
 }
 
 #refresh-sheet {

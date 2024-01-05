@@ -13,35 +13,43 @@ import { toAddress } from './functions/addressConverter';
   * address heading
   */
 document.querySelector('#app').innerHTML = `
-  <div>
-    ${createFormulaBar(sheetSize)}
-    ${createSheet(sheetSize)}
-  </div>
+  ${createFormulaBar(sheetSize)}
+  ${createSheet(sheetSize)}
 `;
 
 /**
-  * Creates an array (3 dimesions: `size` x `size` x 2) to store formulas and values
+  * Creates an array (2 dimesions: `sheetSize` x `sheetSize`) for storing formulae
   */
 export const storageArr = createStorage(sheetSize);
 
 /**
-  * Update the formula and value in the storage array
+  * Getter for the storage array
+  */
+const getStorageArr = () => storageArr;
+
+/**
+  * Updates the formula in the storage array and recalculates the value
   */
 const updateStorage = (event) => {
   const coordsArr = event.target.id === 'formula-input'
     ? getCoordsArr()
     : event.target.id.split('-');
-  saveFormula(storageArr, coordsArr, event.target.value);
-  document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value);
-  refreshSheet(storageArr, document);
+  saveFormula(getStorageArr(), coordsArr, event.target.value, document);
+  document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value, document);
+  refreshSheet(getStorageArr(), document);
 }
 
+/**
+  * Update the formula bar with the most recent formula edits from the cells
+  */
 const updateFormulaBar = (event) => {
-  const value = getFormula(storageArr, event.target.id.split('-'));
+  const formula = getFormula(storageArr, event.target.id.split('-'));
   setCoordsArr(event.target.id.split('-'));
-  document.getElementById('formula-input').value = !value
-    ? event.target.value || '' || event.target.value === 0 ? event.target.value : ''
-    : value || '' || value === 0 ? value : '';
+  document.getElementById('formula-input').value = !formula
+    ? event.target.value || '' || event.target.value === 0
+      ? event.target.value
+      : ''
+    : formula || '' || formula === 0 ? formula : '';
 }
 
 const updateSheet = (event) => {
@@ -72,8 +80,7 @@ const updateCell = (event) => {
 }
 
 const callRefresh = () => {
-  // console.log('Clicked refresh');
-  refreshSheet(storageArr, document);
+  refreshSheet(getStorageArr(), document);
 }
 
 /**

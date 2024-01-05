@@ -17,7 +17,7 @@ export const refreshSheet = (storageArr, doc) => {
           colArr.forEach((cellFormula, j) => {
             if (cellFormula) {
               const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
-              cellSheet.value = parseFormula(cellFormula);
+              cellSheet.value = parseFormula(cellFormula, doc);
             }
           });
         }
@@ -42,12 +42,12 @@ export const getFormula = (storageArr, address) => {
   return ''
 }
 
-export const saveFormula = (storage, address, formula) => {
+export const saveFormula = (storage, address, formula, doc) => {
   if (address && Array.isArray(address) && address.length > 1 && storage) {
     const col = address[0];
     const row = address[1];
     storage[col][row] = formula;
-    const result = parseFormula(formula);
+    const result = parseFormula(formula, doc);
     return result;
   }
   return formula;
