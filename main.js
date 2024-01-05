@@ -34,8 +34,8 @@ const updateStorage = (event) => {
   const coordsArr = event.target.id === 'formula-input'
     ? getCoordsArr()
     : event.target.id.split('-');
-  saveFormula(getStorageArr(), coordsArr, event.target.value, document);
-  document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value, document);
+  saveFormula(getStorageArr(), coordsArr, event.target.value);
+  // document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value, document);
   refreshSheet(getStorageArr(), document);
 }
 

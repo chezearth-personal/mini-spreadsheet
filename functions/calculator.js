@@ -74,25 +74,27 @@ const rangeListHandler = (rangeListFunc, funcName, doc) => {
   return result;
 }
 
+const funcRegexp = (f) => new RegExp(`${f.toUpperCase()}\(.+\)`, 'g');
+
 const parseFuncs = (formula, doc) => {
-  console.log('parsefuncs(): formula =', formula);
-  // const startArr = [];
-  funcsList.forEach((func) => {
-    console.log('parsefuncs(): func = ', func);
-    const regexp = new RegExp(`${func.toUpperCase()}\(.+\)`, 'g');
-    const isFunc = regexp.test(formula);
-    if (isFunc) {
-      const newFormula = formula.toUpperCase().replaceAll(regexp, (match) => {
-        // const funcsArr = match ? startArr.concat(match) : startArr;
-        // console.log('parseFuncs(): match =', match);
-        const range = rangeListHandler(match, func, doc);
-        console.log('parsefuncs(): range =', range);
-        return range.toString();
-      });
-      return newFormula;
-    }
-  });
-  return formula;
+  console.log('parseFuncs(): formula =', formula);
+  const result = funcsList.reduce((r, func) => {
+    console.log('parseFuncs(): res = ', r, '; func = ', func);
+    const newFormula = r.toUpperCase().replaceAll(funcRegexp(func), (match) => {
+      // console.log('parseFuncs(): match =', match);
+      const range = rangeListHandler(match, func, doc);
+      console.log('parseFuncs(): range =', range);
+      return range.toString();
+    });
+    return newFormula;
+  }, formula);
+  const isFormula = funcsList.reduce((r, func) => {
+    console.log('parseFuncs(): regexp =', funcRegexp(func), '; formula =', formula);
+    console.log('parseFuncs(): func =', func, '; funcRegexp(func).test(formula)? ', funcRegexp(func).test(formula.toUpperCase()));
+    return r || funcRegexp(func).test(formula.toUpperCase());
+  }, false);
+  console.log('parseFormula(): isFormula? ', isFormula);
+  return isFormula ? result : '';
 }
 
 const parseRefs = (formula, doc) => {
@@ -104,6 +106,7 @@ const parseRefs = (formula, doc) => {
 }
 
 export const parseFormula = (formula, doc) => {
+  console.log('parseFormula(): formula =', formula);
   const func = parseFuncs(formula, doc);
   console.log('parseFormula(): func = ', func);
   return !func && func !== 0
