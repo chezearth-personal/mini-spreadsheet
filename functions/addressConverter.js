@@ -1,7 +1,10 @@
 'use strict';
 
+const maxColumns = () => 702; /** Two-letter addresses (27 X 26 : 'A' to 'ZZ') */
+const maxRows = () => 32768; /** Just big! */
+
 /**
-  * Converts a column letter to a column number (zero-based, limits to 100 and positive numbers)
+  * Converts a column letter to a column number (zero-based, limits to max and positive numbers)
   */
 function toColNum(address) {
   let col = address
@@ -15,21 +18,21 @@ function toColNum(address) {
       .reduce((r, e, i) => r + (e.charCodeAt(0) - 64) * Math.pow(26, i), -1)
     : 1;
   return col > 0
-    ? col < 32769
+    ? col < maxColumns() + 1
       ? col
-      : 32768
+      : maxColumns()
     : 0;
 }
 
 /**
-  * Converts a row address to a row number (zero-based, limits to 100 and positive numbers)
+  * Converts a row address to a row number (zero-based, limits to max and positive numbers)
   */
 function toRowNum(address) {
   let row = address ? address.toString().match(/[0-9]/g).join('') : 1;
   return !isNaN(Number(row)) && row > 0
-    ? Number(row) < 32769
+    ? Number(row) < maxRows() + 1
       ? Number(row) - 1
-      : 32768
+      : maxRows()
     : 0;
 }
 
@@ -58,7 +61,7 @@ export function linearToGrid(pos, size) {
   */
 export function toColAddr(colNum) {
   return colNum > -1
-    ? colNum < 100 
+    ? colNum < maxColumns()
       ? (colNum > 25 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : '')
         + String.fromCharCode((colNum % 26) + 65)
       : 'CV'
@@ -72,7 +75,7 @@ export function toRowAddr(rowNum) {
   if (!isNaN(Number(rowNum))) {
     let rowInt = Math.floor(rowNum);
     if (rowInt > 0) {
-      return rowInt < 100 ? (rowInt + 1).toString() : '100';
+      return rowInt < maxRows() ? (rowInt + 1).toString() : maxRows().toString();
     }
     return '1';
   }
