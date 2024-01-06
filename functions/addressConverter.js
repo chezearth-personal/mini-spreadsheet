@@ -15,9 +15,9 @@ function toColNum(address) {
       .reduce((r, e, i) => r + (e.charCodeAt(0) - 64) * Math.pow(26, i), -1)
     : 1;
   return col > 0
-    ? col < 101
+    ? col < 32769
       ? col
-      : 100
+      : 32768
     : 0;
 }
 
@@ -27,9 +27,9 @@ function toColNum(address) {
 function toRowNum(address) {
   let row = address ? address.toString().match(/[0-9]/g).join('') : 1;
   return !isNaN(Number(row)) && row > 0
-    ? Number(row) < 101
+    ? Number(row) < 32769
       ? Number(row) - 1
-      : 100
+      : 32768
     : 0;
 }
 
