@@ -1,25 +1,17 @@
 'use strict';
 
-import { toRowAddr, toColAddr, linearToGrid } from '../functions/addressConverter';
+import { linearToHeader, linearToGrid } from '../functions/addressConverter';
 
 /**
-  * Constructor functions for the cells
+  * Creates the grid cells, with the header row and header columns identified separately
   */
-function makeHeader(pos, size) {
-  return pos % (size + 1) === 0 && pos > size
-    ? toRowAddr(pos / (size + 1) - 1)
-    : pos === 0 ? '' : toColAddr(pos - 1);
-}
-
-function makeAddressCell(pos) {
-  return pos === 0 ? ` id="address"` : ``;
-}
-
 function createCells(size) {
+  const id = 'id';
+  const value = 'value';
   return Array(Math.pow(size + 1, 2))
     .fill(`<input class=`)
     .map((e, i) => i % (size + 1) === 0 || i < size + 2
-      ? `${e}"grid-header"${makeAddressCell(i)} disabled="true" type="text" value="${makeHeader(i, size)}" />`
+      ? `${e}"grid-header" id="${linearToHeader(i, size, id)}" disabled="true" type="text" value="${linearToHeader(i, size, value)}" />`
       : `${e}"cell" id=${linearToGrid(i, size)} type="text" />`
     )
     .join('\n');
@@ -34,6 +26,9 @@ function arrayTest(arr) {
     && !isNaN(Number(arr[1]))
 }
 
+/**
+  * Creates and array with two elements, each 0
+  */
 function zeroArray() {
   return Array.of('0', '0');
 }
@@ -84,7 +79,7 @@ export const navLeft = (coordsArr) => arrayTest(coordsArr)
   * Create the grid DOM elements
   */
 export const createSheet = (size) => `
-    <div class="sheet" style="grid-template-columns:5ch repeat(${size}, 14ch)">
+    <main class="sheet" style="grid-template-columns:5ch repeat(${size}, 10ch)">
       ${createCells(size)}
-    </div>
+    </main>
 `;

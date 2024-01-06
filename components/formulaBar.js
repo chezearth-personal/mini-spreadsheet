@@ -17,9 +17,9 @@ export const setCoordsArr = (coordArr) => {
 /**
   * Sets uop the formula bar
   */
-export const createFormulaBar = (size) => `
-  <nav id="formula-bar">
+export const createFormulaBar = () => `
+  <header id="formula-bar">
     <input type="button" id="refresh-sheet" value=" = " />
-    <input type="text" id="formula-input" name="f"  width="100%" />
-  </nav>
+    <input type="text" id="formula-input" name="f"  size="100%" />
+  </header>
 `;

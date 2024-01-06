@@ -1,4 +1,8 @@
 {
   "sheetSize": 12,
-  "funcsList": ["SUM", "COUNT", "AVERAGE"]
+  "funcsList": [
+    { "name": "SUM" },
+    { "name": "COUNT" },
+    { "name": "AVERAGE" }
+  ]
 }

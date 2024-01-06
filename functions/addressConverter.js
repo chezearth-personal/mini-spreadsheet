@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+  * Converts a column letter to a column number (zero-based, limits to 100 and positive numbers)
+  */
 function toColNum(address) {
   let col = address
     ? address.toString()
@@ -18,6 +21,9 @@ function toColNum(address) {
     : 0;
 }
 
+/**
+  * Converts a row address to a row number (zero-based, limits to 100 and positive numbers)
+  */
 function toRowNum(address) {
   let row = address ? address.toString().match(/[0-9]/g).join('') : 1;
   return !isNaN(Number(row)) && row > 0
@@ -27,12 +33,29 @@ function toRowNum(address) {
     : 0;
 }
 
+/**
+  * Converts a linear array position to row or column header values
+  */
+export function linearToHeader(pos, size, attribute) {
+  return pos === 0
+    ? attribute === 'id' ? 'address' : ''
+    : pos > 0 && pos <= size
+      ? attribute === 'id' ? toColAddr(pos - 1).toLowerCase() : toColAddr(pos - 1).toUpperCase()
+      : toRowAddr(Math.floor(pos / size) - 1);
+}
+
+/**
+  * Converts a linear array position to cell grid coordinates (zero-based)
+  */
 export function linearToGrid(pos, size) {
   return (pos % (size + 1) - 1).toString()
     + '-'
     + (Math.floor(pos / (size + 1)) - 1).toString();
 }
 
+/**
+  * Converts a coordinate number to a column letter on the grid
+  */
 export function toColAddr(colNum) {
   return colNum > -1
     ? colNum < 100 
@@ -42,6 +65,9 @@ export function toColAddr(colNum) {
     : 'A';
 }
 
+/**
+  * Converts a coordinate number to a row number on the grid
+  */
 export function toRowAddr(rowNum) {
   if (!isNaN(Number(rowNum))) {
     let rowInt = Math.floor(rowNum);
@@ -52,24 +78,34 @@ export function toRowAddr(rowNum) {
   }
 }
 
+/**
+  * Tests for a valid address
+  */
 export function isAddress(address) {
   return !!address
     && address.toString().length > 1
     && /^([A-Z]+)([0-9]+)$/.test(address.toString().toUpperCase());
 }
 
+/**
+  * Tests for valid coordinates
+  */
 export function isCoordinates(coordArr) {
   return Array.isArray(coordArr) && coordArr.length > 1 && !isNaN(coordArr[0]) && !isNaN(coordArr[1]);
 }
 
-/** Converts addresses in the form 'A23' or 'AZ7' to arrays of coordinates, e.g. [1, 23] or [52, 7] */
+/**
+  * Converts addresses in the form 'A23' or 'AZ7' to arrays of coordinates, e.g. [1, 23] or [52, 7]
+  */
 export function toCoords(address) {
   return isAddress(address)
     ? Array.of(toColNum(address), toRowNum(address))
     : [0, 0];
 }
 
-/** Converts a coordinate array e.g. [3, 31], to an alphanumeric address, e.g. 'C31' */
+/**
+  * Converts a coordinate array e.g. [3, 31], to an alphanumeric address, e.g. 'C31'
+  */
 export function toAddress(coordArr) {
   return isCoordinates(coordArr)
     ? (toColAddr(coordArr[0]) + toRowAddr(coordArr[1])).toString()

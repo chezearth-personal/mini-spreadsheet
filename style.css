@@ -43,17 +43,21 @@ h1 {
   text-align: left;
 }
 
-nav {
+
+/** formula-bar */
+header {
   display: flex;
   flex-direction: row;
-  /* flex-basis: left; */
+  flex-wrap: nowrap;
+  align-items: left;
+  justify-content: stretch;
+  position: fixed;
   width: 100%;
-  /* max-width: 100%; */
-  /* min-width: 100%; */
+  max-width: 100%;
+  min-width: 100%;
 }
 
 #refresh-sheet {
-  /* margin-left: 3px; */
   border-radius: 8px;
   border: 1px solid transparent;
   font-size: 0.9em;
@@ -63,16 +67,25 @@ nav {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 #refresh-sheet:hover {
   border-color: #646cff;
 }
+
 #refresh-sheet:focus,
 #refresh-sheet:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.sheet {
+#formula-input {
+  size: 100%;
+}
+
+
+/** Sheet */
+main {
   display: grid;
+  margin-top: 23px;
 }
 
 .grid-header {
