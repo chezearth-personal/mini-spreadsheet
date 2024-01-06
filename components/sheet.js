@@ -11,7 +11,7 @@ function createCells(size) {
   return Array(Math.pow(size + 1, 2))
     .fill(`<input class=`)
     .map((e, i) => i % (size + 1) === 0 || i < size + 2
-      ? `${e}"grid-header" id="${linearToHeader(i, size, id)}" disabled="true" type="text" value="${linearToHeader(i, size, value)}" />`
+      ? `${e}"grid-header" id="${linearToHeader(i, size, id)}" ${i === 0 ? ' autocomplete="none"' : ''} disabled="true" type="text" value="${linearToHeader(i, size, value)}" />`
       : `${e}"cell" id=${linearToGrid(i, size)} type="text" />`
     )
     .join('\n');

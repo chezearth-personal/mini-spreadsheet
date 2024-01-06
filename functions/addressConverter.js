@@ -59,7 +59,7 @@ export function linearToGrid(pos, size) {
 export function toColAddr(colNum) {
   return colNum > -1
     ? colNum < 100 
-      ? (colNum > 26 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : '')
+      ? (colNum > 25 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : '')
         + String.fromCharCode((colNum % 26) + 65)
       : 'CV'
     : 'A';
