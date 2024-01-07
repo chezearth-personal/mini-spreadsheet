@@ -22,4 +22,6 @@
 
 - The overall aim was to keep the app composable and extendable, allowing new functionality to be 'plugged in', rather than requiring new code builds.
 
-  
+## Building and running
+
+To build and run the app locally on your machine, clone this repo and `cd` into the working directory. Then `npm run build` will have Vite install the dependencies and build the code. To run it on your local machine, use `npm run dev`. To run the few tests that have been written, use `npm run test`.
