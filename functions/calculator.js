@@ -115,7 +115,6 @@ const parseRefs = (formula, doc) => {
   */
 export const parseFormula = (formula, doc) => {
   const func = parseFuncs(formula, doc);
-  console.log(func);
   return !func && func !== 0
     ? (formula || '').toString().substring(0, 1) === "="
       ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())

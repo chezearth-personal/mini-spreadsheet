@@ -98,7 +98,7 @@ h1 {
 }
 
 #format-bold {
-  font-weight: bold;
+  font-weight:bold;
 }
 
 #format-underline {
@@ -144,6 +144,10 @@ main {
   border: 0.5px solid #b7b7b7;
   background-color: #f9f9f9;
   text-align: left;
+}
+
+#footer {
+  height: 10ch;
 }
 
 @media (prefers-color-scheme: light) {

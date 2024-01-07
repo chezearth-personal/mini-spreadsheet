@@ -4,7 +4,15 @@ import './style.css';
 import { createFormulaBar, setCoordsArr, getCoordsArr } from "./components/formulaBar";
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
 import { sheetSize } from './config.json';
-import { createStorage, getFormula, saveFormula, refreshSheet } from './controllers/storageManager';
+import { 
+  createStorage,
+  getFormula,
+  getStyling,
+  saveFormula,
+  saveStyling, 
+  refreshSheetFormula,
+  refreshSheetStyling
+} from './controllers/storageManager';
 import { toAddress } from './functions/addressConverter';
 
 /**
@@ -34,7 +42,7 @@ const updateStorage = (event) => {
     ? getCoordsArr()
     : event.target.id.split('-');
   saveFormula(getStorageArr(), coordsArr, event.target.value);
-  refreshSheet(getStorageArr(), document);
+  refreshSheetFormula(getStorageArr(), document);
 }
 
 /**
@@ -78,7 +86,30 @@ const updateCell = (event) => {
 }
 
 const callRefresh = () => {
-  refreshSheet(getStorageArr(), document);
+  refreshSheetFormula(getStorageArr(), document);
+}
+
+const setStyling = (storageArr, style) => {
+  const coordsArr = getCoordsArr();
+  const styling = getStyling(storageArr, coordsArr);
+  const regexp = new RegExp('[' + style[0].toUpperCase() + style[0].toLowerCase() + ']', 'g');
+  const newStyling = styling && regexp.test(styling)
+    ? styling.replaceAll(regexp, '')
+    : !styling ? style[0].toUpperCase() : styling + style[0].toUpperCase();
+  saveStyling(storageArr, coordsArr, newStyling);
+  refreshSheetStyling(storageArr, document);
+}
+
+const setBold = () => {
+  setStyling(storageArr, 'B');
+}
+
+const setItalic = () => {
+  setStyling(storageArr, 'I');
+}
+
+const setUnderline = () => {
+  setStyling(storageArr, 'U');
 }
 
 /**
@@ -91,4 +122,7 @@ sheet.forEach(cell => cell.addEventListener('input', updateFormulaBar));
 sheet.forEach(cell => cell.addEventListener('focus', updateCell));
 document.getElementById('formula-input').addEventListener('input', updateSheet);
 document.getElementById('formula-input').addEventListener('change', updateStorage);
-document.getElementById('refresh-sheet').addEventListener('click', callRefresh);
+document.getElementById('refresh').addEventListener('click', callRefresh);
+document.getElementById('format-bold').addEventListener('click', setBold);
+document.getElementById('format-italic').addEventListener('click', setItalic);
+document.getElementById('format-underline').addEventListener('click', setUnderline);

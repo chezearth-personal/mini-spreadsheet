@@ -13,7 +13,6 @@ const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
   * separate classes
   */
 function createCells(size) {
-  console.log(size);
   return Array(Math.pow(size + 1, 2))
     .fill(`<input class="`)
     .map((e, i) => i < (size + 1)
@@ -89,6 +88,7 @@ export const createSheet = (size) => `
   <main>
     <div id="sheet" style="grid-template-columns:3ch repeat(${size}, 8ch);grid-template-rows:repeat(${size + 1}, 2ch)">
       ${createCells(size)}
+      <div id="footer"></div>
     </div>
   </main>
 `;
