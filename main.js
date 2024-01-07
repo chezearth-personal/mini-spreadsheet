@@ -1,8 +1,8 @@
 'use strict';
 
 import './style.css';
-import { createFormulaBar, setCoordsArr, getCoordsArr } from './components/formulaBar';
-import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
+import { createFormulaBar, setCoordsArr, getCoordsArr } from './components/formulaBar.js';
+import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet.js';
 import { sheetSize } from './config.json';
 import { 
   createStorage,
@@ -12,8 +12,8 @@ import {
   saveStyling, 
   refreshSheetFormula,
   refreshSheetStyling
-} from './controllers/storageManager';
-import { toAddress } from './functions/addressConverter';
+} from './controllers/storageManager.js';
+import { toAddress } from './functions/addressConverter.js';
 
 /**
   * Creates the formula bar and grid on the page, with one additional row and column for the
