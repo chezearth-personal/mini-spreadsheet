@@ -19,7 +19,10 @@ export const setCoordsArr = (coordArr) => {
   */
 export const createFormulaBar = () => `
   <header id="formula-bar">
-    <input type="button" id="refresh-sheet" value=" = " />
+    <input class="button" type="button" id="refresh" value=" = " />
     <input type="text" id="formula-input" name="f"  size="100%" />
+    <input class="button format-button" type="button" id="format-italic" value=" I " />
+    <input class="button format-button" type="button" id="format-bold" value=" B " />
+    <input class="button format-button" type="button" id="format-underline" value=" U " />
   </header>
 `;

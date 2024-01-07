@@ -1,5 +1,5 @@
 {
-  "sheetSize": 100,
+  "sheetSize": 55,
   "funcsList": [
     { "name": "SUM" },
     { "name": "COUNT" },

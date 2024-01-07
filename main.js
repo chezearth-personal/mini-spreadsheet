@@ -5,7 +5,6 @@ import { createFormulaBar, setCoordsArr, getCoordsArr } from "./components/formu
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
 import { sheetSize } from './config.json';
 import { createStorage, getFormula, saveFormula, refreshSheet } from './controllers/storageManager';
-import { parseFormula } from './functions/calculator';
 import { toAddress } from './functions/addressConverter';
 
 /**
@@ -35,7 +34,6 @@ const updateStorage = (event) => {
     ? getCoordsArr()
     : event.target.id.split('-');
   saveFormula(getStorageArr(), coordsArr, event.target.value);
-  // document.getElementById(coordsArr.join('-')).value = parseFormula(event.target.value, document);
   refreshSheet(getStorageArr(), document);
 }
 

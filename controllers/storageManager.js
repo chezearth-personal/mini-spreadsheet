@@ -47,8 +47,6 @@ export const saveFormula = (storage, address, formula) => {
     const col = address[0];
     const row = address[1];
     storage[col][row] = formula;
-    // const result = parseFormula(formula, doc);
-    // return result;
   }
   return formula;
 }

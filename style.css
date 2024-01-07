@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* color-scheme: light dark; */
+  /** color-scheme: light dark; */
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -39,13 +39,14 @@ h1 {
 #app {
   max-width: 100%;
   margin: 0 0;
-  padding: 0.25rem;
+  padding: 0 0 0 0;
   text-align: left;
 }
 
 
 /** formula-bar */
-header {
+
+#formula-bar {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -55,49 +56,93 @@ header {
   width: 100%;
   max-width: 100%;
   min-width: 100%;
+  background-color: #242424;
+  z-index: 3;
 }
 
-#refresh-sheet {
-  border-radius: 8px;
-  border: 1px solid transparent;
+.button {
+  border-radius: 5px;
   font-size: 0.9em;
   font-weight: 500;
+}
+
+#refresh {
+  border: 1px solid transparent;
   font-family: inherit;
   background-color: #7a7a7a;
   cursor: pointer;
   transition: border-color 0.25s;
+  z-index: 5;
 }
 
-#refresh-sheet:hover {
+#refresh:hover {
   border-color: #646cff;
 }
 
-#refresh-sheet:focus,
-#refresh-sheet:focus-visible {
+#refresh:focus,
+#refresh:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
 #formula-input {
   size: 100%;
+  z-index: 4;
 }
 
+.format-button {
+  font-family: 'Times New Roman', Times, serif;
+}
+
+#format-italic {
+  font-style: italic;
+}
+
+#format-bold {
+  font-weight: bold;
+}
+
+#format-underline {
+  text-decoration-line: underline;
+}
 
 /** Sheet */
+
 main {
-  display: grid;
   margin-top: 23px;
 }
 
-.grid-header {
-  background-color: lightgrey;
-  size: 5;
-  text-align: center;
+#sheet {
+  display: grid;
+  overflow: scroll;
+  max-height: 100vh;
 }
 
+.col-header {
+  background-color: #eee;
+  text-align: center;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  &:first-of-type {
+    z-index: 2;
+    left: 0;
+  }
+}
+
+.row-header {
+  background-color: #eee;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+
 .cell {
-  border: 1px solid #545454;
+  border: 0.5px solid #b7b7b7;
   background-color: #f9f9f9;
-  size: 8;
   text-align: left;
 }
 
@@ -109,7 +154,7 @@ main {
   a:hover {
     color: #747bff;
   }
-  #refresh-sheet {
+  #refresh {
     background-color: #f9f9f9;
   }
 }
