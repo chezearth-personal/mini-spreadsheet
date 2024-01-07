@@ -77,7 +77,7 @@ describe('Test: addressConverter.js', () => {
       });
     });
   });
-  describe('It should convert addresses to array coordinates (numbered from 1, column and row 0 for the headings', () => {
+  describe('It should convert addresses to array coordinates (numbered from 0)', () => {
     describe('Bad addresses should default to [1, 1] (\'A1\')', () => {
       describe('Null, undefined and empty addresses should go to [0, 0] (\'A1\')', () => {
         it('should convert undefined to [0, 0]', () => {
@@ -104,15 +104,15 @@ describe('Test: addressConverter.js', () => {
         });
       });
     });
-    describe('Addresses that are out of range must betruncated to 100', () => {
+    describe('Addresses that are out of range must betruncated to 702', () => {
       describe('When the column characters are too big, the first element must be 100', () => {
-        it('should set the maximum column to 100, i.e. \'DX\' -> 100, not 128', () => {
-          expect(toCoords('DX29')).to.have.ordered.members([100, 28]);
+        it('should set the maximum column to 702, i.e. \'AAA\' -> 702, not 703', () => {
+          expect(toCoords('AAA29')).to.have.ordered.members([702, 28]);
         });
       });
-      describe('When the row number is too big, the second element must be 100', () => {
-        it('should set the maximum row to 100, i.e. \'CM329\' -> [91, 100]', () => {
-          expect(toCoords('CM329')).to.have.ordered.members([90, 100]);
+      describe('When the row number is too big, the second element must be 702', () => {
+        it('should set the maximum row to 702, i.e. \'CM829\' -> [91, 702]', () => {
+          expect(toCoords('CM829')).to.have.ordered.members([90, 702]);
         });
       });
     });
@@ -133,15 +133,15 @@ describe('Test: addressConverter.js', () => {
     });
   });
   describe('It should convert array coordinates to an Excel alphanumeric address', () => {
-    describe('Coordinates that are out of range should be trancated to \'CV\' and 100', () => {
-      describe('Coordinates with large column numbers must be limited to \'CV\'', () => {
-        it('should truncate large column numbers over 100 to \'CV\'', () => {
-          expect(toAddress([137, 42])).to.equal('CV43');
+    describe('Coordinates that are out of range should be trancated to \'ZZ\' and 702', () => {
+      describe('Coordinates with large column numbers must be limited to \'ZZ\'', () => {
+        it('should truncate large column numbers over 1000 to \'ZZ\'', () => {
+          expect(toAddress([1037, 42])).to.equal('ZZ43');
         });
       });
-      describe('Coordinates with large row numbers must be limited to 100', () => {
-        it('should truncate large row numbers over 100 to 100', () => {
-          expect(toAddress([90, 714])).to.equal('CM100');
+      describe('Coordinates with large row numbers must be limited to 702', () => {
+        it('should truncate large row numbers over 702 to 702', () => {
+          expect(toAddress([90, 714])).to.equal('CM702');
         });
       });
     });

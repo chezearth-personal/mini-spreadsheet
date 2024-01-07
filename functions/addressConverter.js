@@ -30,9 +30,9 @@ function toColNum(address) {
 function toRowNum(address) {
   let row = address ? address.toString().match(/[0-9]/g).join('') : 1;
   return !isNaN(Number(row)) && row > 0
-    ? Number(row) < maxRows() + 1
+    ? Number(row) < Math.min(maxColumns(), maxRows()) + 1
       ? Number(row) - 1
-      : maxRows()
+      : Math.min(maxColumns(), maxRows())
     : 0;
 }
 
@@ -58,7 +58,7 @@ export const linearToGrid = (pos, size) => ((pos) % (size + 1) - 1).toString()
   * Converts a coordinate number to a column letter on the grid
   */
 export const toColAddr = (colNum) => colNum > -1
-    ? colNum < maxColumns()
+    ? colNum < Math.min(maxColumns(), maxRows())
       ? (colNum > 25 ? String.fromCharCode(Math.floor(colNum / 26) + 64) : '')
         + String.fromCharCode((colNum % 26) + 65)
       : 'ZZ'
@@ -71,7 +71,7 @@ export const toRowAddr = (rowNum) => {
   if (!isNaN(Number(rowNum))) {
     const rowInt = Math.floor(rowNum);
     if (rowInt > 0) {
-      return rowInt < maxRows() ? (rowInt + 1).toString() : maxRows().toString();
+      return rowInt < Math.min(maxColumns(), maxRows()) ? (rowInt + 1).toString() : Math.min(maxColumns(), maxRows()).toString();
     }
     return '1';
   }
