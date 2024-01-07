@@ -1,7 +1,7 @@
 'use strict';
 
 import './style.css';
-import { createFormulaBar, setCoordsArr, getCoordsArr } from "./components/formulaBar";
+import { createFormulaBar, setCoordsArr, getCoordsArr } from './components/formulaBar';
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet';
 import { sheetSize } from './config.json';
 import { 
