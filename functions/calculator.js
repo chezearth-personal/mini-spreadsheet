@@ -1,7 +1,7 @@
 'use strict';
 
 import { toCoords } from './addressConverter.js';
-import { funcsList } from '../config.json';
+import { funcsList } from '../config.json' with { type: 'json' };
 
 const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
 
