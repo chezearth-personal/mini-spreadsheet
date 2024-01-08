@@ -24,5 +24,6 @@ export const createFormulaBar = () => `
     <input class="button format-button" type="button" id="format-bold" value=" B " />
     <input class="button format-button" type="button" id="format-italic" value=" I " />
     <input class="button format-button" type="button" id="format-underline" value="U" />
+    <p class="author">© Charles Rethman</p>
   </header>
 `;
