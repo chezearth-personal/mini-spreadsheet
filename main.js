@@ -3,7 +3,7 @@
 import './style.css';
 import { createFormulaBar, setCoordsArr, getCoordsArr } from './components/formulaBar.js';
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet.js';
-import { sheetSize } from './config.json' with { type: 'json' };
+import { sheetSize } from './config.json' assert { type: 'json' };
 import { 
   createStorage,
   getFormula,
