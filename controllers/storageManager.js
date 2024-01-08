@@ -1,6 +1,6 @@
 'use strict';
 
-import { parseFormula } from "../functions/calculator";
+import { parseFormula } from "../functions/calculator.js";
 
 /**
   * Test a coordinate array to make sure it exists and is an array and has a length
