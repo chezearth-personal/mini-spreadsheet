@@ -10,7 +10,11 @@
     "test:vitest": "vitest --coverage",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "http-server ./"
+  },
+  "dependencies": {
+    "http-server": "^14.1"
   },
   "devDependencies": {
     "chai": "^4.3.10",

@@ -1,5 +1,5 @@
-export const sheetSize = 100;
-export const funcsList = [
+const sheetSize = 100;
+const funcsList = [
   { name: 'SUM' },
   { name: 'COUNT' },
   { name: 'AVERAGE' }
