@@ -1,6 +1,6 @@
 'use strict';
 
-import './style.css' assert {type: 'css' };
+// import './style.css' assert {type: 'css' };
 import { createFormulaBar, setCoordsArr, getCoordsArr } from './components/formulaBar.js';
 import { createSheet, newArray, navDown, navUp, navRight, navLeft } from './components/sheet.js';
 import { sheetSize } from './config.js';
