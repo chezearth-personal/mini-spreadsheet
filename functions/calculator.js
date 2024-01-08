@@ -76,7 +76,7 @@ const parametersHandler = (formulaFunc, func, doc) => {
 const funcRegexp = (f) => new RegExp(`${f.toUpperCase()}\(.+\)`, 'g');
 
 /**
-  * Loops through the list of functions in config.json and tests the formula for each
+  * Loops through the list of functions in config.js and tests the formula for each
   * listed function. If the function is found, then it calls the function's parameters
   * handler
   */
