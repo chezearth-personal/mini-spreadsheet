@@ -1,8 +1,6 @@
-export const configs = {
-  sheetSize: 100,
-  funcsList: [
-    { name: 'SUM' },
-    { name: 'COUNT' },
-    { name: 'AVERAGE' }
-  ]
-};
+export const sheetSize = 100;
+export const funcsList = [
+  { name: 'SUM' },
+  { name: 'COUNT' },
+  { name: 'AVERAGE' }
+];
