@@ -1,6 +1,6 @@
 'use strict';
 
-import { linearToColHeader, linearToRowHeader, linearToGrid } from '../functions/addressConverter';
+import { linearToColHeader, linearToRowHeader, linearToGrid } from '../functions/addressConverter.js';
 
 const getId = () => 'id';
 
