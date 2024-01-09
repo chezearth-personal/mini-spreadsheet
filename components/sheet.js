@@ -88,7 +88,6 @@ export const createSheet = (size) => `
   <main>
     <div id="sheet" style="grid-template-columns:3ch repeat(${size}, 8ch);grid-template-rows:repeat(${size + 1}, 2ch)">
       ${createCells(size)}
-      <div id="footer"></div>
     </div>
   </main>
 `;

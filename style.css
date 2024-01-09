@@ -23,18 +23,14 @@ a:hover {
 }
 
 body {
-  margin: 0 0 0 0;
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
+  margin: 0 0 0 0;
   min-width: 100vw;
-  min-height: 100vh;
+  height: fit-content;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
 
 #app {
   max-width: 100%;
@@ -49,15 +45,19 @@ h1 {
 header {
   display: flex;
   flex-flow: row nowrap;
+  flex-grow: 0;
   align-items: left;
   justify-content: flex-start;
   position: fixed;
+  height: 2ch;
   width: 100vw;
   background-color: #242424;
   z-index: 3;
 }
 
 .button {
+  flex-grow: 0;
+  height: 23px;
   border-radius: 5px;
   font-size: 0.9em;
   font-weight: 500;
@@ -70,13 +70,13 @@ header {
 
 #refresh {
   font-family: inherit;
-  flex-grow: 0;
   z-index: 5;
 }
 
 #formula-input {
-  width: 20ch;
   flex-grow: 5;
+  height: 2ch;
+  width: 20ch;
   z-index: 4;
 }
 
@@ -86,17 +86,14 @@ header {
 
 #format-italic {
   font-style: italic;
-  flex-grow: 0;
 }
 
 #format-bold {
   font-weight:bold;
-  flex-grow: 0;
 }
 
 #format-underline {
   text-decoration-line: underline;
-  flex-grow: 0;
 }
 
 .author {
@@ -123,8 +120,8 @@ main {
 .col-header {
   background-color: #eee;
   text-align: center;
-  position: -webkit-sticky;
   position: sticky;
+  position: -webkit-sticky;
   top: 0;
   z-index: 1;
 
@@ -138,6 +135,7 @@ main {
   background-color: #eee;
   text-align: center;
   position: sticky;
+  position: -webkit-sticky;
   left: 0;
   z-index: 1;
 }
@@ -149,9 +147,6 @@ main {
   text-align: left;
 }
 
-#footer {
-  height: 10ch;
-}
 
 @media (prefers-color-scheme: light) {
   :root {
