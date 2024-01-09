@@ -44,6 +44,7 @@ export const refreshSheetFormula = (storageArr, doc) => {
           colArr.forEach((cell, j) => {
             if (cell[0]) {
               const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
+              cellSheet.value = '';
               cellSheet.value = parseFormula(cell[0], doc);
             }
           });
