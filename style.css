@@ -103,7 +103,7 @@ header {
   font-size: 0.7em;
   text-wrap: nowrap;
   text-align: right;
-  margin: 0 2ch 0 5ch;
+  margin: 0 2ch 0 0;
 }
 
 /** Sheet */
