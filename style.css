@@ -62,29 +62,19 @@ header {
   font-size: 0.9em;
   font-weight: 500;
   text-align: center;
-  /* cursor: pointer; */
 }
 
 .button:hover {
-  /* border-color: #646cff; */
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* .button:focus, */
-/* .button:focus-visible { */
-/* } */
-
 #refresh {
-  /* border: 1px solid transparent; */
   font-family: inherit;
-  /* background-color: #7a7a7a; */
-  /* transition: border-color 0.25s; */
   flex-grow: 0;
   z-index: 5;
 }
 
 #formula-input {
-  /* size: 100%; */
   width: 20ch;
   flex-grow: 5;
   z-index: 4;
