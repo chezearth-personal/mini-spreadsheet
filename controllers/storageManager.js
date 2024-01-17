@@ -34,6 +34,17 @@ function setStyling(styling, elem) {
 }
 
 /**
+  * Sets up the alignment based on whether the data are text or numbers
+  */
+function setAlignment(elem, formula) {
+  if (/^[0-9]+$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
+    elem.style.textAlign = 'right';
+  } else {
+    elem.style.textAlign = 'left';
+  }
+}
+
+/**
   * Refresh the entire sheet's formulae
   */
 export const refreshSheetFormula = (storageArr, doc) => {
@@ -45,7 +56,8 @@ export const refreshSheetFormula = (storageArr, doc) => {
             if (cell[0]) {
               const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
               cellSheet.value = '';
-              cellSheet.value = parseFormula(cell[0], doc);
+              cellSheet.value = parseFormula(cell[0], doc, storageArr);
+              setAlignment(cellSheet, cell[0]);
             }
           });
         }

@@ -17,11 +17,12 @@ const count = (paramsArr, doc) => {
     .length;
 }
 
-const sum = (paramsArr, doc) => {
+const sum = (paramsArr, doc, storageArr) => {
   return Array.isArray(paramsArr) && paramsArr
     .reduce((r, param) => {
       const cellValue = Array.isArray(param) ? doc.getElementById(param.join('-')).value : param;
-      return r + (isNaN(Number(cellValue)) ? cellValue : Number(cellValue));
+      const cellFormula = Array.isArray(param) ? storageArr[param[0]][param[1]][0]: param;
+      return isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
     }, 0);
 }
 
@@ -45,14 +46,14 @@ const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,
 /**
   * Based on the function name, executes the required calculation function
   */
-const functionHandler = (paramsArr, func, doc) => {
+const functionHandler = (paramsArr, func, doc, storageArr) => {
   if (Array.isArray(paramsArr)) {
     if (func.name === 'AVERAGE') {
       return average(paramsArr, doc);
     } else if (func.name === 'COUNT') {
       return count(paramsArr, doc);
     } else {
-      return sum(paramsArr, doc);
+      return sum(paramsArr, doc, storageArr);
     }
   }
   return '!#REF';
@@ -90,13 +91,13 @@ const paramsListHandler = (paramsList) => {
   * and calls the appropriate processing function to obtain an array of rwo-column
   * coordinates
   */
-const functionParametersHandler = (formula, func, doc) => {
+const functionParametersHandler = (formula, func, doc, storageArr) => {
   const parameters = formula.match(/\(.+\)/g)[0].slice(1, -1);
   const resolvedParameters = containsFunction(parameters)
     ? parseBuiltInFunctions(parameters, doc)
     : parameters;
   const paramsArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
-  return functionHandler(paramsArr, func, doc);
+  return functionHandler(paramsArr, func, doc, storageArr);
 }
 
 /**
@@ -104,11 +105,11 @@ const functionParametersHandler = (formula, func, doc) => {
   * each listed function. If the function is found, then it calls the function's parameters
   * handler
   */
-const parseBuiltInFunctions = (formula, doc) => {
+const parseBuiltInFunctions = (formula, doc, storageArr) => {
   return containsFunction(formula)
     ? builtInFunctionsArr.reduce((result, func) => {
         const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
-          const range = functionParametersHandler(match, func, doc);
+          const range = functionParametersHandler(match, func, doc, storageArr);
           return range.toString();
         });
         return newFormula;
@@ -136,8 +137,12 @@ const parseReferences = (formula, doc) => {
   *   formula: string
   *   doc: DOM document object
   */
-export const parseFormula = (formula, doc) => {
-  const functionResult = parseBuiltInFunctions(formula, doc);
+export const parseFormula = (formula, doc, storageArr) => {
+  /** Treat anything after `'` as plain text */
+  if (formula.substring(0, 1) === `'`) {
+    return formula.substring(1);
+  }
+  const functionResult = parseBuiltInFunctions(formula, doc, storageArr);
   if (!functionResult && functionResult !== 0) {
     return (formula || '').toString().substring(0, 1) === '='
       ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())
@@ -145,7 +150,7 @@ export const parseFormula = (formula, doc) => {
         : calcFormula(parseReferences(formula.toString().substring(1), doc))
       : (formula || '' || formula === 0 ? formula : '').toString();
   }
-  const newFunctionResult = parseFormula(functionResult, doc);
+  const newFunctionResult = parseFormula(functionResult, doc, storageArr);
   return newFunctionResult.toString().substring(0, 1) === '='
     ? newFunctionResult.toString().substring(1)
     : newFunctionResult.toString();
