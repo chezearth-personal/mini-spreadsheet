@@ -34,41 +34,10 @@ function setStyling(styling, elem) {
 }
 
 /**
-  * Sets up the alignment based on whether the data are text or numbers
+  * Create a 3-dimensional storage array (columns x rows x fomulae | formatting)
   */
-function setAlignment(elem, formula) {
-  if (/^[0-9]+$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
-    elem.style.textAlign = 'right';
-  } else {
-    elem.style.textAlign = 'left';
-  }
-}
-
-/**
-  * Refresh the entire sheet's formulae
-  */
-export const refreshSheetFormula = (storageArr, doc) => {
-  try {
-    if (storageArr && Array.isArray(storageArr) && doc) {
-      storageArr.forEach((colArr, i) => {
-        if (colArr && Array.isArray(colArr)) {
-          colArr.forEach((cell, j) => {
-            if (cell[0]) {
-              const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
-              cellSheet.value = '';
-              cellSheet.value = parseFormula(cell[0], doc, storageArr);
-              setAlignment(cellSheet, cell[0]);
-            }
-          });
-        }
-      });
-    }
-    return -1;
-  } catch (e) {
-    console.log(e);
-    return 0;
-  }
-}
+export const createStorageArr = (size) => Array
+  .from(Array(size), () => Array.from(Array(size), () => new Array(2)));
 
 /**
   * Refresh the entire sheet's formatting
@@ -92,18 +61,12 @@ export const refreshSheetStyling = (storageArr, doc) => {
 }
 
 /**
-  * Create a 3-dimensional storage array (columns x rows x fomulae | formatting)
-  */
-export const createStorage = (size) => Array
-  .from(Array(size), () => Array.from(Array(size), () => new Array(2)));
-
-/**
   * Get a formula from the storage at a particular address
   */
-export const getFormula = (storageArr, coordsArr) => {
-  if (testArray(coordsArr)) {
-    const col = coordsArr[0];
-    const row = coordsArr[1];
+export const getFormula = (storageArr, cellCoordinatesArr) => {
+  if (testArray(cellCoordinatesArr)) {
+    const col = cellCoordinatesArr[0];
+    const row = cellCoordinatesArr[1];
     return storageArr[col][row][0];
   }
   return ''
@@ -124,10 +87,10 @@ export const getStyling = (storageArr, coordsArr) => {
 /**
   * Set a formula for the storage at a particular address
   */
-export const saveFormula = (storageArr, coordsArr, formula) => {
-  if (testArray(coordsArr) && storageArr) {
-    const col = coordsArr[0];
-    const row = coordsArr[1];
+export const saveFormula = (storageArr, cellCoordinatesArr, formula) => {
+  if (testArray(cellCoordinatesArr) && storageArr) {
+    const col = cellCoordinatesArr[0];
+    const row = cellCoordinatesArr[1];
     storageArr[col][row][0] = formula;
   }
   return formula;
@@ -136,10 +99,10 @@ export const saveFormula = (storageArr, coordsArr, formula) => {
 /**
   * Set a format string for the storage at a particular address
   */
-export const saveStyling = (storageArr, coordsArr, styling) => {
-  if (testArray(coordsArr) && storageArr) {
-    const col = coordsArr[0];
-    const row = coordsArr[1];
+export const saveStyling = (storageArr, cellCoordinatesArr, styling) => {
+  if (testArray(cellCoordinatesArr) && storageArr) {
+    const col = cellCoordinatesArr[0];
+    const row = cellCoordinatesArr[1];
     storageArr[col][row][1] = styling;
   }
   return styling;

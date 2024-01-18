@@ -22,7 +22,7 @@ const sum = (paramsArr, doc, storageArr) => {
     .reduce((r, param) => {
       const cellValue = Array.isArray(param) ? doc.getElementById(param.join('-')).value : param;
       const cellFormula = Array.isArray(param) ? storageArr[param[0]][param[1]][0]: param;
-      return isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
+      return !cellValue || isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
     }, 0);
 }
 
