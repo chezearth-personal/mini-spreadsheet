@@ -46,7 +46,7 @@ function arrayTest(arr) {
   * Sets up the alignment based on whether the data are text or numbers
   */
 function setAlignment(elem, formula) {
-  if (/^[0-9]+$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
+  if (/^[\-0-9]+$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
     elem.style.textAlign = 'right';
   } else {
     elem.style.textAlign = 'left';
@@ -55,11 +55,9 @@ function setAlignment(elem, formula) {
 
 function setBorderFocusRing(elem, selectCell) {
   if (selectCell) {
-    // elem.style.borderColor = '#2361C5';
     elem.style.border = 'solid 2px #2361C5';
   } else {
     elem.style.border = 'solid 0.5px #b7b7b7';
-    // elem.style.border = '0.5px';
   }
 }
 /**
