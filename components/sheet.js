@@ -3,7 +3,7 @@
 import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray } from './formulaBar.js';
-import { linearToColHeader, linearToRowHeader, linearToGrid } from '../functions/addressConverter.js';
+import { linearToColHeader, linearToRowHeader, linearToGrid, toAddress, toCoords } from '../functions/addressConverter.js';
 import { parseFormula } from '../functions/calculator.js';
 import { saveFormula, getStyling, saveStyling, refreshSheetStyling } from '../controllers/storageManager.js';
 
@@ -22,14 +22,14 @@ const newArray = (arr) => Array.of(arr[0], arr[1]);
   * Creates the grid cells, with the header row and header columns identified in
   * separate classes
   */
-function createCells(size) {
-  return Array(Math.pow(size + 1, 2))
+function createCells(columns, rows) {
+  return Array((columns + 1) * (rows + 1))
     .fill(`<input class="`)
-    .map((e, i) => i < (size + 1)
+    .map((e, i) => i < (columns + 1)
       ? `${e}col-header" id="${linearToColHeader(i, getId())}"${getAutocomplete(i)} disabled="true" type="text" value="${linearToColHeader(i, getValue())}" />`
-      : i % (size + 1) === 0
-        ? `${e}row-header" id="${linearToRowHeader(i, size)}" disabled="true" type="text" value="${linearToRowHeader(i, size)}" />`
-        : `${e}cell" id=${linearToGrid(i, size)} type="text" />`)
+      : i % (columns + 1) === 0
+        ? `${e}row-header" id="${linearToRowHeader(i, columns)}" disabled="true" type="text" value="${linearToRowHeader(i, columns)}" />`
+        : `${e}cell" id=${linearToGrid(i, columns)} type="text" />`)
     .join('\n');
 }
 
@@ -53,6 +53,15 @@ function setAlignment(elem, formula) {
   }
 }
 
+function setBorderFocusRing(elem, selectCell) {
+  if (selectCell) {
+    // elem.style.borderColor = '#2361C5';
+    elem.style.border = 'solid 2px #2361C5';
+  } else {
+    elem.style.border = 'solid 0.5px #b7b7b7';
+    // elem.style.border = '0.5px';
+  }
+}
 /**
   * Increment the rows coordinate if not at the limit
   */
@@ -74,38 +83,20 @@ const navUp = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
 /**
   * Increment the columns coordinate if not at the limit
   */
-const navRight = (coordsArr, limit) => arrayTest(coordsArr)
-  ? Number(coordsArr[0]) < limit - 1
-    ? Array.of((Number(coordsArr[0]) + 1).toString(), coordsArr[1])
-    : newArray(coordsArr)
+const navRight = (cellCoordinatesArr, limit) => arrayTest(cellCoordinatesArr)
+  ? Number(cellCoordinatesArr[0]) < limit - 1
+    ? Array.of((Number(cellCoordinatesArr[0]) + 1).toString(), cellCoordinatesArr[1])
+    : newArray(cellCoordinatesArr)
   : zeroArray();
 
 /**
   * Decrement the columns coordinate if above zero
   */
-const navLeft = (coordsArr) => arrayTest(coordsArr)
-  ? Number(coordsArr[0]) > 0
-    ? Array.of((Number(coordsArr[0]) - 1).toString(), coordsArr[1])
-    : newArray(coordsArr)
+const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
+  ? Number(cellCoordinatesArr[0]) > 0
+    ? Array.of((Number(cellCoordinatesArr[0]) - 1).toString(), cellCoordinatesArr[1])
+    : newArray(cellCoordinatesArr)
   : zeroArray();
-
-/**
-  * Choose navigation depending on the input
-  */
-export const navigate = (event) => {
-  const oldCoordsArr = event.target.id.split('-');
-  const newCoordsArr = event.code === 'Enter' || (event.code === 'ArrowDown' && !event.target.value)
-    ? navDown(oldCoordsArr, sheetSize)
-    : event.code === 'ArrowUp' && !event.target.value
-      ? navUp(oldCoordsArr)
-      : event.code === 'ArrowRight' && !event.target.value
-        ? navRight(oldCoordsArr, sheetSize)
-        : event.code === 'ArrowLeft' && !event.target.value
-          ? navLeft(oldCoordsArr)
-          : newArray(oldCoordsArr);
-  const toId = newCoordsArr.join('-');
-  getParentDocument(event).getElementById(toId).focus();
-}
 
 /**
   * Refresh the entire sheet's formulae
@@ -132,6 +123,50 @@ const refreshSheetValues = (storageArr, doc) => {
     return 0;
   }
 }
+
+const getAddress = (event) => toCoords(getParentDocument(event).getElementById('address').value);
+
+export const clickCell = (event) => {
+  event.target.blur();
+  getParentDocument(event).querySelectorAll('input.cell').forEach(cell => setBorderFocusRing(cell, false));
+  getParentDocument(event).getElementById('address').value = toAddress(event.target.id.split('-'));
+  setBorderFocusRing(event.target, true);
+}
+
+/**
+  * Choose navigation depending on the input
+  */
+export const navigate = (event) => {
+  // const oldCellCoordinatesArr = event.target.id.split('-');
+  const oldCellCoordinatesArr = getAddress(event);
+  console.log(oldCellCoordinatesArr);
+  // const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
+  if (event.code === 'DoubleClick') {
+    comsole.log('\'DoubleClick\' pressed.');
+    setFocus(event);
+  } else {
+  // const newCellCoordinatesArr = event.code === 'Click'
+  const newCellCoordinatesArr = event.code === 'Enter' || (event.code === 'ArrowDown' && !event.target.value)
+      ? navDown(oldCellCoordinatesArr, sheetSize.rows)
+      : event.code === 'ArrowUp' && !event.target.value
+        ? navUp(oldCellCoordinatesArr)
+        : event.code === 'ArrowRight' && !event.target.value
+          ? navRight(oldCellCoordinatesArr, sheetSize.columns)
+          : event.code === 'ArrowLeft' && !event.target.value
+            ? navLeft(oldCellCoordinatesArr)
+            : newArray(oldCellCoordinatesArr);
+  console.log(newCellCoordinatesArr);
+  const toId = newCellCoordinatesArr.join('-');
+  console.log(toId);
+  getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
+  setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
+  getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
+  event.target.blur();
+  }
+  // getParentDocument(event).getElementById(toId).focus();
+}
+
+export const setFocus = (event) => event.target.focus();
 
 /**
   * Updates the cell value
@@ -168,10 +203,11 @@ export const setStyling = (storageArr, style, doc) => {
 /**
   * Create the grid DOM elements
   */
-export const createSheet = (size) => `
+export const createSheet = () => `
   <main>
-    <div id="sheet" style="grid-template-columns:3ch repeat(${size}, 8ch);grid-template-rows:repeat(${size + 1}, 2ch)">
-      ${createCells(size)}
+    <div id="sheet"
+      style="grid-template-columns:${sheetSize.cells.rowHeaderWidth} repeat(${sheetSize.columns}, ${sheetSize.cells.width});grid-template-rows:repeat(${sheetSize.rows + 1}, 2ch)">
+      ${createCells(sheetSize.columns, sheetSize.rows)}
     </div>
   </main>
 `;

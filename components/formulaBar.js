@@ -22,6 +22,7 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
   * Update the formula bar with the most recent formula edits from the cells
   */
 export const refreshFormulaBar = (event, storageArr) => {
+  // console.log(storageArr, event.target.id, event.target.id.split['-']);
   const formula = getFormula(storageArr, event.target.id.split('-'));
   setCellCoordinatesArr(event.target.id.split('-'));
   getParentDocument(event).getElementById('formula-input').value = (

@@ -45,14 +45,14 @@ export const linearToColHeader = (pos, attribute) => pos === 0
 
 /**
   */
-export const linearToRowHeader = (pos, size) => toRowAddr(Math.floor(pos / (size + 1)) - 1);
+export const linearToRowHeader = (pos, columns) => toRowAddr(Math.floor(pos / (columns + 1)) - 1);
 
 /**
   * Converts a linear array position to cell grid coordinates (zero-based)
   */
-export const linearToGrid = (pos, size) => ((pos) % (size + 1) - 1).toString()
-    + '-'
-    + (Math.floor((pos) / (size + 1)) - 1).toString();
+export const linearToGrid = (pos, columns) => (pos % (columns + 1) - 1).toString()
+  + '-'
+  + (Math.floor(pos / (columns + 1) - 1)).toString();
 
 /**
   * Converts a coordinate number to a column letter on the grid

@@ -36,8 +36,8 @@ function setStyling(styling, elem) {
 /**
   * Create a 3-dimensional storage array (columns x rows x fomulae | formatting)
   */
-export const createStorageArr = (size) => Array
-  .from(Array(size), () => Array.from(Array(size), () => new Array(2)));
+export const createStorageArr = (columns, rows) => Array
+  .from(Array(columns), () => Array.from(Array(rows), () => new Array(2)));
 
 /**
   * Refresh the entire sheet's formatting
@@ -75,10 +75,10 @@ export const getFormula = (storageArr, cellCoordinatesArr) => {
 /**
   * Get a format string from the storage at a particular address
   */
-export const getStyling = (storageArr, coordsArr) => {
-  if (testArray(coordsArr)) {
-    const col = coordsArr[0];
-    const row = coordsArr[1];
+export const getStyling = (storageArr, cellCoordinatesArr) => {
+  if (testArray(cellCoordinatesArr)) {
+    const col = cellCoordinatesArr[0];
+    const row = cellCoordinatesArr[1];
     return storageArr[col][row][1];
   }
   return '';
