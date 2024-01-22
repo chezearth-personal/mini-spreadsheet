@@ -67,7 +67,7 @@ function setBorderFocusRing(elem, selectCell) {
   */
 const navDown = (cellCoordinatesArr, limit) => arrayTest(cellCoordinatesArr)
   ? Number(cellCoordinatesArr[1]) < limit - 1
-    ? Array.of(cellCoordinatesArr[0], (Number(cellCoordinatesArr[1]) + 1).toString())
+    ? Array.of(cellCoordinatesArr[0], (Number(cellCoordinatesArr[1]) + 1))
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
@@ -76,7 +76,7 @@ const navDown = (cellCoordinatesArr, limit) => arrayTest(cellCoordinatesArr)
   */
 const navUp = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
   ? Number(cellCoordinatesArr[1]) > 0
-    ? Array.of(cellCoordinatesArr[0], (Number(cellCoordinatesArr[1]) - 1).toString())
+    ? Array.of(cellCoordinatesArr[0], (Number(cellCoordinatesArr[1]) - 1))
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
@@ -85,7 +85,7 @@ const navUp = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
   */
 const navRight = (cellCoordinatesArr, limit) => arrayTest(cellCoordinatesArr)
   ? Number(cellCoordinatesArr[0]) < limit - 1
-    ? Array.of((Number(cellCoordinatesArr[0]) + 1).toString(), cellCoordinatesArr[1])
+    ? Array.of((Number(cellCoordinatesArr[0]) + 1), cellCoordinatesArr[1])
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
@@ -94,7 +94,7 @@ const navRight = (cellCoordinatesArr, limit) => arrayTest(cellCoordinatesArr)
   */
 const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
   ? Number(cellCoordinatesArr[0]) > 0
-    ? Array.of((Number(cellCoordinatesArr[0]) - 1).toString(), cellCoordinatesArr[1])
+    ? Array.of((Number(cellCoordinatesArr[0]) - 1), cellCoordinatesArr[1])
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
@@ -139,31 +139,39 @@ export const clickCell = (event) => {
 export const navigate = (event) => {
   // const oldCellCoordinatesArr = event.target.id.split('-');
   const oldCellCoordinatesArr = getAddress(event);
-  console.log(oldCellCoordinatesArr);
   // const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
+  if (event.code === 'Tab' || event.code === 'ShiftLeft') { event.preventDefault(); }
+  console.log(oldCellCoordinatesArr);
+  // const newCellCoordinatesArr;
   if (event.code === 'DoubleClick') {
-    comsole.log('\'DoubleClick\' pressed.');
+    console.log('\'DoubleClick\' pressed.');
     setFocus(event);
-  } else {
-  // const newCellCoordinatesArr = event.code === 'Click'
-  const newCellCoordinatesArr = event.code === 'Enter' || (event.code === 'ArrowDown' && !event.target.value)
-      ? navDown(oldCellCoordinatesArr, sheetSize.rows)
-      : event.code === 'ArrowUp' && !event.target.value
-        ? navUp(oldCellCoordinatesArr)
-        : event.code === 'ArrowRight' && !event.target.value
+  } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
+    console.log(event);
+    console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
+    const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
+      ? navUp(oldCellCoordinatesArr)
+      : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
+        ? navLeft(oldCellCoordinatesArr)
+        : event.code === 'ArrowRight' || event.code === 'Tab'
           ? navRight(oldCellCoordinatesArr, sheetSize.columns)
-          : event.code === 'ArrowLeft' && !event.target.value
-            ? navLeft(oldCellCoordinatesArr)
-            : newArray(oldCellCoordinatesArr);
-  console.log(newCellCoordinatesArr);
-  const toId = newCellCoordinatesArr.join('-');
-  console.log(toId);
-  getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
-  setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
-  getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
-  event.target.blur();
-  }
+          : navDown(oldCellCoordinatesArr, sheetSize.rows);
+    console.log(newCellCoordinatesArr);
+    const toId = newCellCoordinatesArr.join('-');
+    // console.log(toId);
+    getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
+    setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
+    getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
+    event.target.blur();
   // getParentDocument(event).getElementById(toId).focus();
+  } else {
+    // console.log(event.target);
+    console.log(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    const elem = getParentDocument(event)
+      .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
+    elem.focus();
+  }
 }
 
 export const setFocus = (event) => event.target.focus();
