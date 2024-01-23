@@ -1,7 +1,7 @@
 'use strict';
 
 import { createFormulaBar, refreshFormulaBar } from './components/formulaBar.js';
-import { createSheet, clickCell, navigate, setFocus, setStyling, refreshCell, refreshStorage } from './components/sheet.js';
+import { createSheet, clickCell, handleKeyDown, setFocus, setStyling, refreshCell, refreshStorage } from './components/sheet.js';
 import { sheetSize } from './config.js';
 import { createStorageArr } from './controllers/storageManager.js';
 // import { toAddress } from './functions/addressConverter.js';
@@ -40,22 +40,13 @@ const updateCell = (event) => {
   updateFormulaBar(event);
 }
 
-function navigateSheet(event) {
-  console.log(this);
-}
 const callRefresh = () => refreshSheetFormula(getStorageArr(), document);
-
-const setBold = (event) => setStyling(storageArr, 'B', getParentDocument(event));
-
-const setItalic = (event) => setStyling(storageArr, 'I', getParentDocument(event));
-
-const setUnderline = (event) => setStyling(storageArr, 'U', getParentDocument(event));
 
 /**
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
 const sheet = document.querySelectorAll('input.cell');
-document.addEventListener('keydown', navigate.bind(storageArr));
+document.addEventListener('keydown', handleKeyDown.bind(getStorageArr()));
 // sheet.forEach(cell => cell.addEventListener('keydown', navigate));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', updateStorage));
@@ -65,6 +56,15 @@ sheet.forEach(cell => cell.addEventListener('focus', updateCell));
 document.getElementById('formula-input').addEventListener('change', updateStorage);
 document.getElementById('refresh').addEventListener('click', callRefresh);
 document.getElementById('formula-input').addEventListener('input', refreshCell);
-document.getElementById('format-bold').addEventListener('click', setBold);
-document.getElementById('format-italic').addEventListener('click', setItalic);
-document.getElementById('format-underline').addEventListener('click', setUnderline);
+document.getElementById('format-bold').addEventListener(
+  'click',
+  setStyling.bind({ storageArr: getStorageArr() , style: 'B' })
+);
+document.getElementById('format-italic').addEventListener(
+  'click',
+  setStyling.bind({ storageArr: getStorageArr(), style: 'I' })
+);
+document.getElementById('format-underline').addEventListener(
+  'click',
+  setStyling.bind({ storageArr: getStorageArr(), style: 'U' })
+);

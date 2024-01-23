@@ -124,6 +124,8 @@ const refreshSheetValues = (storageArr, doc) => {
 
 const getAddress = (event) => toCoords(getParentDocument(event).getElementById('address').value);
 
+export const setFocus = (event) => event.target.focus();
+
 export const clickCell = (event) => {
   event.target.blur();
   getParentDocument(event).querySelectorAll('input.cell').forEach(cell => setBorderFocusRing(cell, false));
@@ -134,18 +136,11 @@ export const clickCell = (event) => {
 /**
   * Choose navigation depending on the input
   */
-export function navigate(event) {
+export function handleKeyDown(event) {
   const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
   console.log(event.code, event.key, event.keyCode);
   if (event.code === 'Tab' ) {
     event.preventDefault();
-    // const elem = getParentDocument(event)
-      // .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
-    // console.log('current address =', getParentDocument(event).getElementById('address').value);
-    // console.log('current cellCoords =', toCoords(getParentDocument(event).getElementById('address').value));
-    // console.log('cell input id =', toCoords(getParentDocument(event).getElementById('address').value).join('-'));
-    // console.log('cell value = ', elem.value);
-    // elem.blur();
   }
   // console.log(oldCellCoordinatesArr);
   if (event.code === 'DoubleClick') {
@@ -178,14 +173,11 @@ export function navigate(event) {
     refreshFormulaBar(this, event, newCellCoordinatesArr);
   } else {
     console.log(getAddress(event).join('-'));
-    const elem = getParentDocument(event)
-      .getElementById(getAddress(event).join('-'));
+    const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
     if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
     elem.focus();
   }
 }
-
-export const setFocus = (event) => event.target.focus();
 
 /**
   * Updates the cell value
@@ -208,15 +200,17 @@ export const refreshStorage = (event, storageArr) => {
   refreshSheetValues(storageArr, getParentDocument(event));
 }
 
-export const setStyling = (storageArr, style, doc) => {
-  const coordsArr = getCellCoordinatesArr();
-  const styling = getStyling(storageArr, coordsArr);
-  const regexp = new RegExp('[' + style[0].toUpperCase() + style[0].toLowerCase() + ']', 'g');
+export function setStyling(event) {
+  console.log(this.style);
+  console.log(this.storageArr);
+  const cellCoordinatesArr = getAddress(event);
+  const styling = getStyling(this.storageArr, cellCoordinatesArr);
+  const regexp = new RegExp('[' + this.style[0].toUpperCase() + this.style[0].toLowerCase() + ']', 'g');
   const newStyling = styling && regexp.test(styling)
     ? styling.replaceAll(regexp, '')
-    : !styling ? style[0].toUpperCase() : styling + style[0].toUpperCase();
-  saveStyling(storageArr, coordsArr, newStyling);
-  refreshSheetStyling(storageArr, doc);
+    : !styling ? this.style[0].toUpperCase() : styling + this.style[0].toUpperCase();
+  saveStyling(this.storageArr, cellCoordinatesArr, newStyling);
+  refreshSheetStyling(this.storageArr, getParentDocument(event));
 }
 
 /**
