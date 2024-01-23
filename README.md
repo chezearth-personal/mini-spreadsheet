@@ -2,8 +2,9 @@
 
 ## Basic functionality
 
-- The spreadsheet was created with vanilla javascript (no frameworks, although inspiration was drawn from React!)
-- The `index.html` file, as usual, anchors the page with the basic links and set up. The `main.js` script injects the important HTML snippets to make the whole spreadsheet interactive. This file has a good many dependencies, to perform the various bits of fucntionality: setting up the formula bar, setting up the sheet, translating Excel-style cell addresses into more machine-useable column-row coordinates, doing the calculations and managing the storage.
+- The spreadsheet was created with vanilla javascript (no frameworks, although
+inspiration was drawn from React!)
+- The `index.html` file, as usual, anchors the page with the basic links and set up. The `index.js` script injects the important HTML snippets to make the whole spreadsheet interactive. This file has a good many dependencies, to perform the various bits of fucntionality: setting up the formula bar, setting up the sheet, translating Excel-style cell addresses into more machine-useable column-row coordinates, doing the calculations and managing the storage.
 - The app draws a 100 X 100 grid (configurable, up to 702 colums), with an extra row and column for the heading labels. The headings are sticky, meaning they scroll with their corresponding columns or rows, but stay on the top and left of the page.
 - Unlike Excel, when you click a cell, you edit it directly (Excel lets you first 'select' the cell, then you edit it when you double-click it). This affects the arrow movements, because if there is data in the cell, the arrow keys will not leave it. However, the TAB or ENTER keys do move out and you can always click another cell with your mouse.
 - The current cell's formula is copied up to the formula bar and can be edited there as well. When TAB or ENTER or the refresh button ` = ` is pressed, the result is calculated.
