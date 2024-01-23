@@ -1,6 +1,6 @@
 'use strict';
 
-import { toCoords } from './addressConverter.js';
+import { toCellCoordinates } from './addressConverter.js';
 import { builtInFunctions as builtInFunctionsArr } from '../config.js';
 
 const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
@@ -64,7 +64,7 @@ const functionHandler = (paramsArr, func, doc, storageArr) => {
   */
 const paramsRangeHandler = (paramsRange) => {
   const rangeArr = paramsRange.match(/[A-Z]{1,2}[0-9]{1,3}/g);
-  const eArr = rangeArr.map(addr => toCoords(addr));
+  const eArr = rangeArr.map(addr => toCellCoordinates(addr));
   let cellsArr = [];
   for (let i = Math.min(eArr[0][1], eArr[1][1]); i <= Math.max(eArr[0][1], eArr[1][1]); i++) {
     for (let j = Math.min(eArr[0][0], eArr[1][0]); j <= Math.max(eArr[0][0], eArr[1][0]); j++) {
@@ -81,7 +81,7 @@ const paramsRangeHandler = (paramsRange) => {
 const paramsListHandler = (paramsList) => {
   return paramsList.split(',')
     .map(param => /[A-Z]{1,2}[0-9]{1,3}/.test(param.toUpperCase().trim())
-      ? toCoords(param.trim())
+      ? toCellCoordinates(param.trim())
       : param.trim()
     );
 }
@@ -125,7 +125,7 @@ const parseReferences = (formula, doc) => {
   return !formula
     ? 0
     : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
-        const elem = doc.getElementById(toCoords(match).join('-'));
+        const elem = doc.getElementById(toCellCoordinates(match).join('-'));
         return elem ? !elem.value ? 0 : elem.value : '#REF!'
       });
 }

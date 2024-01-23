@@ -92,13 +92,13 @@ export const isCoordinates = (coordArr) => Array.isArray(coordArr) && coordArr.l
 /**
   * Converts addresses in the form 'A23' or 'AZ7' to arrays of coordinates, e.g. [1, 23] or [52, 7]
   */
-export const toCoords = (address) => isAddress(address)
+export const toCellCoordinates = (address) => isAddress(address)
     ? Array.of(toColNum(address), toRowNum(address))
     : [0, 0];
 
 /**
   * Converts a coordinate array e.g. [3, 31], to an alphanumeric address, e.g. 'C31'
   */
-export const toAddress = (coordArr) => isCoordinates(coordArr)
+export const toCellAddress = (coordArr) => isCoordinates(coordArr)
     ? (toColAddr(coordArr[0]) + toRowAddr(coordArr[1])).toString()
     : 'A1';

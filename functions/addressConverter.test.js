@@ -1,7 +1,7 @@
 'use strict';
 
 import { expect } from 'chai';
-import { isAddress, isCoordinates, toAddress, toCoords } from './addressConverter.js';
+import { isAddress, isCoordinates, toCellAddress, toCellCoordinates } from './addressConverter.js';
 
 describe('Test: addressConverter.js', () => {
   describe('It should verifiy inputs', () => {
@@ -81,53 +81,53 @@ describe('Test: addressConverter.js', () => {
     describe('Bad addresses should default to [1, 1] (\'A1\')', () => {
       describe('Null, undefined and empty addresses should go to [0, 0] (\'A1\')', () => {
         it('should convert undefined to [0, 0]', () => {
-          expect(toCoords(undefined)).to.have.ordered.members([0, 0]);
+          expect(toCellCoordinates(undefined)).to.have.ordered.members([0, 0]);
         });
         it('should convert null to [0, 0]', () => {
-          expect(toCoords(null)).to.have.ordered.members([0, 0]);
+          expect(toCellCoordinates(null)).to.have.ordered.members([0, 0]);
         });
         it('should convert \'\' to [0, 0]', () => {
-          expect(toCoords(undefined)).to.have.ordered.members([0, 0]);
+          expect(toCellCoordinates(undefined)).to.have.ordered.members([0, 0]);
         });
       });
       describe('Addresses that are missing either characters or numbers should go to the top-left [1, 1]', () => {
         it('should convert a number only to column 0', () => {
-          expect(toCoords('20')).to.have.ordered.members([0, 0]);
+          expect(toCellCoordinates('20')).to.have.ordered.members([0, 0]);
         });
         it('should convert a character only to row 0', () => {
-          expect(toCoords('F')).to.have.ordered.members([0, 0]);
+          expect(toCellCoordinates('F')).to.have.ordered.members([0, 0]);
         });
       });
       describe('An address that has 0 for its number must go to row 1', () => {
         it('Should convert a zero row to 1, ie. \'C0\' -> [2, 0]', () => {
-          expect(toCoords('C0')).to.have.ordered.members([2, 0]);
+          expect(toCellCoordinates('C0')).to.have.ordered.members([2, 0]);
         });
       });
     });
     describe('Addresses that are out of range must betruncated to 702', () => {
       describe('When the column characters are too big, the first element must be 100', () => {
         it('should set the maximum column to 702, i.e. \'AAA\' -> 702, not 703', () => {
-          expect(toCoords('AAA29')).to.have.ordered.members([702, 28]);
+          expect(toCellCoordinates('AAA29')).to.have.ordered.members([702, 28]);
         });
       });
       describe('When the row number is too big, the second element must be 702', () => {
         it('should set the maximum row to 702, i.e. \'CM829\' -> [91, 702]', () => {
-          expect(toCoords('CM829')).to.have.ordered.members([90, 702]);
+          expect(toCellCoordinates('CM829')).to.have.ordered.members([90, 702]);
         });
       });
     });
     describe('Addresses that are in range should be converted correctly', () => {
       describe('Single-character, single-digit addresses should convert correctly', () => {
         it('should convert \'A2\' to [0, 1]', () => {
-          expect(toCoords('A2')).to.have.ordered.members([0, 1]);
+          expect(toCellCoordinates('A2')).to.have.ordered.members([0, 1]);
         });
         it('should convert \'a2\' to [0, 1]', () => {
-          expect(toCoords('a2')).to.have.ordered.members([0, 1]);
+          expect(toCellCoordinates('a2')).to.have.ordered.members([0, 1]);
         });
       });
       describe('Double-character, double-digit addresses should convert correctly', () => {
         it('should convert \'BL47\' to [63, 46]', () => {
-          expect(toCoords('bL47')).to.have.ordered.members([63, 46]);
+          expect(toCellCoordinates('bL47')).to.have.ordered.members([63, 46]);
         });
       });
     });
@@ -136,22 +136,22 @@ describe('Test: addressConverter.js', () => {
     describe('Coordinates that are out of range should be trancated to \'ZZ\' and 702', () => {
       describe('Coordinates with large column numbers must be limited to \'ZZ\'', () => {
         it('should truncate large column numbers over 1000 to \'ZZ\'', () => {
-          expect(toAddress([1037, 42])).to.equal('ZZ43');
+          expect(toCellAddress([1037, 42])).to.equal('ZZ43');
         });
       });
       describe('Coordinates with large row numbers must be limited to 702', () => {
         it('should truncate large row numbers over 702 to 702', () => {
-          expect(toAddress([90, 714])).to.equal('CM702');
+          expect(toCellAddress([90, 714])).to.equal('CM702');
         });
       });
     });
     describe('It should convert array coordinate in range correctly', () => {
       describe('Coordinates in-range should convert accurately', () => {
         it('should convert smaller in-range numbers to two-alphanumeric characters, e.g. [17, 8] to \'Q8\'', () => {
-          expect(toAddress([16, 7])).to.equal('Q8');
+          expect(toCellAddress([16, 7])).to.equal('Q8');
         });
         it('should convert larger in-range numbers to four alphanumeric characters, e.g. [67, 73] to \'BO73\'', () => {
-          expect(toAddress([66, 72])).to.equal('BO73');
+          expect(toCellAddress([66, 72])).to.equal('BO73');
         });
       });
     });

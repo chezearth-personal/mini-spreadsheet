@@ -3,7 +3,7 @@
 import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
-import { linearToColHeader, linearToRowHeader, linearToGrid, toAddress, toCoords } from '../functions/addressConverter.js';
+import { linearToColHeader, linearToRowHeader, linearToGrid, toCellAddress, toCellCoordinates } from '../functions/addressConverter.js';
 import { parseFormula } from '../functions/calculator.js';
 import { getFormula, saveFormula, getStyling, saveStyling, refreshSheetStyling } from '../controllers/storageManager.js';
 
@@ -96,19 +96,26 @@ const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
+export const handleDoubleClick = (event) => {
+  console.log('\'DoubleClick\' pressed.');
+  setFocus(event);
+  getParentDocument(event).getElementById(getAddress(event).join('-')).value = getFormula(this, getAddress(event));
+}
+
 /**
   * Refresh the entire sheet's formulae
   */
-export const refreshSheetValues = (storageArr, doc) => {
+export function refreshSheetValues (event) {
+  console.log('this =', this);
   try {
-    if (storageArr && Array.isArray(storageArr) && doc) {
-      storageArr.forEach((colArr, i) => {
+    if (this && Array.isArray(this) && getParentDocument(event)) {
+      this.forEach((colArr, i) => {
         if (colArr && Array.isArray(colArr)) {
           colArr.forEach((cell, j) => {
             if (cell[0]) {
-              const cellSheet = doc.getElementById(Array.of(i,j).join('-'));
+              const cellSheet = getParentDocument(event).getElementById(Array.of(i, j).join('-'));
               cellSheet.value = '';
-              cellSheet.value = parseFormula(cell[0], doc, storageArr);
+              cellSheet.value = parseFormula(cell[0], getParentDocument(event), this);
               setAlignment(cellSheet, cell[0]);
             }
           });
@@ -122,14 +129,14 @@ export const refreshSheetValues = (storageArr, doc) => {
   }
 }
 
-const getAddress = (event) => toCoords(getParentDocument(event).getElementById('address').value);
+const getAddress = (event) => toCellCoordinates(getParentDocument(event).getElementById('address').value);
 
 export const setFocus = (event) => event.target.focus();
 
 export const clickCell = (event) => {
   event.target.blur();
   getParentDocument(event).querySelectorAll('input.cell').forEach(cell => setBorderFocusRing(cell, false));
-  getParentDocument(event).getElementById('address').value = toAddress(event.target.id.split('-'));
+  getParentDocument(event).getElementById('address').value = toCellAddress(event.target.id.split('-'));
   setBorderFocusRing(event.target, true);
 }
 
@@ -137,16 +144,13 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export function handleKeyDown(event) {
-  const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
+  const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
   console.log(event.code, event.key, event.keyCode);
   if (event.code === 'Tab' ) {
     event.preventDefault();
   }
   // console.log(oldCellCoordinatesArr);
   if (event.code === 'DoubleClick') {
-    console.log('\'DoubleClick\' pressed.');
-    setFocus(event);
-    getParentDocument(event).getElementById(getAddress(event).join('-')).value = getFormula(this, getAddress(event));
   } else if (/^Shift/.test(event.code)
     || /^Alt/.test(event.code)
     || /^Meta/.test(event.code)
@@ -168,9 +172,15 @@ export function handleKeyDown(event) {
     const toId = newCellCoordinatesArr.join('-');
     getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
     setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
-    getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
+    getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
     // console.log('this(storageArr) =', this);
-    refreshFormulaBar(this, event, newCellCoordinatesArr);
+    const boundObj = {
+      storageArr: this,
+      cellCoordinatesArr: newCellCoordinatesArr
+    };
+    console.log('boundObj =', boundObj);
+    const formulaBar = refreshFormulaBar.bind(boundObj);
+    formulaBar(event);
   } else {
     console.log(getAddress(event).join('-'));
     const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
@@ -193,13 +203,20 @@ export const refreshCell = (event) => {
   * Updates the formula in the storage array and recalculates all values
   */
 export function refreshStorage(event) {
+  console.log('this =', this);
+  // console.log('this.calcCells =', this.calcCells);
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()
     : event.target.id.split('-');
   saveFormula(this, cellCoordinatesArr, event.target.value);
-  refreshSheetValues(this, getParentDocument(event));
+  const boundRefresh = refreshSheetValues.bind(this);
+  boundRefresh(event);
+  // this.calcCells(event);
 }
 
+/**
+  * Sets up the cell styling and saves it along with the formula
+  */
 export function setStyling(event) {
   console.log(this.style);
   console.log(this.storageArr);

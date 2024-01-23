@@ -21,11 +21,11 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
 /**
   * Update the formula bar with the most recent formula edits from the cells
   */
-export const refreshFormulaBar = (storageArr, event, cellCoordinatesArr) => {
-  // console.log(storageArr, event.target.id, event.target.id.split['-']);
-  const formula = getFormula(storageArr, cellCoordinatesArr);
-  setCellCoordinatesArr(cellCoordinatesArr);
-  const elem = getParentDocument(event).getElementById(cellCoordinatesArr.join('-'));
+export function refreshFormulaBar(event) {
+  console.log('this =', this);
+  const formula = getFormula(this.storageArr, this.cellCoordinatesArr);
+  setCellCoordinatesArr(this.cellCoordinatesArr);
+  const elem = getParentDocument(event).getElementById(this.cellCoordinatesArr.join('-'));
   getParentDocument(event).getElementById('formula-input').value = (
     !formula
       ? elem.value || '' || elem.value === 0
