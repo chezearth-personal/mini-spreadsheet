@@ -96,17 +96,18 @@ const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
-export const handleDoubleClick = (event) => {
-  console.log('\'DoubleClick\' pressed.');
+export function handleDoubleClick(event) {
+  // console.log('\'DoubleClick\' pressed.');
   setFocus(event);
-  getParentDocument(event).getElementById(getAddress(event).join('-')).value = getFormula(this, getAddress(event));
+  const formula = getFormula(this, getAddress(event));
+  getParentDocument(event).getElementById(getAddress(event).join('-')).value = !formula && formula !== 0 ? '' : formula;
 }
 
 /**
   * Refresh the entire sheet's formulae
   */
 export function refreshSheetValues (event) {
-  console.log('this =', this);
+  // console.log('this =', this);
   try {
     if (this && Array.isArray(this) && getParentDocument(event)) {
       this.forEach((colArr, i) => {
@@ -144,48 +145,56 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export function handleKeyDown(event) {
-  const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
-  console.log(event.code, event.key, event.keyCode);
-  if (event.code === 'Tab' ) {
-    event.preventDefault();
-  }
-  // console.log(oldCellCoordinatesArr);
-  if (event.code === 'DoubleClick') {
-  } else if (/^Shift/.test(event.code)
-    || /^Alt/.test(event.code)
-    || /^Meta/.test(event.code)
-    || /^Control/.test(event.code)
+  console.log('handleKeyDown event');
+  console.log(getParentDocument(event).activeElement.id);
+  console.log(getParentDocument(event).activeElement.id === 'body');
+  if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
+    || getParentDocument(event).activeElement.id === 'body'
+    || event.code === 'Enter'
   ) {
-    return;
-  } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
-    event.target.blur();
-    // console.log(event);
-    // console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
-    const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
-      ? navUp(oldCellCoordinatesArr)
-      : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
-        ? navLeft(oldCellCoordinatesArr)
-        : event.code === 'ArrowRight' || event.code === 'Tab'
-          ? navRight(oldCellCoordinatesArr, sheetSize.columns)
-          : navDown(oldCellCoordinatesArr, sheetSize.rows);
-    // console.log(newCellCoordinatesArr);
-    const toId = newCellCoordinatesArr.join('-');
-    getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
-    setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
-    getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
-    // console.log('this(storageArr) =', this);
-    const boundObj = {
-      storageArr: this,
-      cellCoordinatesArr: newCellCoordinatesArr
-    };
-    console.log('boundObj =', boundObj);
-    const formulaBar = refreshFormulaBar.bind(boundObj);
-    formulaBar(event);
-  } else {
-    console.log(getAddress(event).join('-'));
-    const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
-    if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
-    elem.focus();
+    const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
+    // console.log(event.code, event.key, event.keyCode);
+    if (event.code === 'Tab' ) {
+      event.preventDefault();
+    }
+    // console.log(oldCellCoordinatesArr);
+    if (event.code === 'DoubleClick') {
+    } else if (/^Shift/.test(event.code)
+      || /^Alt/.test(event.code)
+      || /^Meta/.test(event.code)
+      || /^Control/.test(event.code)
+    ) {
+      return;
+    } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
+      event.target.blur();
+      // console.log(event);
+      // console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
+      const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
+        ? navUp(oldCellCoordinatesArr)
+        : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
+          ? navLeft(oldCellCoordinatesArr)
+          : event.code === 'ArrowRight' || event.code === 'Tab'
+            ? navRight(oldCellCoordinatesArr, sheetSize.columns)
+            : navDown(oldCellCoordinatesArr, sheetSize.rows);
+      // console.log(newCellCoordinatesArr);
+      const toId = newCellCoordinatesArr.join('-');
+      getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
+      setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
+      getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
+      // console.log('this(storageArr) =', this);
+      const boundObj = {
+        storageArr: this,
+        cellCoordinatesArr: newCellCoordinatesArr
+      };
+      // console.log('boundObj =', boundObj);
+      const formulaBar = refreshFormulaBar.bind(boundObj);
+      formulaBar(event);
+    } else {
+      // console.log(getAddress(event).join('-'));
+      const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
+      if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
+      elem.focus();
+    }
   }
 }
 
@@ -203,7 +212,7 @@ export const refreshCell = (event) => {
   * Updates the formula in the storage array and recalculates all values
   */
 export function refreshStorage(event) {
-  console.log('this =', this);
+  // console.log('this =', this);
   // console.log('this.calcCells =', this.calcCells);
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()

@@ -2,6 +2,8 @@
 
 import { getParentDocument } from './main.js';
 import { getFormula } from '../controllers/storageManager.js';
+import { handleKeyDown, refreshStorage } from './sheet.js';
+
 /**
   * For storing address state (could use grid element 0)
   */
@@ -18,11 +20,18 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
   currentCellCoordinates = cellCoordinatesArr;
 }
 
+export function updateFormulaBar(event) {
+  const storageHandler = refreshStorage.bind(this);
+  storageHandler(event);
+  const keyDownHandler = handleKeyDown.bind(this);
+  keyDownHandler(event);
+}
+
 /**
   * Update the formula bar with the most recent formula edits from the cells
   */
 export function refreshFormulaBar(event) {
-  console.log('this =', this);
+  // console.log('this =', this);
   const formula = getFormula(this.storageArr, this.cellCoordinatesArr);
   setCellCoordinatesArr(this.cellCoordinatesArr);
   const elem = getParentDocument(event).getElementById(this.cellCoordinatesArr.join('-'));

@@ -1,6 +1,6 @@
 'use strict';
 
-import { createFormulaBar, refreshFormulaBar } from './components/formulaBar.js';
+import { createFormulaBar, refreshFormulaBar, updateFormulaBar } from './components/formulaBar.js';
 import { createSheet,
   refreshSheetValues,
   clickCell,
@@ -44,15 +44,21 @@ const createBoundObj = (cell) => ({
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
 const sheet = document.querySelectorAll('input.cell');
+// console.log(document.getElementById('sheet'));
 document.addEventListener('keydown', handleKeyDown.bind(getStorageArr()));
+// document.querySelector('#sheet').addEventListener('keydown', handleKeyDown.bind(getStorageArr()));
+// sheet.forEach(cell => { console.log(cell); cell.addEventListener('keydown', handleKeyDown.bind(getStorageArr())); });
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', refreshStorage.bind(getStorageArr())));
 sheet.forEach(cell => cell.addEventListener('input', refreshFormulaBar.bind(createBoundObj(cell))));
 sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr())));
 sheet.forEach(cell => cell.addEventListener('focus', refreshFormulaBar.bind(createBoundObj(cell))));
+// document
+  // .getElementById('formula-input')
+  // .addEventListener('change', refreshStorage.bind(getStorageArr()));
 document
   .getElementById('formula-input')
-  .addEventListener('change', refreshStorage.bind(getStorageArr()));
+  .addEventListener('change', updateFormulaBar.bind(getStorageArr()));
 document
   .getElementById('refresh')
   .addEventListener('click', refreshSheetValues.bind(getStorageArr()));
