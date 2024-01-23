@@ -34,12 +34,15 @@ const updateStorage = (event) => refreshStorage(event, getStorageArr());
 /**
   * Update the formula bar with the most recent formula edits from the cells
   */
-const updateFormulaBar = (event) => refreshFormulaBar(event, getStorageArr());
+const updateFormulaBar = (event) => refreshFormulaBar(getStorageArr(), event, event.target.id.split('-'));
 
 const updateCell = (event) => {
   updateFormulaBar(event);
 }
 
+function navigateSheet(event) {
+  console.log(this);
+}
 const callRefresh = () => refreshSheetFormula(getStorageArr(), document);
 
 const setBold = (event) => setStyling(storageArr, 'B', getParentDocument(event));
@@ -52,7 +55,7 @@ const setUnderline = (event) => setStyling(storageArr, 'U', getParentDocument(ev
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
 const sheet = document.querySelectorAll('input.cell');
-document.addEventListener('keydown', navigate);
+document.addEventListener('keydown', navigate.bind(storageArr));
 // sheet.forEach(cell => cell.addEventListener('keydown', navigate));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', updateStorage));

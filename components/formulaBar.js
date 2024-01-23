@@ -21,14 +21,15 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
 /**
   * Update the formula bar with the most recent formula edits from the cells
   */
-export const refreshFormulaBar = (event, storageArr) => {
+export const refreshFormulaBar = (storageArr, event, cellCoordinatesArr) => {
   // console.log(storageArr, event.target.id, event.target.id.split['-']);
-  const formula = getFormula(storageArr, event.target.id.split('-'));
-  setCellCoordinatesArr(event.target.id.split('-'));
+  const formula = getFormula(storageArr, cellCoordinatesArr);
+  setCellCoordinatesArr(cellCoordinatesArr);
+  const elem = getParentDocument(event).getElementById(cellCoordinatesArr.join('-'));
   getParentDocument(event).getElementById('formula-input').value = (
     !formula
-      ? event.target.value || '' || event.target.value === 0
-        ? event.target.value
+      ? elem.value || '' || elem.value === 0
+        ? elem.value
         : ''
       : formula || '' || formula === 0 ? formula : ''
   );

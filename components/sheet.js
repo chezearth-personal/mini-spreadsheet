@@ -2,10 +2,10 @@
 
 import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
-import { getCellCoordinatesArr, zeroArray } from './formulaBar.js';
+import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
 import { linearToColHeader, linearToRowHeader, linearToGrid, toAddress, toCoords } from '../functions/addressConverter.js';
 import { parseFormula } from '../functions/calculator.js';
-import { saveFormula, getStyling, saveStyling, refreshSheetStyling } from '../controllers/storageManager.js';
+import { getFormula, saveFormula, getStyling, saveStyling, refreshSheetStyling } from '../controllers/storageManager.js';
 
 const getId = () => 'id';
 
@@ -134,28 +134,32 @@ export const clickCell = (event) => {
 /**
   * Choose navigation depending on the input
   */
-export const navigate = (event) => {
+export function navigate(event) {
   const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
   console.log(event.code, event.key, event.keyCode);
-  if (event.code === 'Tab' 
-    || /^Shift/.test(event.code)
-    || /^Alt/.test(event.code)
-    || /^Meta/.test(event.code)
-  ) {
+  if (event.code === 'Tab' ) {
     event.preventDefault();
-    const elem = getParentDocument(event)
-      .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'))
-    console.log('current address =', getParentDocument(event).getElementById('address').value);
-    console.log('current cellCoords =', toCoords(getParentDocument(event).getElementById('address').value));
-    console.log('cell input id =', toCoords(getParentDocument(event).getElementById('address').value).join('-'));
-    console.log('cell value = ', elem.value);
-    elem.blur();
+    // const elem = getParentDocument(event)
+      // .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    // console.log('current address =', getParentDocument(event).getElementById('address').value);
+    // console.log('current cellCoords =', toCoords(getParentDocument(event).getElementById('address').value));
+    // console.log('cell input id =', toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    // console.log('cell value = ', elem.value);
+    // elem.blur();
   }
   // console.log(oldCellCoordinatesArr);
   if (event.code === 'DoubleClick') {
     console.log('\'DoubleClick\' pressed.');
     setFocus(event);
+    getParentDocument(event).getElementById(getAddress(event).join('-')).value = getFormula(this, getAddress(event));
+  } else if (/^Shift/.test(event.code)
+    || /^Alt/.test(event.code)
+    || /^Meta/.test(event.code)
+    || /^Control/.test(event.code)
+  ) {
+    return;
   } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
+    event.target.blur();
     // console.log(event);
     // console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
     const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
@@ -170,11 +174,12 @@ export const navigate = (event) => {
     getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
     setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
     getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
-    event.target.blur();
+    // console.log('this(storageArr) =', this);
+    refreshFormulaBar(this, event, newCellCoordinatesArr);
   } else {
-    console.log(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    console.log(getAddress(event).join('-'));
     const elem = getParentDocument(event)
-      .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+      .getElementById(getAddress(event).join('-'));
     if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
     elem.focus();
   }
