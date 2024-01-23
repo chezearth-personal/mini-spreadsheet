@@ -135,18 +135,29 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export const navigate = (event) => {
-  // const oldCellCoordinatesArr = event.target.id.split('-');
-  const oldCellCoordinatesArr = getAddress(event);
-  // const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
-  if (event.code === 'Tab' || event.code === 'ShiftLeft') { event.preventDefault(); }
-  console.log(oldCellCoordinatesArr);
-  // const newCellCoordinatesArr;
+  const oldCellCoordinatesArr = toCoords(getParentDocument(event).getElementById('address').value)
+  console.log(event.code, event.key, event.keyCode);
+  if (event.code === 'Tab' 
+    || /^Shift/.test(event.code)
+    || /^Alt/.test(event.code)
+    || /^Meta/.test(event.code)
+  ) {
+    event.preventDefault();
+    const elem = getParentDocument(event)
+      .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'))
+    console.log('current address =', getParentDocument(event).getElementById('address').value);
+    console.log('current cellCoords =', toCoords(getParentDocument(event).getElementById('address').value));
+    console.log('cell input id =', toCoords(getParentDocument(event).getElementById('address').value).join('-'));
+    console.log('cell value = ', elem.value);
+    elem.blur();
+  }
+  // console.log(oldCellCoordinatesArr);
   if (event.code === 'DoubleClick') {
     console.log('\'DoubleClick\' pressed.');
     setFocus(event);
   } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
-    console.log(event);
-    console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
+    // console.log(event);
+    // console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
     const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
       ? navUp(oldCellCoordinatesArr)
       : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
@@ -154,16 +165,13 @@ export const navigate = (event) => {
         : event.code === 'ArrowRight' || event.code === 'Tab'
           ? navRight(oldCellCoordinatesArr, sheetSize.columns)
           : navDown(oldCellCoordinatesArr, sheetSize.rows);
-    console.log(newCellCoordinatesArr);
+    // console.log(newCellCoordinatesArr);
     const toId = newCellCoordinatesArr.join('-');
-    // console.log(toId);
     getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
     setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
     getParentDocument(event).getElementById('address').value = toAddress(newCellCoordinatesArr);
     event.target.blur();
-  // getParentDocument(event).getElementById(toId).focus();
   } else {
-    // console.log(event.target);
     console.log(toCoords(getParentDocument(event).getElementById('address').value).join('-'));
     const elem = getParentDocument(event)
       .getElementById(toCoords(getParentDocument(event).getElementById('address').value).join('-'));

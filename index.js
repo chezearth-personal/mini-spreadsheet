@@ -53,7 +53,7 @@ const setUnderline = (event) => setStyling(storageArr, 'U', getParentDocument(ev
   */
 const sheet = document.querySelectorAll('input.cell');
 document.addEventListener('keydown', navigate);
-sheet.forEach(cell => cell.addEventListener('keydown', navigate));
+// sheet.forEach(cell => cell.addEventListener('keydown', navigate));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', updateStorage));
 sheet.forEach(cell => cell.addEventListener('input', updateFormulaBar));
