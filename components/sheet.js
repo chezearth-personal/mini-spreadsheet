@@ -99,7 +99,7 @@ const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
 /**
   * Refresh the entire sheet's formulae
   */
-const refreshSheetValues = (storageArr, doc) => {
+export const refreshSheetValues = (storageArr, doc) => {
   try {
     if (storageArr && Array.isArray(storageArr) && doc) {
       storageArr.forEach((colArr, i) => {
@@ -192,12 +192,12 @@ export const refreshCell = (event) => {
 /**
   * Updates the formula in the storage array and recalculates all values
   */
-export const refreshStorage = (event, storageArr) => {
+export function refreshStorage(event) {
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()
     : event.target.id.split('-');
-  saveFormula(storageArr, cellCoordinatesArr, event.target.value);
-  refreshSheetValues(storageArr, getParentDocument(event));
+  saveFormula(this, cellCoordinatesArr, event.target.value);
+  refreshSheetValues(this, getParentDocument(event));
 }
 
 export function setStyling(event) {
