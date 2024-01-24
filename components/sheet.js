@@ -18,6 +18,8 @@ const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
   */
 const newArray = (arr) => Array.of(arr[0], arr[1]);
 
+const testForNumericalValue = (str) => /^[\-0-9][\.0-9]*$/.test(str);
+
 /**
   * Creates the grid cells, with the header row and header columns identified in
   * separate classes
@@ -26,9 +28,13 @@ function createCells(columns, rows) {
   return Array((columns + 1) * (rows + 1))
     .fill(`<input class="`)
     .map((e, i) => i < (columns + 1)
-      ? `${e}col-header" id="${linearToColHeader(i, getId())}"${getAutocomplete(i)} disabled="true" type="text" value="${linearToColHeader(i, getValue())}" />`
+      ? `${e}col-header" id="${linearToColHeader(i, getId())}"`
+        + `${getAutocomplete(i)} disabled="true" type="text" `
+        + `value="${linearToColHeader(i, getValue())}" />`
       : i % (columns + 1) === 0
-        ? `${e}row-header" id="${linearToRowHeader(i, columns)}" disabled="true" type="text" value="${linearToRowHeader(i, columns)}" />`
+        ? `${e}row-header" id="${linearToRowHeader(i, columns)}"`
+          + ` disabled="true" type="text"`
+          + ` value="${linearToRowHeader(i, columns)}" />`
         : `${e}cell" id=${linearToGrid(i, columns)} type="text" />`)
     .join('\n');
 }
@@ -46,19 +52,13 @@ function arrayTest(arr) {
   * Sets up the alignment based on whether the data are text or numbers
   */
 function setAlignment(elem, formula) {
-  if (/^[\-0-9][\.0-9]*$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
-    elem.style.textAlign = 'right';
-  } else {
-    elem.style.textAlign = 'left';
-  }
+  elem.style.textAlign = testForNumericalValue(elem.value) && formula.substring(0, 1) !== `'`
+    ? 'right'
+    : 'left';
 }
 
 function setBorderFocusRing(elem, selectCell) {
-  if (selectCell) {
-    elem.style.border = 'solid 2px #2361C5';
-  } else {
-    elem.style.border = 'solid 0.5px #b7b7b7';
-  }
+  elem.style.border = selectCell ? 'solid 2px #2361C5' : 'solid 0.5px #b7b7b7';
 }
 /**
   * Increment the rows coordinate if not at the limit
@@ -230,8 +230,8 @@ export function refreshStorage(event) {
   * Sets up the cell styling and saves it along with the formula
   */
 export function setStyling(event) {
-  console.log(this.style);
-  console.log(this.storageArr);
+  // console.log(this.style);
+  // console.log(this.storageArr);
   const cellCoordinatesArr = getAddress(event);
   const styling = getStyling(this.storageArr, cellCoordinatesArr);
   const regexp = new RegExp('[' + this.style[0].toUpperCase() + this.style[0].toLowerCase() + ']', 'g');
