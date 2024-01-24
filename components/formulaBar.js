@@ -36,15 +36,12 @@ export function updateFormulaBar(event) {
   * Update the formula bar with the most recent formula edits from the cells
   */
 export function refreshFormulaBar(event) {
-  // console.log('this =', this);
   const formula = getFormula(this.storageArr, this.cellCoordinatesArr);
   setCellCoordinatesArr(this.cellCoordinatesArr);
   const elem = getParentDocument(event).getElementById(this.cellCoordinatesArr.join('-'));
   getParentDocument(event).getElementById('formula-input').value = (
     !formula
-      ? elem.value || '' || elem.value === 0
-        ? elem.value
-        : ''
+      ? elem.value || '' || elem.value === 0 ? elem.value : ''
       : formula || '' || formula === 0 ? formula : ''
   );
 }

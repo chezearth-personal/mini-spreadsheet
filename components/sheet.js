@@ -3,14 +3,43 @@
 import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
-import { linearToColHeader, linearToRowHeader, linearToGrid, toCellAddress, toCellCoordinates } from '../functions/addressConverter.js';
+import { linearToColHeader,
+  linearToRowHeader,
+  linearToGrid,
+  toCellAddress,
+  toCellCoordinates } from '../functions/addressConverter.js';
 import { parseFormula } from '../functions/calculator.js';
-import { getFormula, saveFormula, getStyling, saveStyling, refreshSheetStyling } from '../controllers/storageManager.js';
+import { getFormula,
+  saveFormula,
+  getStyling,
+  saveStyling} from '../controllers/storageManager.js';
 
 const getId = () => 'id';
 
 const getValue = () => 'value';
 
+/**
+  * Makes the HTML text for the cell at the top of the sheet with the column letter header
+  */
+const makeColumnHeaderCell = (e, i) => `${e}col-header" id="${linearToColHeader(i, getId())}"`
+  + `${getAutocomplete(i)} disabled="true" type="text" `
+  + `value="${linearToColHeader(i, getValue())}" />`;
+
+/**
+  * Makes the HTML text for the cell at the left of the sheet with the rown number header
+  */
+const makeRowHeaderCell = (e, i, columns) => `${e}row-header" id="${linearToRowHeader(i, columns)}"`
+  + ` disabled="true" type="text"`
+  + ` value="${linearToRowHeader(i, columns)}" />`;
+
+/**
+  * Makes the blank cells in the body of the sheet
+  */
+const makeSheetCell = (e, i, columns) => `${e}cell" id=${linearToGrid(i, columns)} type="text" />`;
+
+/**
+  * Adds an autocomplete attribute
+  */
 const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
 
 /**
@@ -28,14 +57,9 @@ function createCells(columns, rows) {
   return Array((columns + 1) * (rows + 1))
     .fill(`<input class="`)
     .map((e, i) => i < (columns + 1)
-      ? `${e}col-header" id="${linearToColHeader(i, getId())}"`
-        + `${getAutocomplete(i)} disabled="true" type="text" `
-        + `value="${linearToColHeader(i, getValue())}" />`
-      : i % (columns + 1) === 0
-        ? `${e}row-header" id="${linearToRowHeader(i, columns)}"`
-          + ` disabled="true" type="text"`
-          + ` value="${linearToRowHeader(i, columns)}" />`
-        : `${e}cell" id=${linearToGrid(i, columns)} type="text" />`)
+      ? makeColumnHeaderCell(e, i)
+      : i % (columns + 1) === 0 ? makeRowHeaderCell(e, i, columns) : makeSheetCell(e, i, columns)
+    )
     .join('\n');
 }
 
@@ -55,6 +79,17 @@ function setAlignment(elem, formula) {
   elem.style.textAlign = testForNumericalValue(elem.value) && formula.substring(0, 1) !== `'`
     ? 'right'
     : 'left';
+}
+
+/**
+  * Set an element's styling according to a formatting string
+  */
+function setStyling(styling, elem) {
+  if (elem) {
+    elem.style.fontWeight = !styling || !/[Bb]/.test(styling) ? 'normal' : 'bold';
+    elem.style.fontStyle = !styling || !/[Ii]/.test(styling) ? 'normal' : 'italic';
+    elem.style.textDecorationLine = !styling || !/[Uu]/.test(styling) ? 'none' : 'underline';
+  }
 }
 
 function setBorderFocusRing(elem, selectCell) {
@@ -104,10 +139,30 @@ export function handleDoubleClick(event) {
 }
 
 /**
+  * Refresh the entire sheet's formatting
+  */
+const refreshSheetStyling = (storageArr, doc) => {
+  try {
+    if (storageArr && Array.isArray(storageArr) && doc) {
+      storageArr.forEach((colArr, i) => {
+        if (colArr && Array.isArray(colArr)) {
+          colArr.forEach((cell, j) => {
+              const cellSheet = doc.getElementById(Array.of(i, j).join('-'));
+              setStyling(cell[1], cellSheet);
+          });
+        }
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    return 0;
+  }
+}
+
+/**
   * Refresh the entire sheet's formulae
   */
 export function refreshSheetValues (event) {
-  // console.log('this =', this);
   try {
     if (this && Array.isArray(this) && getParentDocument(event)) {
       this.forEach((colArr, i) => {
@@ -170,8 +225,6 @@ export function handleKeyDown(event) {
       return;
     } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
       event.target.blur();
-      // console.log(event);
-      // console.log('event.code =', event.code, '; event.shiftKey?', event.shiftKey);
       const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
         ? navUp(oldCellCoordinatesArr)
         : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
@@ -189,7 +242,6 @@ export function handleKeyDown(event) {
         storageArr: this,
         cellCoordinatesArr: newCellCoordinatesArr
       };
-      // console.log('boundObj =', boundObj);
       const formulaBar = refreshFormulaBar.bind(boundObj);
       formulaBar(event);
     } else {
@@ -216,20 +268,18 @@ export const refreshCell = (event) => {
   */
 export function refreshStorage(event) {
   // console.log('this =', this);
-  // console.log('this.calcCells =', this.calcCells);
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()
     : event.target.id.split('-');
   saveFormula(this, cellCoordinatesArr, event.target.value);
   const boundRefresh = refreshSheetValues.bind(this);
   boundRefresh(event);
-  // this.calcCells(event);
 }
 
 /**
   * Sets up the cell styling and saves it along with the formula
   */
-export function setStyling(event) {
+export function handleStyling(event) {
   // console.log(this.style);
   // console.log(this.storageArr);
   const cellCoordinatesArr = getAddress(event);
