@@ -1,5 +1,9 @@
 # Mini-Spreadsheet
 
+## Live version
+
+It is hosted (here)[https://mini-spreadsheet.netlify.app/].
+
 ## Basic functionality
 
 - The spreadsheet was created with vanilla javascript (no frameworks, although
@@ -36,6 +40,7 @@ information about how they are to be proceed, e.g. a function like `PI()` won't
 take any arguments, whereas a function like `SIN()` would take a single number, 
 `SUM()`, etc. take a range of values and a complex functions like `=DSUM()` take 
 a list of arguments that include ranges.
+- Functions can be nested and operated on.
 - Finally, the spreadsheet does basic cell-level formatting, just `Bold`, 
 `Italic` and `Underline`.
 
