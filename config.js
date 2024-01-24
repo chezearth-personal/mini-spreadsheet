@@ -1,6 +1,6 @@
 export const sheetSize = {
-  columns : 10,
-  rows: 20,
+  columns : 100,
+  rows: 100,
   cells : {
     rowHeaderWidth: '4ch',
     width : '8ch'
