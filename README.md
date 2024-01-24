@@ -2,7 +2,7 @@
 
 ## Live version
 
-It is hosted [here](https://mini-spreadsheet.netlify.app/).
+It is hosted live [here](https://mini-spreadsheet.netlify.app/).
 
 ## Basic functionality
 
