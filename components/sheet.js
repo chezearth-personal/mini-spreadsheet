@@ -1,6 +1,6 @@
 'use strict';
 
-import { sheetSize } from '../config.js';
+// import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
 import { linearToColHeader,
@@ -164,8 +164,9 @@ const refreshSheetStyling = (storageArr, doc) => {
   */
 export function refreshSheetValues (event) {
   try {
-    if (this && Array.isArray(this) && getParentDocument(event)) {
-      this.forEach((colArr, i) => {
+    // console.log('this =', this);
+    if (this.storageArr && Array.isArray(this.storageArr) && getParentDocument(event)) {
+      this.storageArr.forEach((colArr, i) => {
         if (colArr && Array.isArray(colArr)) {
           colArr.forEach((cell, j) => {
             if (cell[0]) {
@@ -230,8 +231,8 @@ export function handleKeyDown(event) {
         : event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey)
           ? navLeft(oldCellCoordinatesArr)
           : event.code === 'ArrowRight' || event.code === 'Tab'
-            ? navRight(oldCellCoordinatesArr, sheetSize.columns)
-            : navDown(oldCellCoordinatesArr, sheetSize.rows);
+            ? navRight(oldCellCoordinatesArr, this.sheetSize.columns)
+            : navDown(oldCellCoordinatesArr, this.sheetSize.rows);
       // console.log(newCellCoordinatesArr);
       const toId = newCellCoordinatesArr.join('-');
       getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
@@ -239,7 +240,7 @@ export function handleKeyDown(event) {
       getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
       // console.log('this(storageArr) =', this);
       const boundObj = {
-        storageArr: this,
+        storageArr: this.storageArr,
         cellCoordinatesArr: newCellCoordinatesArr
       };
       const formulaBar = refreshFormulaBar.bind(boundObj);
@@ -271,7 +272,7 @@ export function refreshStorage(event) {
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()
     : event.target.id.split('-');
-  saveFormula(this, cellCoordinatesArr, event.target.value);
+  saveFormula(this.storageArr, cellCoordinatesArr, event.target.value);
   const boundRefresh = refreshSheetValues.bind(this);
   boundRefresh(event);
 }
@@ -295,7 +296,7 @@ export function handleStyling(event) {
 /**
   * Create the grid DOM elements
   */
-export const createSheet = () => `
+export const createSheet = (sheetSize) => `
   <main>
     <div id="sheet"
       style="grid-template-columns:${sheetSize.cells.rowHeaderWidth} repeat(${sheetSize.columns}, ${sheetSize.cells.width});grid-template-rows:repeat(${sheetSize.rows + 1}, 2ch)">

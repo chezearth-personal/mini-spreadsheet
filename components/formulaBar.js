@@ -22,7 +22,7 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
 
 export function updateFormulaBar(event) {
   const currentCellCoordinatesArr = getAddress(event);
-  const storageHandler = refreshStorage.bind(this);
+  const storageHandler = refreshStorage.bind(this.storageArr);
   storageHandler(event);
   const keyDownHandler = handleKeyDown.bind(this);
   keyDownHandler(event);

@@ -1,7 +1,7 @@
 'use strict';
 
 import { toCellCoordinates } from './addressConverter.js';
-import { builtInFunctions as builtInFunctionsArr } from '../config.js';
+// import { builtInFunctions as builtInFunctionsArr } from '../config.js';
 
 const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
 
@@ -34,7 +34,7 @@ const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\
 /**
   * Determine if at least one ocurrance of the formula is present
   */
-const containsFunction = (formula) => builtInFunctionsArr
+const containsFunction = (builtInFunctionsArr, formula) => builtInFunctionsArr
   .reduce((result, func) => result || functionRegExp(func.name).test(formula.toUpperCase()), false);
 
 /**
@@ -91,13 +91,13 @@ const paramsListHandler = (paramsList) => {
   * and calls the appropriate processing function to obtain an array of rwo-column
   * coordinates
   */
-const functionParametersHandler = (formula, func, doc, storageArr) => {
+const functionParametersHandler = (formula, func, doc, data) => {
   const parameters = formula.match(/\(.+\)/g)[0].slice(1, -1);
-  const resolvedParameters = containsFunction(parameters)
+  const resolvedParameters = containsFunction(data.builtInFunctions, parameters)
     ? parseBuiltInFunctions(parameters, doc)
     : parameters;
   const paramsArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
-  return functionHandler(paramsArr, func, doc, storageArr);
+  return functionHandler(paramsArr, func, doc, data.storageArr);
 }
 
 /**
@@ -105,11 +105,13 @@ const functionParametersHandler = (formula, func, doc, storageArr) => {
   * each listed function. If the function is found, then it calls the function's parameters
   * handler
   */
-const parseBuiltInFunctions = (formula, doc, storageArr) => {
-  return containsFunction(formula)
-    ? builtInFunctionsArr.reduce((result, func) => {
+const parseBuiltInFunctions = (formula, doc, data) => {
+  // console.log(data.builtInFunctions);
+  return containsFunction(data.builtInFunctions, formula)
+    ? data.builtInFunctions.reduce((result, func) => {
+        // console.log('func =', func);
         const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
-          const range = functionParametersHandler(match, func, doc, storageArr);
+          const range = functionParametersHandler(match, func, doc, data);
           return range.toString();
         });
         return newFormula;
@@ -137,12 +139,13 @@ const parseReferences = (formula, doc) => {
   *   formula: string
   *   doc: DOM document object
   */
-export const parseFormula = (formula, doc, storageArr) => {
+export const parseFormula = (formula, doc, data) => {
+  // console.log('boundData =', data);
   /** Treat anything after `'` as plain text */
   if (formula.substring(0, 1) === `'`) {
     return formula.substring(1);
   }
-  const functionResult = parseBuiltInFunctions(formula, doc, storageArr);
+  const functionResult = parseBuiltInFunctions(formula, doc, data);
   if (!functionResult && functionResult !== 0) {
     const testForFormula = (formula || '').toString().substring(0, 1) === '='
       || (formula || '').toString().substring(0, 1) === '+';
@@ -152,7 +155,7 @@ export const parseFormula = (formula, doc, storageArr) => {
         : calcFormula(parseReferences(formula.toString().substring(1), doc))
       : (formula || '' || formula === 0 ? formula : '').toString();
   }
-  const newFunctionResult = parseFormula(functionResult, doc, storageArr);
+  const newFunctionResult = parseFormula(functionResult, doc, data);
   return newFunctionResult.toString().substring(0, 1) === '='
     ? newFunctionResult.toString().substring(1)
     : newFunctionResult.toString();

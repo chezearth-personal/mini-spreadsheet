@@ -12,6 +12,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "devDependencies": {
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
