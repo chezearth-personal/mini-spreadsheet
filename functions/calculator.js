@@ -144,7 +144,9 @@ export const parseFormula = (formula, doc, storageArr) => {
   }
   const functionResult = parseBuiltInFunctions(formula, doc, storageArr);
   if (!functionResult && functionResult !== 0) {
-    return (formula || '').toString().substring(0, 1) === '='
+    const testForFormula = (formula || '').toString().substring(0, 1) === '='
+      || (formula || '').toString().substring(0, 1) === '+';
+    return testForFormula
       ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())
         ? formula.toString().substring(1)
         : calcFormula(parseReferences(formula.toString().substring(1), doc))

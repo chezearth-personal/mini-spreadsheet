@@ -46,7 +46,7 @@ function arrayTest(arr) {
   * Sets up the alignment based on whether the data are text or numbers
   */
 function setAlignment(elem, formula) {
-  if (/^[\-0-9]+$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
+  if (/^[\-0-9][\.0-9]*$/.test(elem.value) && formula.substring(0, 1) !== `'`) {
     elem.style.textAlign = 'right';
   } else {
     elem.style.textAlign = 'left';
@@ -130,7 +130,7 @@ export function refreshSheetValues (event) {
   }
 }
 
-const getAddress = (event) => toCellCoordinates(getParentDocument(event).getElementById('address').value);
+export const getAddress = (event) => toCellCoordinates(getParentDocument(event).getElementById('address').value);
 
 export const setFocus = (event) => event.target.focus();
 
@@ -145,9 +145,9 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export function handleKeyDown(event) {
-  console.log('handleKeyDown event');
-  console.log(getParentDocument(event).activeElement.id);
-  console.log(getParentDocument(event).activeElement.id === 'body');
+  // console.log('handleKeyDown event');
+  // console.log(getParentDocument(event).activeElement.id);
+  // console.log(getParentDocument(event).activeElement.id === 'body');
   if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
     || getParentDocument(event).activeElement.id === 'body'
     || event.code === 'Enter'
@@ -156,6 +156,9 @@ export function handleKeyDown(event) {
     // console.log(event.code, event.key, event.keyCode);
     if (event.code === 'Tab' ) {
       event.preventDefault();
+    }
+    if (event.code === 'Enter') {
+      getParentDocument(event).getElementById(oldCellCoordinatesArr.join('-')).blur();
     }
     // console.log(oldCellCoordinatesArr);
     if (event.code === 'DoubleClick') {
