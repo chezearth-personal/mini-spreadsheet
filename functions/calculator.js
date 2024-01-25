@@ -133,13 +133,23 @@ const parseReferences = (formula, doc) => {
 }
 
 /**
+  * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
 const formatNumber = (formula) => {
-  const stripEquals = formula.toString().substring(0, 1) === '='
+  const dropEquals = formula.toString().substring(0, 1) === '='
     ? formula.toString().substring(1)
     : formula.toString();
-  const stripDp = stripEquals.substring(0, 1) === '.' ? '0' + stripEquals : stripEquals;
-  return isNaN(Number(stripDp)) ? stripDp : Number(stripDp) === 0 ? '0' : stripDp;
+  const getNegsMatch = dropEquals.match(/^[\-]+/g)
+  // console.log(getNegsMatch);
+  const getNeg = getNegsMatch && getNegsMatch[0].length % 2 === 0 ? '' : '-';
+  const dropNegs = dropEquals.match(/[^\-][\.0-9]*/g);
+  // console.log(dropNegs);
+  const stripDp = dropNegs.length > 0
+    ? dropNegs[0].substring(0, 1) === '.' ? '0' + dropNegs : dropNegs
+    : '';
+  // console.log(stripDp);
+  const signed = getNeg + stripDp;
+  return isNaN(Number(signed)) ? signed : Number(signed) === 0 ? '0' : signed;
 }
 
 /**
