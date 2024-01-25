@@ -157,7 +157,6 @@ const refreshSheetStyling = (storageArr, doc) => {
     }
   } catch (e) {
     console.log(e);
-    return 0;
   }
 }
 
@@ -165,26 +164,24 @@ const refreshSheetStyling = (storageArr, doc) => {
   * Refresh the entire sheet's formulae
   */
 export function refreshSheetValues (event) {
-  try {
-    // console.log('this =', this);
-    if (this.storageArr && Array.isArray(this.storageArr) && getParentDocument(event)) {
-      this.storageArr.forEach((colArr, i) => {
-        if (colArr && Array.isArray(colArr)) {
-          colArr.forEach((cell, j) => {
-            if (cell[0]) {
-              const cellSheet = getParentDocument(event).getElementById(Array.of(i, j).join('-'));
-              cellSheet.value = '';
+  if (this.storageArr && Array.isArray(this.storageArr) && getParentDocument(event)) {
+    this.storageArr.forEach((colArr, i) => {
+      if (colArr && Array.isArray(colArr)) {
+        colArr.forEach((cell, j) => {
+          if (cell[0]) {
+            const cellSheet = getParentDocument(event).getElementById(Array.of(i, j).join('-'));
+            cellSheet.value = '';
+            try {
               cellSheet.value = parseFormula(cell[0], getParentDocument(event), this);
-              setAlignment(cellSheet, cell[0]);
+            } catch(e) {
+              console.log(e);
+              cellSheet.value = '#ERROR!';
             }
-          });
-        }
-      });
-    }
-    return -1;
-  } catch (e) {
-    console.log(e);
-    return 0;
+            setAlignment(cellSheet, cell[0]);
+          }
+        });
+      }
+    });
   }
 }
 
