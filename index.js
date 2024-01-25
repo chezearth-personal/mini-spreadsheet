@@ -1,6 +1,6 @@
 'use strict';
 
-import configs from './config.json' assert {type: 'json' };
+import { configs } from './config.js';
 import { createFormulaBar,
   refreshFormulaBar,
   updateFormulaBar } from './components/formulaBar.js';
@@ -20,6 +20,7 @@ import { createStorageArr } from './controllers/storageManager.js';
 const getStorageArr = () => storageArr;
 
 /**
+  * Get the main configuration settings as objects
   */
 const getSheetSize = () => configs.sheetSize;
 const getBuiltInFunctions = () => configs.builtInFunctions;
