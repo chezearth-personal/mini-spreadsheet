@@ -12,7 +12,6 @@ import { createSheet,
   refreshCell,
   refreshStorage,
   handleDoubleClick} from './components/sheet.js';
-// import { sheetSize } from './config.js';
 import { createStorageArr } from './controllers/storageManager.js';
 
 /**
@@ -53,13 +52,6 @@ const createBoundObj = (cell) => ({
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
 const sheet = document.querySelectorAll('input.cell');
-// console.log(document.getElementById('sheet'));
-// const boundObj = {
-  // storageArr: getStorageArr(),
-  // sheetSize: getSheetSize(),
-  // builtInFunctions: getBuiltInFunctions()
-// };
-// console.log(boundObj);
 document.addEventListener('keydown', handleKeyDown.bind(createBoundObj()));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', refreshStorage.bind(createBoundObj())));

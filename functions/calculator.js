@@ -133,6 +133,16 @@ const parseReferences = (formula, doc) => {
 }
 
 /**
+  */
+const formatNumber = (formula) => {
+  const stripEquals = formula.toString().substring(0, 1) === '='
+    ? formula.toString().substring(1)
+    : formula.toString();
+  const stripDp = stripEquals.substring(0, 1) === '.' ? '0' + stripEquals : stripEquals;
+  return isNaN(Number(stripDp)) ? stripDp : Number(stripDp) === 0 ? '0' : stripDp;
+}
+
+/**
   * The main function for calling the calculator that parses the formula expressions
   * into functions or arithmetic expressions.
   * Parameters:
@@ -140,11 +150,11 @@ const parseReferences = (formula, doc) => {
   *   doc: DOM document object
   */
 export const parseFormula = (formula, doc, data) => {
-  // console.log('boundData =', data);
   /** Treat anything after `'` as plain text */
   if (formula.substring(0, 1) === `'`) {
     return formula.substring(1);
   }
+  /** Process the formula as a number, a formula or default back to text */
   const functionResult = parseBuiltInFunctions(formula, doc, data);
   if (!functionResult && functionResult !== 0) {
     const testForFormula = (formula || '').toString().substring(0, 1) === '='
@@ -153,10 +163,7 @@ export const parseFormula = (formula, doc, data) => {
       ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())
         ? formula.toString().substring(1)
         : calcFormula(parseReferences(formula.toString().substring(1), doc))
-      : (formula || '' || formula === 0 ? formula : '').toString();
+      : (!formula && formula !== 0 ? '' : formatNumber(formula));
   }
-  const newFunctionResult = parseFormula(functionResult, doc, data);
-  return newFunctionResult.toString().substring(0, 1) === '='
-    ? newFunctionResult.toString().substring(1)
-    : newFunctionResult.toString();
+  return formatNumber(parseFormula(functionResult, doc, data));
 }

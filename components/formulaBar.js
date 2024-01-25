@@ -22,11 +22,12 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
 
 export function updateFormulaBar(event) {
   const currentCellCoordinatesArr = getAddress(event);
-  const storageHandler = refreshStorage.bind(this.storageArr);
+  // console.log(this);
+  const storageHandler = refreshStorage.bind(this);
   storageHandler(event);
+  // console.log(this);
   const keyDownHandler = handleKeyDown.bind(this);
   keyDownHandler(event);
-  // console.log('currentCellCoordinatesArr =', currentCellCoordinatesArr);
   getParentDocument(event).getElementById(currentCellCoordinatesArr.join('-')).blur();
   const refreshCells = refreshSheetValues.bind(this);
   refreshCells(event);

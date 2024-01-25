@@ -1,6 +1,5 @@
 'use strict';
 
-// import { sheetSize } from '../config.js';
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
 import { linearToColHeader,
@@ -47,7 +46,10 @@ const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
   */
 const newArray = (arr) => Array.of(arr[0], arr[1]);
 
-const testForNumericalValue = (str) => /^[\-0-9][\.0-9]*$/.test(str);
+/**
+  * Tests for a string that is purely numerical
+  */
+const testForNumericalValue = (str) => /^[\-\+\.0-9][\.0-9]*$/.test(str);
 
 /**
   * Creates the grid cells, with the header row and header columns identified in
