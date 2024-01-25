@@ -4,6 +4,9 @@
 
 It is hosted live [here](https://mini-spreadsheet.netlify.app/).
 
+The app does not save any data or calculations; when you refresh, everything you 
+typed will be gone.
+
 ## Basic functionality
 
 - The spreadsheet was created with vanilla javascript (no frameworks, although
@@ -46,13 +49,22 @@ a list of arguments that include ranges.
 
 ## Build principles
 
-- The choice was: use table widget or a flex-grid and and a long list of inputs. In the end I went for the flex-grid; it's more modern and the user's movement around the enclosed input boxes is more slick. It was tricky to get the column and row headings sticky.
-- I made lots of small functions spread over a number of JS modules. Not having any frameworks means not having any packages either -- no `npm install` to be done. However, there is one exception: I used Vite as a deploy solution.
-
-- Tests were written for the address-to-coorinates converter. Although other test files are on the system, they are empty. It takes a lot of time to write tests! In the real world, with a Production environment, this isn't an option.
-
-- The overall aim was to keep the app composable and extendable, allowing new functionality to be 'plugged in', rather than requiring new code builds.
+- The choice was: use table widget or a flex-grid and and a long list of inputs.
+In the end I went for the flex-grid; it's more modern and the user's movement 
+around the enclosed input boxes is more slick. It was tricky to get the column 
+and row headings sticky.
+- I made lots of small functions spread over a number of JS modules. Not having 
+any frameworks means not having any packages either -- no `npm install` to be 
+done. However, there is one exception: I used Vite as a deploy solution.
+- Tests were written for the address-to-coorinates converter. Although other 
+test files are on the system, they are empty. It takes a lot of time to write 
+tests! In the real world, with a Production environment, this isn't an option.
+- The overall aim was to keep the app composable and extendable, allowing new 
+functionality to be 'plugged in', rather than requiring new code builds.
 
 ## Building and running
 
-To build and run the app locally on your machine, clone this repo and `cd` into the working directory. Then `npm run build` will have Vite install the dependencies and build the code. To run it on your local machine, use `npm run dev`. To run the few tests that have been written, use `npm run test`.
+To build and run the app locally on your machine, clone this repo and `cd` into 
+the working directory. Then `npm run build` will have Vite install the 
+dependencies and build the code. To run it on your local machine, use 
+`npm run dev`. To run the few tests that have been written, use `npm run test`.
