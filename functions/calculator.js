@@ -148,12 +148,10 @@ const parseReferences = (formula, doc) => {
   */
 
 const formatCalcResult = (formula) => {
-  // console.log(!Object.getOwnPropertyNames(String.prototype).includes('dropLeadingChars'));
   if (!Object.getOwnPropertyNames(String.prototype).includes('dropLeadingChars')) {
     Object.defineProperties(String.prototype, {
       dropLeadingChars: {
         value: function(character) {
-          // console.log('dropLeadingChars() this =', this);
           return this.toString().substring(0, 1) === character
             ? this.toString().substring(1).dropLeadingChars(character)
             : this.toString();
@@ -161,9 +159,7 @@ const formatCalcResult = (formula) => {
       },
       getLeadingNegativeSigns: {
         value: function() {
-          // console.log('getLeadingNegativeSigns() this =', this);
           const getLeadingNegativeSignsArr = this.toString().match(/^[\-]+/g);
-          // console.log('getLeadingNegativeSignsArr =', getLeadingNegativeSignsArr);
           return Array.isArray(getLeadingNegativeSignsArr)
             && getLeadingNegativeSignsArr.length 
             && getLeadingNegativeSignsArr[0].length % 2 !== 0
@@ -173,7 +169,6 @@ const formatCalcResult = (formula) => {
       },
       coverLeadingDecimalPoint: {
         value: function() {
-          // console.log('coverLeadingDecimalPoint() this =', this);
           const dropLeadingNegativeSignsArr = this.toString().match(/[^\-][\.0-9]*/g);
           return Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
             ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
