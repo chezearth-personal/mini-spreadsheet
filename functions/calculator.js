@@ -1,22 +1,33 @@
 'use strict';
 
 import { toCellCoordinates } from './addressConverter.js';
-// import { builtInFunctions as builtInFunctionsArr } from '../config.js';
 
+/**
+  * Main basic calculator; converts a string into a calculation
+  */
 const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
 
+/**
+  * Array average function calculator
+  */
 const average = (paramsArr, doc) => {
   return Array.isArray(paramsArr) && count(paramsArr, doc) !== 0
     ? sum(paramsArr, doc) / count(paramsArr, doc)
-    : '!#DIV0';
+    : '#DIV0!';
 }
 
+/**
+  * Array count function calculator
+  */
 const count = (paramsArr, doc) => {
   return Array.isArray(paramsArr) && paramsArr
     .filter(param => !!doc.getElementById(param.join('-')).value || doc.getElementById(param.join('-')).value === 0)
     .length;
 }
 
+/**
+  * Array sum function calculator
+  */
 const sum = (paramsArr, doc, storageArr) => {
   return Array.isArray(paramsArr) && paramsArr
     .reduce((r, param) => {
@@ -135,25 +146,56 @@ const parseReferences = (formula, doc) => {
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
+
 const formatNumber = (formula) => {
-  const dropEquals = formula.toString().substring(0, 1) === '='
-    ? formula.toString().substring(1)
-    : formula.toString();
-  const getNegsMatch = dropEquals.match(/^[\-]+/g)
-  // console.log(getNegsMatch);
-  const getNeg = getNegsMatch && getNegsMatch[0].length % 2 === 0 ? '' : '-';
-  const dropNegs = dropEquals.match(/[^\-][\.0-9]*/g);
-  // console.log(dropNegs);
-  const stripDp = dropNegs.length > 0
-    ? dropNegs[0].substring(0, 1) === '.' ? '0' + dropNegs : dropNegs
-    : '';
-  // console.log(stripDp);
-  const signed = getNeg + stripDp;
-  return isNaN(Number(signed)) ? signed : Number(signed) === 0 ? '0' : signed;
+  Object.defineProperties(String.prototype, {
+    dropLeadingChars: {
+      value: function(character) {
+        return this.toString().substring(0, 1) === character
+          ? this.toString().substring(1).dropLeadingChars(character)
+          : this.toString();
+      }
+    },
+    getLeadingNegativeSigns: {
+      value: function() {
+        const getLeadingNegativeSignsArr = (formula) => formula.toString().match(/^[\-]+/g);
+        return Array.isArray(getLeadingNegativeSignsArr(this)) 
+          && getLeadingNegativeSignsArr(this).length 
+          && getLeadingNegativeSignsArr(this)[0].length % 2 === 0
+            ? '' 
+            : '-';
+      }
+    },
+    dropLeadingNegativeSigns: {
+      value: function() {
+        return this
+      }
+    },
+    coverLeadingDecimalPoint: {
+      value: function() {
+        const dropLeadingNegativeSignsArr = this.toString().match(/[^\-][\.0-9]*/g);
+        return Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
+          ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
+            ? '0' + dropLeadingNegativeSignsArr[0]
+            : dropLeadingNegativeSignsArr[0]
+          : '';
+      }
+    },
+    coalesceZero: {
+      value: function() {
+        return (Number(this))
+          ? this 
+          : Number(this) === 0 ? '0' : this;
+      }
+    }
+  }); 
+  return (formula.toString().dropLeadingChars('=').getLeadingNegativeSigns().getLeadingNegativeSigns()
+    + formula.toString().dropLeadingChars('=').coverLeadingDecimalPoint()
+  ).coalesceZero();
 }
 
 /**
-  * The main function for calling the calculator that parses the formula expressions
+  * The main function for calling the calculator th at parses the formula expressions
   * into functions or arithmetic expressions.
   * Parameters:
   *   formula: string

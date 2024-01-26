@@ -15,15 +15,15 @@ import { createSheet,
 import { createStorageArr } from './controllers/storageManager.js';
 
 /**
-  * Getter for the storage array
-  */
-const getStorageArr = () => storageArr;
-
-/**
   * Get the main configuration settings as objects
   */
 const getSheetSize = () => configs.sheetSize;
 const getBuiltInFunctions = () => configs.builtInFunctions;
+
+/**
+  * Getter for the storage array
+  */
+const getStorageArr = () => storageArr;
 
 /**
   * Creates an array (2 dimesions: `sheetSize.columns` x `sheetSize.rows`) for storing formulae

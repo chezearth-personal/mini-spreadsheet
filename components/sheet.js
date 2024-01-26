@@ -2,20 +2,27 @@
 
 import { getParentDocument } from './main.js';
 import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
-import { linearToColHeader,
+import {
+  linearToColHeader,
   linearToRowHeader,
   linearToGrid,
   toCellAddress,
   toCellCoordinates } from '../functions/addressConverter.js';
 import { parseFormula } from '../functions/calculator.js';
-import { getFormula,
+import {
+  getFormula,
   saveFormula,
   getStyling,
-  saveStyling} from '../controllers/storageManager.js';
+  saveStyling } from '../controllers/storageManager.js';
 
 const getId = () => 'id';
 
 const getValue = () => 'value';
+
+/**
+  * Adds an autocomplete attribute
+  */
+const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
 
 /**
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
@@ -37,9 +44,11 @@ const makeRowHeaderCell = (e, i, columns) => `${e}row-header" id="${linearToRowH
 const makeSheetCell = (e, i, columns) => `${e}cell" id=${linearToGrid(i, columns)} type="text" />`;
 
 /**
-  * Adds an autocomplete attribute
+  * Decides whether to make row header cell (left-most column) or a sheet cell
   */
-const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
+const makeRowCell = (e, i, columns) => i % (columns + 1) === 0 
+  ? makeRowHeaderCell(e, i, columns)
+  : makeSheetCell(e, i, columns)
 
 /**
   * Creates a new 2-element array with the same element values
@@ -58,10 +67,7 @@ const testForNumericalValue = (str) => /^[\-\+\.0-9][\.0-9]*$/.test(str);
 function createCells(columns, rows) {
   return Array((columns + 1) * (rows + 1))
     .fill(`<input class="`)
-    .map((e, i) => i < (columns + 1)
-      ? makeColumnHeaderCell(e, i)
-      : i % (columns + 1) === 0 ? makeRowHeaderCell(e, i, columns) : makeSheetCell(e, i, columns)
-    )
+    .map((e, i) => i < (columns + 1) ? makeColumnHeaderCell(e, i) : makeRowCell(e, i, columns))
     .join('\n');
 }
 
@@ -202,7 +208,6 @@ export const clickCell = (event) => {
 export function handleKeyDown(event) {
   // console.log('handleKeyDown event');
   // console.log(getParentDocument(event).activeElement.id);
-  // console.log(getParentDocument(event).activeElement.id === 'body');
   if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
     || getParentDocument(event).activeElement.id === 'body'
     || event.code === 'Enter'
@@ -215,7 +220,6 @@ export function handleKeyDown(event) {
     if (event.code === 'Enter') {
       getParentDocument(event).getElementById(oldCellCoordinatesArr.join('-')).blur();
     }
-    // console.log(oldCellCoordinatesArr);
     if (event.code === 'DoubleClick') {
     } else if (/^Shift/.test(event.code)
       || /^Alt/.test(event.code)
@@ -237,7 +241,6 @@ export function handleKeyDown(event) {
       getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
       setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
       getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
-      // console.log('this(storageArr) =', this);
       const boundObj = {
         storageArr: this.storageArr,
         cellCoordinatesArr: newCellCoordinatesArr
@@ -245,7 +248,6 @@ export function handleKeyDown(event) {
       const formulaBar = refreshFormulaBar.bind(boundObj);
       formulaBar(event);
     } else {
-      // console.log(getAddress(event).join('-'));
       const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
       if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
       elem.focus();
