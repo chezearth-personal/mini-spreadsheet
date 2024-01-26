@@ -148,48 +148,50 @@ const parseReferences = (formula, doc) => {
   */
 
 const formatCalcResult = (formula) => {
-  Object.defineProperties(String.prototype, {
-    dropLeadingChars: {
-      value: function(character) {
-        return this.toString().substring(0, 1) === character
-          ? this.toString().substring(1).dropLeadingChars(character)
-          : this.toString();
+  // console.log(!Object.getOwnPropertyNames(String.prototype).includes('dropLeadingChars'));
+  if (!Object.getOwnPropertyNames(String.prototype).includes('dropLeadingChars')) {
+    Object.defineProperties(String.prototype, {
+      dropLeadingChars: {
+        value: function(character) {
+          // console.log('dropLeadingChars() this =', this);
+          return this.toString().substring(0, 1) === character
+            ? this.toString().substring(1).dropLeadingChars(character)
+            : this.toString();
+        }
+      },
+      getLeadingNegativeSigns: {
+        value: function() {
+          // console.log('getLeadingNegativeSigns() this =', this);
+          const getLeadingNegativeSignsArr = this.toString().match(/^[\-]+/g);
+          // console.log('getLeadingNegativeSignsArr =', getLeadingNegativeSignsArr);
+          return Array.isArray(getLeadingNegativeSignsArr)
+            && getLeadingNegativeSignsArr.length 
+            && getLeadingNegativeSignsArr[0].length % 2 !== 0
+              ? '-' 
+              : '';
+        }
+      },
+      coverLeadingDecimalPoint: {
+        value: function() {
+          // console.log('coverLeadingDecimalPoint() this =', this);
+          const dropLeadingNegativeSignsArr = this.toString().match(/[^\-][\.0-9]*/g);
+          return Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
+            ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
+              ? '0' + dropLeadingNegativeSignsArr[0]
+              : dropLeadingNegativeSignsArr[0]
+            : '';
+        }
+      },
+      coalesceZero: {
+        value: function() {
+          return (Number(this))
+            ? this 
+            : Number(this) === 0 ? '0' : this;
+        }
       }
-    },
-    getLeadingNegativeSigns: {
-      value: function() {
-        const getLeadingNegativeSignsArr = (formula) => formula.toString().match(/^[\-]+/g);
-        return Array.isArray(getLeadingNegativeSignsArr(this)) 
-          && getLeadingNegativeSignsArr(this).length 
-          && getLeadingNegativeSignsArr(this)[0].length % 2 === 0
-            ? '' 
-            : '-';
-      }
-    },
-    dropLeadingNegativeSigns: {
-      value: function() {
-        return this
-      }
-    },
-    coverLeadingDecimalPoint: {
-      value: function() {
-        const dropLeadingNegativeSignsArr = this.toString().match(/[^\-][\.0-9]*/g);
-        return Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
-          ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
-            ? '0' + dropLeadingNegativeSignsArr[0]
-            : dropLeadingNegativeSignsArr[0]
-          : '';
-      }
-    },
-    coalesceZero: {
-      value: function() {
-        return (Number(this))
-          ? this 
-          : Number(this) === 0 ? '0' : this;
-      }
-    }
-  }); 
-  return (formula.toString().dropLeadingChars('=').getLeadingNegativeSigns().getLeadingNegativeSigns()
+    }); 
+  }
+  return (formula.toString().dropLeadingChars('=').getLeadingNegativeSigns()
     + formula.toString().dropLeadingChars('=').coverLeadingDecimalPoint()
   ).coalesceZero();
 }
@@ -217,5 +219,7 @@ export const parseFormula = (formula, doc, data) => {
         : calcFormula(parseReferences(formula.toString().substring(1), doc))
       : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
   }
+  const r = parseFormula(functionResult, doc, data);
+  console.log(r);
   return formatCalcResult(parseFormula(functionResult, doc, data));
 }
