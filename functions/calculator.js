@@ -147,7 +147,7 @@ const parseReferences = (formula, doc) => {
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
 
-const formatNumber = (formula) => {
+const formatCalcResult = (formula) => {
   Object.defineProperties(String.prototype, {
     dropLeadingChars: {
       value: function(character) {
@@ -215,7 +215,7 @@ export const parseFormula = (formula, doc, data) => {
       ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())
         ? formula.toString().substring(1)
         : calcFormula(parseReferences(formula.toString().substring(1), doc))
-      : (!formula && formula !== 0 ? '' : formatNumber(formula));
+      : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
   }
-  return formatNumber(parseFormula(functionResult, doc, data));
+  return formatCalcResult(parseFormula(functionResult, doc, data));
 }
