@@ -184,7 +184,6 @@ function formattingFunctions(formula) {
       return this;
     },
     result: function() {
-      // console.log('result() =', formula);
       return formula;
     }
   }
