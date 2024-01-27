@@ -67,7 +67,7 @@ const functionHandler = (paramsArr, func, doc, storageArr) => {
       return sum(paramsArr, doc, storageArr);
     }
   }
-  return '!#REF';
+  return '#REF!';
 }
 
 /**
@@ -117,10 +117,8 @@ const functionParametersHandler = (formula, func, doc, data) => {
   * handler
   */
 const parseBuiltInFunctions = (formula, doc, data) => {
-  // console.log(data.builtInFunctions);
   return containsFunction(data.builtInFunctions, formula)
     ? data.builtInFunctions.reduce((result, func) => {
-        // console.log('func =', func);
         const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
           const range = functionParametersHandler(match, func, doc, data);
           return range.toString();
@@ -135,6 +133,7 @@ const parseBuiltInFunctions = (formula, doc, data) => {
   * on the grid input
   */
 const parseReferences = (formula, doc) => {
+  // console.log('formula =', formula);
   return !formula
     ? 0
     : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
@@ -143,53 +142,80 @@ const parseReferences = (formula, doc) => {
       });
 }
 
+const formulaString = (formula) => formula || '';
+
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
+function formattingFunctions(formula) {
+  // console.log('formattingFunctions(): formula =', formula);
+  return {
+    dropLeadingChars: function(character) {
+      formula = formulaString(formula).toString().substring(0, 1) === character.toString().substring(0, 1)
+        ? formattingFunctions(formulaString(formula).toString().substring(1)).dropLeadingChars(character).result()
+        : formulaString(formula).toString();
+      // console.log('formattingFunctions().dropLeadingChars(): formula =', formula);
+      return this;
+    },
+    getLeadingNegativeSigns: function() {
+      // console.log(formula)
+      const getLeadingNegativeSignsArr = formulaString(formula).toString().match(/^[\-]+/g);
+      formula = Array.isArray(getLeadingNegativeSignsArr)
+        && getLeadingNegativeSignsArr.length 
+        && getLeadingNegativeSignsArr[0].length % 2 !== 0
+          ? '-' 
+          : '';
+      // console.log('formattingFunctions().getLeadingNegativeSigns(): formula =', formula);
+      return this;
+    },
+    coverLeadingDecimalPoint: function() {
+      const dropLeadingNegativeSignsArr = formulaString(formula).toString().match(/[^\-][\.0-9]*/g);
+      // console.log('dropLeadingNegativeSignsArr =', dropLeadingNegativeSignsArr);
+      formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
+        ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
+          ? '0' + dropLeadingNegativeSignsArr[0]
+          : dropLeadingNegativeSignsArr[0]
+        : '';
+      // console.log('formattingFunctions().coverLeadingDecimalPoint(): formula =', formula);
+      return this;
+    },
+    coalesceToZero: function() {
+      formula = isNaN(Number(formulaString(formula)))
+        ? formulaString(formula)
+        : Number(formulaString(formula)) === 0 ? '0' : formulaString(formula);
+      return this;
+    },
+    result: function() {
+      // console.log('formattingFunctions().result(): formula =', formula);
+      return formula;
+    }
+  }
+}
+
+const getSign = (formula) => formattingFunctions(formula)
+  .dropLeadingChars('=')
+  .getLeadingNegativeSigns()
+  .result();
+
+const getNumerical = (formula) => formattingFunctions(formula)
+  .dropLeadingChars('=')
+  .coverLeadingDecimalPoint()
+  .result();
 
 const formatCalcResult = (formula) => {
-  if (!Object.getOwnPropertyNames(String.prototype).includes('dropLeadingChars')) {
-    Object.defineProperties(String.prototype, {
-      dropLeadingChars: {
-        value: function(character) {
-          return this.toString().substring(0, 1) === character
-            ? this.toString().substring(1).dropLeadingChars(character)
-            : this.toString();
-        }
-      },
-      getLeadingNegativeSigns: {
-        value: function() {
-          const getLeadingNegativeSignsArr = this.toString().match(/^[\-]+/g);
-          return Array.isArray(getLeadingNegativeSignsArr)
-            && getLeadingNegativeSignsArr.length 
-            && getLeadingNegativeSignsArr[0].length % 2 !== 0
-              ? '-' 
-              : '';
-        }
-      },
-      coverLeadingDecimalPoint: {
-        value: function() {
-          const dropLeadingNegativeSignsArr = this.toString().match(/[^\-][\.0-9]*/g);
-          return Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
-            ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
-              ? '0' + dropLeadingNegativeSignsArr[0]
-              : dropLeadingNegativeSignsArr[0]
-            : '';
-        }
-      },
-      coalesceZero: {
-        value: function() {
-          return (Number(this))
-            ? this 
-            : Number(this) === 0 ? '0' : this;
-        }
-      }
-    }); 
-  }
-  return (formula.toString().dropLeadingChars('=').getLeadingNegativeSigns()
-    + formula.toString().dropLeadingChars('=').coverLeadingDecimalPoint()
-  ).coalesceZero();
+  console.log(formula);
+  // const getSign = 
+  console.log('getSign =', getSign(formula));
+  // const getNumerical = 
+  console.log('getNumerical =', getNumerical(formula));
+  return formattingFunctions(getSign(formula) + getNumerical(formula))
+    .coalesceToZero()
+    .result();
 }
+
+const testForFormula = (formula) => formulaString(formula).toString().substring(0, 1) === '='
+      || formulaString(formula).toString().substring(0, 1) === '+';
+const testForReferences = (formula) => /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formulaString(formula).toString());
 
 /**
   * The main function for calling the calculator th at parses the formula expressions
@@ -200,21 +226,21 @@ const formatCalcResult = (formula) => {
   */
 export const parseFormula = (formula, doc, data) => {
   /** Treat anything after `'` as plain text */
-  if (formula.substring(0, 1) === `'`) {
-    return formula.substring(1);
+  if (formulaString(formula).toString().substring(0, 1) === `'`) {
+    return formulaString(formula).toString().substring(1);
   }
   /** Process the formula as a number, a formula or default back to text */
-  const functionResult = parseBuiltInFunctions(formula, doc, data);
+  const functionResult = parseBuiltInFunctions(formulaString(formula), doc, data);
   if (!functionResult && functionResult !== 0) {
-    const testForFormula = (formula || '').toString().substring(0, 1) === '='
-      || (formula || '').toString().substring(0, 1) === '+';
-    return testForFormula
-      ? /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula.toString())
-        ? formula.toString().substring(1)
-        : calcFormula(parseReferences(formula.toString().substring(1), doc))
+    // console.log('testForFormula? ', testForFormula(formula));
+    // console.log('testForReferences? ', testForReferences(formula));
+    return testForFormula(formula)
+      ? testForReferences(formula)
+        ? formattingFunctions(formula).dropLeadingChars('=').result().toString()
+        : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result().toString(), doc))
       : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
   }
-  const r = parseFormula(functionResult, doc, data);
-  console.log(r);
+  // const r = parseFormula(functionResult, doc, data);
+  // console.log(r);
   return formatCalcResult(parseFormula(functionResult, doc, data));
 }
