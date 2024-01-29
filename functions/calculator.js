@@ -2,7 +2,7 @@
 
 import { toCellCoordinates } from './addressConverter.js';
 
-const coalesceFormula = (formula) => formula || '';
+const coalesceFormula = (formula) => (formula || '').toString();
 
 const testForFormula = (formula) => coalesceFormula(formula).toString().substring(0, 1) === '='
       || coalesceFormula(formula).toString().substring(0, 1) === '+';
@@ -140,22 +140,27 @@ const parseBuiltInFunctions = (formula, doc, data) => {
   * on the grid input
   */
 const parseReferences = (formula, doc) => {
-  return !formula
+  // console.log('parseReferences(): formula =', formula);
+  const res = !formula
     ? 0
     : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
+        // console.log('parseReferences(): formula=', formula, '; match =', match, ';', toCellCoordinates(match));
         const elem = doc.getElementById(toCellCoordinates(match).join('-'));
         return elem ? !elem.value ? 0 : elem.value : '#REF!'
       });
+  // console.log('parseReferences(): res =', res);
+  return res;
 }
+
 
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
 function formattingFunctions(formula) {
   return {
-    dropLeadingChars: function(character) {
-      formula = coalesceFormula(formula).toString().substring(0, 1) === character.toString().substring(0, 1)
-        ? formattingFunctions(coalesceFormula(formula).toString().substring(1)).dropLeadingChars(character).result()
+    dropLeadingChars: function(ch) {
+      formula = coalesceFormula(formula).substring(0, 1) === ch.toString().substring(0, 1)
+        ? formattingFunctions(coalesceFormula(formula).substring(1)).dropLeadingChars(ch).result()
         : coalesceFormula(formula).toString();
       return this;
     },
@@ -169,12 +174,13 @@ function formattingFunctions(formula) {
       return this;
     },
     coverLeadingDecimalPoint: function() {
-      const dropLeadingNegativeSignsArr = coalesceFormula(formula).toString().match(/[^\-][\.0-9]*/g);
+      const dropLeadingNegativeSignsArr = coalesceFormula(formula).toString().match(/[^\-].*/g);
       formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
         ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
           ? '0' + dropLeadingNegativeSignsArr[0]
           : dropLeadingNegativeSignsArr[0]
         : '';
+      // console.log('formattingFunctions(): coverLeadingDecimalPoint() =', formula);
       return this;
     },
     coalesceToZero: function() {
@@ -184,6 +190,7 @@ function formattingFunctions(formula) {
       return this;
     },
     result: function() {
+      // console.log('formattingFunctions(): result =', formula);
       return formula;
     }
   }
@@ -223,7 +230,8 @@ export const parseFormula = (formula, doc, data) => {
     return testForFormula(formula)
       ? testForReferences(formula)
         ? formattingFunctions(formula).dropLeadingChars('=').result().toString()
-        : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result(), doc))
+        : calcFormula(parseReferences(formatCalcResult(formula), doc))
+        // : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result(), doc))
       : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
   }
   return formatCalcResult(parseFormula(functionResult, doc, data));
