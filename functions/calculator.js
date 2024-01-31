@@ -4,10 +4,22 @@ import { toCellCoordinates } from './addressConverter.js';
 
 const coalesceFormula = (formula) => (formula || '').toString();
 
+/**
+  * Determine if the cell expression is a formula, i.e. starts with '='
+  */
 const testForFormula = (formula) => coalesceFormula(formula).toString().substring(0, 1) === '='
       || coalesceFormula(formula).toString().substring(0, 1) === '+';
 
+/**
+  * Determine if there are cell references (addresses) in the formula
+  */
 const testForReferences = (formula) => /[A-Za-z]$|[A-Za-z][^0-9]/g.test(coalesceFormula(formula).toString());
+
+/**
+  * Determine if at least one ocurrance of the formula is present
+  */
+const testForBuiltInFunction = (formula, builtInFunctionsArr) => builtInFunctionsArr
+  .reduce((result, func) => result || functionRegExp(func.name).test(formula.toUpperCase()), false);
 
 /**
   * Main basic calculator; converts a string into a calculation
@@ -48,12 +60,6 @@ const sum = (paramsArr, doc, storageArr) => {
   * Creates a RegExp based on the function's name (e.g. SUM, COUNT, etc.)
   */
 const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\\(\\)]+\\)`, 'g');
-
-/**
-  * Determine if at least one ocurrance of the formula is present
-  */
-const containsFunction = (builtInFunctionsArr, formula) => builtInFunctionsArr
-  .reduce((result, func) => result || functionRegExp(func.name).test(formula.toUpperCase()), false);
 
 /**
   * Determines if an experssion is a range, e.g. A2:C4
@@ -111,7 +117,7 @@ const paramsListHandler = (paramsList) => {
   */
 const functionParametersHandler = (formula, func, doc, data) => {
   const parameters = formula.match(/\(.+\)/g)[0].slice(1, -1);
-  const resolvedParameters = containsFunction(data.builtInFunctions, parameters)
+  const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
     ? parseBuiltInFunctions(parameters, doc)
     : parameters;
   const paramsArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
@@ -124,7 +130,7 @@ const functionParametersHandler = (formula, func, doc, data) => {
   * handler
   */
 const parseBuiltInFunctions = (formula, doc, data) => {
-  return containsFunction(data.builtInFunctions, formula)
+  return testForBuiltInFunction(formula, data.builtInFunctions)
     ? data.builtInFunctions.reduce((result, func) => {
         const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
           const range = functionParametersHandler(match, func, doc, data);
@@ -226,6 +232,7 @@ export const parseFormula = (formula, doc, data) => {
   }
   /** Process the formula as a number, a formula or default back to text */
   const functionResult = parseBuiltInFunctions(coalesceFormula(formula), doc, data);
+  console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForFormula(formula)
       ? testForReferences(formula)
