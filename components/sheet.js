@@ -251,7 +251,7 @@ export function handleKeyDown(event) {
       formulaBar(event);
     } else {
       const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
-      console.log(getParentDocument(event).activeElement.id, elem.id)
+      // console.log(getParentDocument(event).activeElement.id, elem.id)
       if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
     }
   }
