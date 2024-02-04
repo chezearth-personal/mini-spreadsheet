@@ -9,7 +9,7 @@ import { createSheet,
   clickCell,
   handleKeyDown,
   handleStyling,
-  refreshCell,
+  // refreshCell,
   refreshStorage,
   handleDoubleClick} from './components/sheet.js';
 import { createStorageArr } from './controllers/storageManager.js';
@@ -57,21 +57,31 @@ document.addEventListener('keydown', handleKeyDown.bind(createBoundObj()));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', refreshStorage.bind(createBoundObj())));
 sheet.forEach(cell => cell.addEventListener('input', refreshFormulaBar.bind(createBoundObj(cell))));
-sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr())));
+sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr(cell))));
 sheet.forEach(cell => cell.addEventListener('focus', refreshFormulaBar.bind(createBoundObj(cell))));
 document
   .getElementById('formula-input')
   .addEventListener('change', updateFormulaBar.bind(createBoundObj()));
 document
   .getElementById('refresh')
-  .addEventListener('click', refreshSheetValues.bind(createBoundObj()));
-document.getElementById('formula-input').addEventListener('input', refreshCell);
+  .addEventListener('click', refreshSheetValues.bind(
+    createBoundObj()
+  ));
+// document
+  // .getElementById('formula-input')
+  // .addEventListener('keydown', updateFormulaBar.bind(createBoundObj()));
 document
   .getElementById('format-bold')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr() , style: 'B' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'B' }
+  ));
 document
   .getElementById('format-italic')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr(), style: 'I' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'I' }
+  ));
 document
   .getElementById('format-underline')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr(), style: 'U' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'U' }
+  ));

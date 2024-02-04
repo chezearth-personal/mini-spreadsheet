@@ -206,14 +206,15 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export function handleKeyDown(event) {
-  // console.log('handleKeyDown event');
-  // console.log(getParentDocument(event).activeElement.id);
+  // console.log('handleKeyDown():handleKeyDown event');
+  // console.log('handleKeyDown():activeElement.id =', getParentDocument(event).activeElement.id);
   if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
     || getParentDocument(event).activeElement.id === 'body'
     || event.code === 'Enter'
+    || getParentDocument(event).activeElement.id === 'formula-input' && event.code === 'Tab'
   ) {
     const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
-    // console.log(event.code, event.key, event.keyCode);
+    // console.log('event.code =', event.code, event.key, event.keyCode);
     if (event.code === 'Tab' ) {
       event.preventDefault();
     }
