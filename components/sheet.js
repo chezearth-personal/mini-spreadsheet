@@ -246,6 +246,8 @@ export function handleKeyDown(event) {
         storageArr: this.storageArr,
         cellCoordinatesArr: newCellCoordinatesArr
       };
+      const sheetValues = refreshSheetValues.bind(this);
+      sheetValues(event);
       const formulaBar = refreshFormulaBar.bind(boundObj);
       formulaBar(event);
     } else {

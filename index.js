@@ -68,9 +68,6 @@ document
     createBoundObj()
   ));
 document.getElementById('formula-input').addEventListener('input', refreshCell);
-// document
-  // .getElementById('formula-input')
-  // .addEventListener('keydown', updateFormulaBar.bind(createBoundObj()));
 document
   .getElementById('format-bold')
   .addEventListener('click', handleStyling.bind(
