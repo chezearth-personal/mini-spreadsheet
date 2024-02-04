@@ -2,7 +2,7 @@
 
 import { getParentDocument } from './main.js';
 import { getFormula } from '../controllers/storageManager.js';
-import { handleKeyDown, refreshStorage, getAddress, refreshSheetValues } from './sheet.js';
+import { /*handleKeyDown, */refreshStorage, getAddress, refreshSheetValues } from './sheet.js';
 
 /**
   * For storing address state (could use grid element 0)
@@ -21,14 +21,21 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
 }
 
 export function updateFormulaBar(event) {
+  // console.log('updateFormulaBar(): event =', event);
   const currentCellCoordinatesArr = getAddress(event);
-  getParentDocument(event).getElementById(currentCellCoordinatesArr.join('-')).blur();
+  // console.log('updateFormulaBar(): currentCellCoordinates = ', currentCellCoordinates);
+  this.cellCoordinatesArr = [...currentCellCoordinatesArr];
+  // console.log('updateFormulaBar(): this =', this);
+  // getParentDocument(event).getElementById(currentCellCoordinatesArr.join('-')).blur();
   const storageHandler = refreshStorage.bind(this);
   storageHandler(event);
-  const keyDownHandler = handleKeyDown.bind(this);
-  keyDownHandler(event);
+  // console.log('Call handleKeyDown(event) ...');
+  // const keyDownHandler = handleKeyDown.bind(this);
+  // keyDownHandler(event);
   const refreshCells = refreshSheetValues.bind(this);
   refreshCells(event);
+  getParentDocument(event).getElementById(currentCellCoordinatesArr.join('-')).blur();
+  event.preventDefault();
 }
 
 /**

@@ -64,14 +64,25 @@ document
   .addEventListener('change', updateFormulaBar.bind(createBoundObj()));
 document
   .getElementById('refresh')
-  .addEventListener('click', refreshSheetValues.bind(createBoundObj()));
+  .addEventListener('click', refreshSheetValues.bind(
+    createBoundObj()
+  ));
 document.getElementById('formula-input').addEventListener('input', refreshCell);
+// document
+  // .getElementById('formula-input')
+  // .addEventListener('keydown', updateFormulaBar.bind(createBoundObj()));
 document
   .getElementById('format-bold')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr() , style: 'B' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'B' }
+  ));
 document
   .getElementById('format-italic')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr(), style: 'I' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'I' }
+  ));
 document
   .getElementById('format-underline')
-  .addEventListener('click', handleStyling.bind({ storageArr: getStorageArr(), style: 'U' }));
+  .addEventListener('click', handleStyling.bind(
+    { storageArr: getStorageArr(), style: 'U' }
+  ));
