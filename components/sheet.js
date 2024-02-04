@@ -240,14 +240,14 @@ export function handleKeyDown(event) {
       // console.log(newCellCoordinatesArr);
       const toId = newCellCoordinatesArr.join('-');
       getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
+      const sheetValues = refreshSheetValues.bind(this);
+      sheetValues(event);
       setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
       getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
       const boundObj = {
         storageArr: this.storageArr,
         cellCoordinatesArr: newCellCoordinatesArr
       };
-      const sheetValues = refreshSheetValues.bind(this);
-      sheetValues(event);
       const formulaBar = refreshFormulaBar.bind(boundObj);
       formulaBar(event);
     } else {
