@@ -57,7 +57,7 @@ document.addEventListener('keydown', handleKeyDown.bind(createBoundObj()));
 sheet.forEach(cell => cell.addEventListener('click', clickCell));
 sheet.forEach(cell => cell.addEventListener('change', refreshStorage.bind(createBoundObj())));
 sheet.forEach(cell => cell.addEventListener('input', refreshFormulaBar.bind(createBoundObj(cell))));
-sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr(cell))));
+sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr())));
 sheet.forEach(cell => cell.addEventListener('focus', refreshFormulaBar.bind(createBoundObj(cell))));
 document
   .getElementById('formula-input')
