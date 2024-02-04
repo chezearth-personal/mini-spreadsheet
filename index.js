@@ -9,7 +9,7 @@ import { createSheet,
   clickCell,
   handleKeyDown,
   handleStyling,
-  // refreshCell,
+  refreshCell,
   refreshStorage,
   handleDoubleClick} from './components/sheet.js';
 import { createStorageArr } from './controllers/storageManager.js';
@@ -67,6 +67,7 @@ document
   .addEventListener('click', refreshSheetValues.bind(
     createBoundObj()
   ));
+document.getElementById('formula-input').addEventListener('input', refreshCell);
 // document
   // .getElementById('formula-input')
   // .addEventListener('keydown', updateFormulaBar.bind(createBoundObj()));
