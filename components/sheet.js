@@ -208,13 +208,12 @@ export const clickCell = (event) => {
 export function handleKeyDown(event) {
   // console.log('handleKeyDown event');
   // console.log(getParentDocument(event).activeElement.id);
-  // console.log(event.code);
   if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
     || getParentDocument(event).activeElement.id === 'body'
     || event.code === 'Enter'
   ) {
     const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
-    console.log(event.code, event.key, event.keyCode);
+    // console.log(event.code, event.key, event.keyCode);
     if (event.code === 'Tab' ) {
       event.preventDefault();
     }
@@ -239,7 +238,7 @@ export function handleKeyDown(event) {
           : event.code === 'ArrowRight' || event.code === 'Tab'
             ? navRight(oldCellCoordinatesArr, this.sheetSize.columns)
             : navDown(oldCellCoordinatesArr, this.sheetSize.rows);
-      console.log(newCellCoordinatesArr);
+      // console.log(newCellCoordinatesArr);
       const toId = newCellCoordinatesArr.join('-');
       getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
       setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
@@ -251,10 +250,9 @@ export function handleKeyDown(event) {
       const formulaBar = refreshFormulaBar.bind(boundObj);
       formulaBar(event);
     } else {
-      console.log('not a nav');
       const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
-      console.log(getParentDocument(event).activeElement.id, elem.id)
-      // if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
+      // console.log(getParentDocument(event).activeElement.id, elem.id)
+      if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
     }
   }
 }
