@@ -218,11 +218,9 @@ export function handleKeyDown(event) {
       event.preventDefault();
     }
     if (event.code === 'Enter') {
-      // event.preventDefault();
       getParentDocument(event).getElementById(oldCellCoordinatesArr.join('-')).blur();
     }
     if (event.code === 'DoubleClick') {
-      elem.focus();
     } else if (/^Shift/.test(event.code)
       || /^Alt/.test(event.code)
       || /^Meta/.test(event.code)
@@ -251,8 +249,8 @@ export function handleKeyDown(event) {
       formulaBar(event);
     } else {
       const elem = getParentDocument(event).getElementById(getAddress(event).join('-'));
-      console.log(getParentDocument(event).activeElement.id, elem.id)
       if (getParentDocument(event).activeElement.id !== elem.id) { elem.value = null; }
+      elem.focus();
     }
   }
 }
