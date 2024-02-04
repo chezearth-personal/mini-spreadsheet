@@ -20,15 +20,14 @@ export const setCellCoordinatesArr = (cellCoordinatesArr) => {
   currentCellCoordinates = cellCoordinatesArr;
 }
 
+/**
+  * Event handler that runs every time the formula bar is updated
+  */
 export function updateFormulaBar(event) {
-  // console.log('updateFormulaBar(): event =', event);
   const currentCellCoordinatesArr = getAddress(event);
-  // console.log('updateFormulaBar(): currentCellCoordinates = ', currentCellCoordinates);
   this.cellCoordinatesArr = [...currentCellCoordinatesArr];
-  // console.log('updateFormulaBar(): this =', this);
   const storageHandler = refreshStorage.bind(this);
   storageHandler(event);
-  // console.log('Call handleKeyDown(event) ...');
   const refreshCells = refreshSheetValues.bind(this);
   refreshCells(event);
   getParentDocument(event).getElementById(currentCellCoordinatesArr.join('-')).blur();
