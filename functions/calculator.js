@@ -11,7 +11,7 @@ const coalesceExpression = (expression) => (expression || '').toString();
   * Determine if the expression is text
   */
 const testForText = (expression) => {
-  console.log(expression, expression.substring(0, 1) === `'`);
+  // console.log(expression, expression.substring(0, 1) === `'`);
   expression.substring(0, 1) === `'`;
 }
 
@@ -19,8 +19,8 @@ const testForText = (expression) => {
   * Determine if the cell expression is a formula, i.e. starts with '='
   */
 const testForFormula = (expression) => expression.substring(0, 1) === '='
-      || expression.substring(0, 1) === '+'
-      || expression.substring(0, 1) === '-';
+  || expression.substring(0, 1) === '+'
+  || expression.substring(0, 1) === '-';
 
 /**
   * Determine if there are cell references (addresses) in the formula
@@ -195,14 +195,14 @@ const parseReferences = (formula, data) => {
 function formattingFunctions(formula) {
   return {
     dropLeadingChars: function(ch) {
-      console.log('formattingFunctions().dropLeadingChars() typeof formula =', typeof formula);
+      // console.log('formattingFunctions().dropLeadingChars() typeof formula =', typeof formula);
       formula = coalesceExpression(formula).substring(0, 1) === ch.toString().substring(0, 1)
         ? formattingFunctions(coalesceExpression(formula).substring(1)).dropLeadingChars(ch).result()
         : coalesceExpression(formula).toString();
       return this;
     },
     getLeadingNegativeSign: function() {
-      console.log('formattingFunctions().getLeadingNegativeSign() typeof formula =', typeof formula);
+      // console.log('formattingFunctions().getLeadingNegativeSign() typeof formula =', typeof formula);
       const getLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/^[\-]+/g);
       formula = Array.isArray(getLeadingNegativeSignsArr)
         && getLeadingNegativeSignsArr.length 
@@ -212,7 +212,7 @@ function formattingFunctions(formula) {
       return this;
     },
     coverLeadingDecimalPoint: function() {
-      console.log('formattingFunctions().coverLeadingDecimalPoint() typeof formula =', typeof formula);
+      // console.log('formattingFunctions().coverLeadingDecimalPoint() typeof formula =', typeof formula);
       const dropLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/[^\-].*/g);
       formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
         ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
@@ -223,7 +223,7 @@ function formattingFunctions(formula) {
       return this;
     },
     coalesceToZero: function() {
-      console.log('formattingFunctions().coalesceToZero() typeof formula =', typeof formula);
+      // console.log('formattingFunctions().coalesceToZero() typeof formula =', typeof formula);
       formula = isNaN(Number(coalesceExpression(formula)))
         ? coalesceExpression(formula)
         : Number(coalesceExpression(formula)) === 0 ? '0' : coalesceExpression(formula);
@@ -231,7 +231,7 @@ function formattingFunctions(formula) {
     },
     result: function() {
       // console.log('formattingFunctions(): result =', formula);
-      console.log('formattingFunctions().result typeof formula =', typeof formula);
+      // console.log('formattingFunctions().result typeof formula =', typeof formula);
       return formula;
     }
   }
@@ -256,7 +256,7 @@ const formatCalcResult = (formula) => {
 const parseFormula = (formula, data) => {
   /** Process the formula as a number, a formula or default back to text */
   const functionResult = parseBuiltInFunctions(formula, data);
-  console.log('functionResult =', functionResult);
+  // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForReferences(formula)
       ? formattingFunctions(formula).dropLeadingChars('=').result().toString()
@@ -279,7 +279,7 @@ export const parseExpression = (expression, data) => {
   /** Coalesce the expression to a string or empty string */
   const coalescedExpression = coalesceExpression(expression);
   /** First check if the expression is just text: treat anything after `'` as plain text */
-  console.log('coalescedExpression =', coalescedExpression, '; typeof coalescedExpression =', typeof coalescedExpression);
+  // console.log('coalescedExpression =', coalescedExpression, '; typeof coalescedExpression =', typeof coalescedExpression);
   if (testForText(coalescedExpression)) return coalescedExpression.substring(1);
   /** Check whether to expression is a not a formula */
   if (!testForFormula(coalescedExpression)) return coalescedExpression;
