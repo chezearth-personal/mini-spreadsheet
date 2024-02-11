@@ -8,7 +8,7 @@ import {
   linearToGrid,
   toCellAddress,
   toCellCoordinates } from '../functions/addressConverter.js';
-import { parseFormula } from '../functions/calculator.js';
+import { parseExpression } from '../functions/calculator.js';
 import {
   getFormula,
   saveFormula,
@@ -178,7 +178,7 @@ export function refreshSheetValues (event) {
             const cellSheet = getParentDocument(event).getElementById(Array.of(i, j).join('-'));
             cellSheet.value = '';
             try {
-              cellSheet.value = parseFormula(cell[0], this);
+              cellSheet.value = parseExpression(cell[0], this);
             } catch(e) {
               console.log(e);
               cellSheet.value = '#ERROR!';
