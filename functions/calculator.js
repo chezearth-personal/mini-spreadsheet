@@ -127,7 +127,7 @@ const paramsListHandler = (paramsList) => {
   return paramsList.split(',')
     .map(param => /[A-Z]{1,2}[0-9]{1,3}/.test(param.toUpperCase().trim())
       ? toCellCoordinates(param.trim())
-      : param.trim()
+      : !param ? 0 : param.trim()
     );
 }
 
@@ -150,18 +150,14 @@ const functionParametersHandler = (formula, func, data) => {
   * each listed function. If the function is found, then it calls the function's parameters
   * handler
   */
-const parseBuiltInFunctions = (formula, data) => {
-  // console.log('parseBuiltInFunctions(): formula =', formula);
-  return testForBuiltInFunction(formula, data.builtInFunctions)
-    ? data.builtInFunctions.reduce((result, func) => {
-        const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
-          const range = functionParametersHandler(match, func, data);
-          return range.toString();
-        });
-        return newFormula;
-      }, formula)
-    : '';
-}
+const parseBuiltInFunctions = (formula, data) => data
+  .builtInFunctions
+  .reduce((result, func) => result
+    .toUpperCase()
+    .replaceAll(
+      functionRegExp(func.name),
+      (match) => functionParametersHandler(match, func, data).toString()), formula
+  );
 
 /**
   * Parses the cell address references into array coordinates and looks up the 
@@ -188,11 +184,48 @@ const parseReferences = (formula, data) => {
   return res;
 }
 
+/*
+function calculatingMethods(formula) {
+  return {
+    parseBuiltInFunctions: function(formula, data) {
+      return testForBuiltInFunction(formula, data.builtInFunctions)
+        ? data.builtInFunctions.reduce((result, func) => {
+            const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
+              const range = functionParametersHandler(match, func, data);
+              return range.toString();
+            });
+            return newFormula;
+          }, formula)
+        : '';
+    },
+    builtInFunctionsMatcher: function (match) => {
+      const range = functionParametersHandler(match, func, data);
+      return range.toString();
+    },
+    builtInFunctionsReplacer: function(formula, func) {
+      return formula.toUpperCase().replaceAll(
+        functionRegExp(func.name),
+        (match) => functionParametersHandler(match, func, data).toString();
+      );
+    },
+    builtInFunctionsReducer: function(formula, builtInFunctionsArr) {
+      return !builtInFunctionsArr || builtInFunctionsArr.length > 0 || !formula
+        ? 0
+        : builtInFunctionsArr.reduce((result, func) => this.builtInFunctionsReplacer(result, func), formula);
+    },
+    testFunctionResult: function(formula, data) {
+      return !formula && formula !== 0
+        ? ''
+        : this.parseBuiltInFunctions(formula, data);
+    }
+  }
+}
+*/
 
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
-function formattingFunctions(formula) {
+function formattingMethods(formula) {
   return {
     dropLeadingChars: function(ch) {
       // console.log('formattingFunctions().dropLeadingChars() typeof formula =', typeof formula);
@@ -237,29 +270,30 @@ function formattingFunctions(formula) {
   }
 }
 
-const getSign = (formula) => formattingFunctions(formula)
+const getSign = (formula) => formattingMethods(formula)
   .dropLeadingChars('=')
   .getLeadingNegativeSign()
   .result();
 
-const getNumerical = (formula) => formattingFunctions(formula)
+const getNumerical = (formula) => formattingMethods(formula)
   .dropLeadingChars('=')
   .coverLeadingDecimalPoint()
   .result();
 
 const formatCalcResult = (formula) => {
-  return formattingFunctions(getSign(formula) + getNumerical(formula))
+  return formattingMethods(getSign(formula) + getNumerical(formula))
     .coalesceToZero()
     .result();
 }
 
 const parseFormula = (formula, data) => {
   /** Process the formula as a number, a formula or default back to text */
-  const functionResult = parseBuiltInFunctions(formula, data);
+
+  const functionResult = testForBuiltInFunction? parseBuiltInFunctions(formula, data) : null;
   // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForReferences(formula)
-      ? formattingFunctions(formula).dropLeadingChars('=').result().toString()
+      ? formattingMethods(formula).dropLeadingChars('=').result().toString()
       : calcFormula(parseReferences(formatCalcResult(formula), data))
         // : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result(), doc))
       // : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
