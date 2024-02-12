@@ -155,12 +155,14 @@ const parseBuiltInFunctions = (formula, data) => {
   console.log('parseBuiltInFunctions(): formula =', formula, '; data =', data);
   return data
   .builtInFunctions
-  .reduce((result, func) => result
+  .reduce((result, func) => {
+    console.log('parseBuiltInFunctions(): func =', func, '; result =', result);
+    result
     .toUpperCase()
     .replaceAll(
       functionRegExp(func.name),
       (match) => functionParametersHandler(match, func, data).toString()), formula
-  );
+  });
 }
 
 /**
