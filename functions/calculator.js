@@ -137,6 +137,7 @@ const paramsListHandler = (paramsList) => {
   * coordinates
   */
 const functionParametersHandler = (formula, func, data) => {
+  console.log('functionParametersHandler(): formula =', formula, '; func =', func, '; data =', data);
   const parameters = formula.match(/\(.+\)/g)[0].slice(1, -1);
   const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
     ? parseBuiltInFunctions(parameters, data)
