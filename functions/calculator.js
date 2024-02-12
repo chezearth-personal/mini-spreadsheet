@@ -95,7 +95,7 @@ const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,
   * Based on the function name, executes the required calculation function
   */
 const functionHandler = (paramsArr, func, data) => {
-  console.log('functionHandler(): paramsArr =', paramsArr, '; func =', func);
+  // console.log('functionHandler(): paramsArr =', paramsArr, '; func =', func);
   if (Array.isArray(paramsArr)) {
     if (func.name === 'AVERAGE') {
       return average(paramsArr, data);
@@ -129,8 +129,8 @@ const paramsRangeHandler = (paramsRange) => {
   * coordinates or numbers
   */
 const paramsListHandler = (paramsList) => {
-  console.log('paramsListHandler(): paramsList =', paramsList);
-  console.log('paramsListHandler(): paramsList.split(\',\') =', paramsList.split(','));
+  // console.log('paramsListHandler(): paramsList =', paramsList);
+  // console.log('paramsListHandler(): paramsList.split(\',\') =', paramsList.split(','));
   return paramsList.split(',')
     .map(param => /[A-Z]{1,2}[0-9]{1,3}/.test(param.toUpperCase().trim())
       ? toCellCoordinates(param.trim())
@@ -144,15 +144,15 @@ const paramsListHandler = (paramsList) => {
   * coordinates
   */
 const functionParametersHandler = (formula, func, data) => {
-  console.log('functionParametersHandler(): formula =', formula, '; func =', func);
+  // console.log('functionParametersHandler(): formula =', formula, '; func =', func);
   const parametersMatchArr = formula.match(/\(.+\)/g);
-  console.log('parametersMatchArr =', formula.match(/\(.+\)/g));
+  // console.log('parametersMatchArr =', formula.match(/\(.+\)/g));
   const parameters = !parametersMatchArr ? '' : parametersMatchArr[0].slice(1, -1);
-  console.log('parameters =', parameters);
+  // console.log('parameters =', parameters);
   const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
     ? parseBuiltInFunctions(parameters, data)
     : parameters;
-  console.log('resolvedParameters =', resolvedParameters);
+  // console.log('resolvedParameters =', resolvedParameters);
   const parameterssArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
   return functionHandler(parameterssArr, func, data);
 }
@@ -163,7 +163,7 @@ const functionParametersHandler = (formula, func, data) => {
   * handler
   */
 const parseBuiltInFunctions = (formula, data) => {
-  console.log('parseBuiltInFunctions(): formula =', formula);
+  // console.log('parseBuiltInFunctions(): formula =', formula);
   // return testForBuiltInFunction(formula, data.builtInFunctions)
   return data.builtInFunctions.reduce((result, func) => {
         const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
