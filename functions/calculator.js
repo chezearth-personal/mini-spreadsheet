@@ -151,7 +151,9 @@ const functionParametersHandler = (formula, func, data) => {
   * each listed function. If the function is found, then it calls the function's parameters
   * handler
   */
-const parseBuiltInFunctions = (formula, data) => data
+const parseBuiltInFunctions = (formula, data) => {
+  console.log('parseBuiltInFunctions(): formula =', formula, '; data =', data);
+  return data
   .builtInFunctions
   .reduce((result, func) => result
     .toUpperCase()
