@@ -303,8 +303,8 @@ const formatCalcResult = (formula) => {
 }
 
 const parseFormula = (formula, data) => {
-  /** Test to see if the formula contains a built in function, if it does, */
-  /** process the formula as a number, a formula or default back to text */
+  /** Test to see if the formula contains a built in function; if it does, */
+  /** process the formula, otherwise return empty*/
   const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
     ? parseBuiltInFunctions(formula.toUpperCase(), data)
     : '';
@@ -321,10 +321,10 @@ const parseFormula = (formula, data) => {
 
 /**
   * The main function for calling the calculator that parses the spreadsheet
-  * formulasminto functions or arithmetic expressions.
+  * expressions into text expressions of formula functions, defined as beginning 
+  * with '=', '+', or '-'. It then calls the appropriate function to parse the
   * Parameters:
-  *   formula: string
-  *   doc: DOM document object
+  *   expression: string
   *   data: Object that combines configs and the formula array
   */
 export const parseExpression = (expression, data) => {
