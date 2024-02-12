@@ -161,6 +161,7 @@ const parseBuiltInFunctions = (formula, data) => {
       functionRegExp(func.name),
       (match) => functionParametersHandler(match, func, data).toString()), formula
   );
+}
 
 /**
   * Parses the cell address references into array coordinates and looks up the 
