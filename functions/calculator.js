@@ -49,131 +49,64 @@ const calcFormula = (formula) => Function(`'use strict'; return (${formula.toStr
 /**
   * Array average function calculator
   */
-const average = (paramsArr, data) => {
-  return Array.isArray(paramsArr) && count(paramsArr, data) !== 0
-    ? sum(paramsArr, data) / count(paramsArr, data)
-    : '#DIV0!';
-}
+// const average = (paramsArr, data) => {
+  // return Array.isArray(paramsArr) && count(paramsArr, data) !== 0
+    // ? sum(paramsArr, data) / count(paramsArr, data)
+    // : '#DIV0!';
+// }
 
 /**
   * Array count function calculator
   */
-const count = (paramsArr, data) => {
-  return Array.isArray(paramsArr) && paramsArr
-    .filter(param => {
-      const cellValue = Array.isArray(param) 
-        ? parseFormula(data.storageArr[param[0]][param[1]][0], data)
-        : param
-      return !!cellValue || cellValue === 0;
-    })
-    .length;
-}
+// const count = (paramsArr, data) => {
+  // return Array.isArray(paramsArr) && paramsArr
+    // .filter(param => {
+      // const cellValue = Array.isArray(param) 
+        // ? parseFormula(data.storageArr[param[0]][param[1]][0], data)
+        // : param
+      // return !!cellValue || cellValue === 0;
+    // })
+    // .length;
+// }
 
-/**
-  * Array sum function calculator
-  */
-const sum = (paramsArr, data) => {
-  // console.log('sum(): paramsArr =', paramsArr);
-  return Array.isArray(paramsArr) && paramsArr
-    .reduce((r, param) => {
-      // console.log('sum(): param =', param, '; result =', r);
-      const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
-      // console.log('sum(): cellFormula =', cellFormula);
-      const cellValue = !cellFormula && cellFormula !== 0 ? '' : parseFormula(cellFormula, data);
-      // console.log('sum(): cellValue =', cellValue);
-      return !cellValue || isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
-    }, 0);
-}
 
-/**
-  * Determines if an experssion is a range, e.g. A2:C4
-  */
-const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,3}/
-  .test(parameters.toUpperCase());
 
 /**
   * Based on the function name, executes the required calculation function
   */
-const functionHandler = (paramsArr, func, data) => {
-  // console.log('functionHandler(): paramsArr =', paramsArr, '; func =', func);
-  if (Array.isArray(paramsArr)) {
-    if (func.name === 'AVERAGE') {
-      return average(paramsArr, data);
-    } else if (func.name === 'COUNT') {
-      return count(paramsArr, data);
-    } else {
-      return sum(paramsArr, data);
-    }
-  }
-  return '#REF!';
-}
+// const functionHandler = (paramsArr, data, func) => {
+  // // console.log('functionHandler(): paramsArr =', paramsArr, '; func =', func);
+  // if (Array.isArray(paramsArr)) {
+    // if (func.name === 'AVERAGE') {
+      // return average(paramsArr, data);
+    // } else if (func.name === 'COUNT') {
+      // return count(paramsArr, data);
+    // } else {
+      // return sum(paramsArr, data);
+    // }
+  // }
+  // return '#REF!';
+// }
 
-/**
-  * Converts function parameters representing an address range into a sequence of coordinates
-  */
-const paramsRangeHandler = (paramsRange) => {
-  console.log('paramsRangeHandler(): paramsRange =', paramsRange);
-  const rangeArr = paramsRange.match(/[A-Z]{1,2}[0-9]{1,3}/g);
-  const eArr = rangeArr.map(addr => toCellCoordinates(addr));
-  let cellsArr = [];
-  for (let i = Math.min(eArr[0][1], eArr[1][1]); i <= Math.max(eArr[0][1], eArr[1][1]); i++) {
-    for (let j = Math.min(eArr[0][0], eArr[1][0]); j <= Math.max(eArr[0][0], eArr[1][0]); j++) {
-      cellsArr = cellsArr.concat(Array.of([j, i]));
-    }
-  }
-  return cellsArr;
-}
-
-/**
-  * Converts a comma-separated list of addresses or numbers into a list of array
-  * coordinates or numbers
-  */
-const paramsListHandler = (paramsList) => {
-  // console.log('paramsListHandler(): paramsList =', paramsList);
-  // console.log('paramsListHandler(): paramsList.split(\',\') =', paramsList.split(','));
-  return paramsList.split(',')
-    .map(param => /[A-Z]{1,2}[0-9]{1,3}/.test(param.toUpperCase().trim())
-      ? toCellCoordinates(param.trim())
-      : !param ? '' : param.trim()
-    );
-}
 
 /**
   * Tests to see if the parameters are a comma-separated list or a range (e.g. A2:B15)
   * and calls the appropriate processing function to obtain an array of rwo-column
   * coordinates
   */
-const functionParametersHandler = (formula, func, data) => {
-  // console.log('functionParametersHandler(): formula =', formula, '; func =', func);
-  const parametersMatchArr = formula.match(/\(.+\)/g);
-  // console.log('parametersMatchArr =', formula.match(/\(.+\)/g));
-  const parameters = !parametersMatchArr ? '' : parametersMatchArr[0].slice(1, -1);
-  // console.log('parameters =', parameters);
-  const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
-    ? parseBuiltInFunctions(parameters, data)
-    : parameters;
-  // console.log('resolvedParameters =', resolvedParameters);
-  const parameterssArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
-  return functionHandler(parameterssArr, func, data);
-}
-
-/**
-  * Loops through the list of built-in functions in config.js and tests the formula for
-  * each listed function. If the function is found, then it calls the function's parameters
-  * handler
-  */
-const parseBuiltInFunctions = (formula, data) => {
-  // console.log('parseBuiltInFunctions(): formula =', formula);
-  // return testForBuiltInFunction(formula, data.builtInFunctions)
-  return data.builtInFunctions.reduce((result, func) => {
-        const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
-          const range = functionParametersHandler(match, func, data);
-          return range.toString();
-        });
-        return newFormula;
-      }, formula)
-    // : '';
-}
+// const functionParametersHandler = (formula, data, func) => {
+  // // console.log('functionParametersHandler(): formula =', formula, '; func =', func);
+  // const parametersMatchArr = formula.match(/\(.+\)/g);
+  // // console.log('parametersMatchArr =', formula.match(/\(.+\)/g));
+  // const parameters = !parametersMatchArr ? '' : parametersMatchArr[0].slice(1, -1);
+  // // console.log('parameters =', parameters);
+  // const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
+    // ? parseBuiltInFunctions(parameters, data)
+    // : parameters;
+  // // console.log('resolvedParameters =', resolvedParameters);
+  // const parameterssArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
+  // return functionHandler(parameterssArr, data, func);
+// }
 
 /**
   * Parses the cell address references into array coordinates and looks up the 
@@ -200,43 +133,125 @@ const parseReferences = (formula, data) => {
   return res;
 }
 
-/*
-function calculatingMethods(formula) {
+
+/**
+  * Loops through the list of built-in functions in config.js and tests the formula for
+  * each listed function. If the function is found, then it calls the function's parameters
+  * handler
+  */
+const parseBuiltInFunctions = (formula, data) => {
+  return data.builtInFunctions.reduce((result, func) => result
+    .toUpperCase()
+    .replaceAll(
+      functionRegExp(func.name),
+      (match) => calculateMethods(match, data, func)
+        .getParamsStr()
+        .getParamsRangeArr()
+        .getParamsListArr()
+        .sum()
+        .count()
+        .average()
+        .result()
+    ), formula)
+}
+
+function calculateMethods(formula, data, func) {
+  let paramsStr = '';
+  let paramsArr = [];
+  /**
+    * Determines if an experssion is a range, e.g. A2:C4
+    */
+  const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,3}/
+    .test(parameters.toUpperCase());
+  /**
+    * Chained methods for processing Formulae and their parameters
+    */
   return {
-    parseBuiltInFunctions: function(formula, data) {
-      return testForBuiltInFunction(formula, data.builtInFunctions)
-        ? data.builtInFunctions.reduce((result, func) => {
-            const newFormula = result.toUpperCase().replaceAll(functionRegExp(func.name), (match) => {
-              const range = functionParametersHandler(match, func, data);
-              return range.toString();
-            });
-            return newFormula;
-          }, formula)
-        : '';
+    /**
+      * Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4.
+      */
+    getParamsStr: function () {
+      const paramsMatchArr = formula.match(/\(.+\)/g);
+      // console.log('getParamsStr(): paramsMatchArr =', paramsMatchArr);
+      const paramsMatchStr = paramsMatchArr && paramsMatchArr[0].slice(1, -1);
+      // console.log('getParamsStr(): paramsMatchStr =', paramsMatchStr);
+      paramsStr = testForBuiltInFunction(paramsMatchStr, data.builtInFunctions)
+        ? parseBuiltInFunctions(paramsMatchStr, data)
+        : paramsMatchStr;
+      // console.log('getParamsStr(): paramsStr =', paramsStr);
+      return this;
     },
-    builtInFunctionsMatcher: function (match) => {
-      const range = functionParametersHandler(match, func, data);
-      return range.toString();
+    /**
+      * Converts function parameters representing an address range into a sequence of coordinates.
+      */
+    getParamsRangeArr: function() {
+      if (isParamsRange(paramsStr)) {
+        const rangeArr = paramsStr.match(/[A-Z]{1,2}[0-9]{1,3}/g);
+        const eArr = rangeArr.map(addr => toCellCoordinates(addr));
+        let cellsArr = [];
+        for (let i = Math.min(eArr[0][1], eArr[1][1]); i <= Math.max(eArr[0][1], eArr[1][1]); i++) {
+          for (let j = Math.min(eArr[0][0], eArr[1][0]); j <= Math.max(eArr[0][0], eArr[1][0]); j++) {
+            cellsArr = cellsArr.concat(Array.of([j, i]));
+          }
+        }
+        paramsArr = cellsArr;
+      }
+      return this;
     },
-    builtInFunctionsReplacer: function(formula, func) {
-      return formula.toUpperCase().replaceAll(
-        functionRegExp(func.name),
-        (match) => functionParametersHandler(match, func, data).toString();
-      );
+    /**
+      * Converts a comma-separated list of addresses or numbers into a list of array
+      * coordinates or numbers
+      */
+    getParamsListArr: function() {
+      if (!isParamsRange(paramsStr)) {
+        paramsArr = paramsStr
+          .split(',')
+          .map(param => /[A-Z]{1,2}[0-9]{1,3}/.test(param.toUpperCase().trim())
+            ? toCellCoordinates(param.trim())
+            : !param ? '' : param.trim()
+          );
+      }
+      return this;
     },
-    builtInFunctionsReducer: function(formula, builtInFunctionsArr) {
-      return !builtInFunctionsArr || builtInFunctionsArr.length > 0 || !formula
-        ? 0
-        : builtInFunctionsArr.reduce((result, func) => this.builtInFunctionsReplacer(result, func), formula);
+    /**
+      * Array sum function calculator
+      */
+    sum: function() {
+      if (func.name === 'SUM' && Array.isArray(paramsArr) && paramsArr.length) { 
+        formula = paramsArr
+          .reduce((r, param) => {
+            const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
+            const cellValue = !cellFormula && cellFormula !== 0 ? '' : parseFormula(cellFormula, data);
+            return !cellValue || isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
+          }, 0);
+      }
+      return this;
     },
-    testFunctionResult: function(formula, data) {
-      return !formula && formula !== 0
-        ? ''
-        : this.parseBuiltInFunctions(formula, data);
+    count: function() {
+      if (func.name === 'COUNT' && Array.isArray(paramsArr) && paramsArr.length) {
+        formula = paramsArr
+          .filter(param => {
+            const cellValue = Array.isArray(param) 
+              ? parseFormula(data.storageArr[param[0]][param[1]][0], data)
+              : param
+            return !!cellValue || cellValue === 0;
+          })
+          .length;
+      }
+      return this;
+    },
+    average: function() {
+      if (func.name === 'AVERAGE' && Array.isArray(paramsArr) && paramsArr.length) {
+        formula = count(paramsArr, data) ? sum(paramsArr, data) / count(paramsArr, data) : '#DIV0!';
+      }
+      return this;
+    },
+    result: function() {
+      return formula;
     }
   }
 }
-*/
+
 
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
