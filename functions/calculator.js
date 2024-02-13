@@ -144,7 +144,7 @@ const parseBuiltInFunctions = (formula, data) => {
     .toUpperCase()
     .replaceAll(
       functionRegExp(func.name),
-      (match) => calculateMethods(match, data, func)
+      (match) => builtInFunctionCalculator(match, data, func)
         .getParamsStr()
         .getParamsRangeArr()
         .getParamsListArr()
@@ -155,7 +155,7 @@ const parseBuiltInFunctions = (formula, data) => {
     ), formula)
 }
 
-function calculateMethods(formula, data, func) {
+function builtInFunctionCalculator(formula, data, func) {
   let paramsStr = '';
   let paramsArr = [];
   /**
@@ -256,17 +256,15 @@ function calculateMethods(formula, data, func) {
 /**
   * Remove the '=', handle negative signs, handle decimal points, handle zeros
   */
-function formattingMethods(formula) {
+function formatMethods(formula) {
   return {
     dropLeadingChars: function(ch) {
-      // console.log('formattingFunctions().dropLeadingChars() typeof formula =', typeof formula);
       formula = coalesceExpression(formula).substring(0, 1) === ch.toString().substring(0, 1)
-        ? formattingMethods(coalesceExpression(formula).substring(1)).dropLeadingChars(ch).result()
+        ? formatMethods(coalesceExpression(formula).substring(1)).dropLeadingChars(ch).result()
         : coalesceExpression(formula).toString();
       return this;
     },
     getLeadingNegativeSign: function() {
-      // console.log('formattingFunctions().getLeadingNegativeSign() typeof formula =', typeof formula);
       const getLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/^[\-]+/g);
       formula = Array.isArray(getLeadingNegativeSignsArr)
         && getLeadingNegativeSignsArr.length 
@@ -276,43 +274,38 @@ function formattingMethods(formula) {
       return this;
     },
     coverLeadingDecimalPoint: function() {
-      // console.log('formattingFunctions().coverLeadingDecimalPoint() typeof formula =', typeof formula);
       const dropLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/[^\-].*/g);
       formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
         ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
           ? '0' + dropLeadingNegativeSignsArr[0]
           : dropLeadingNegativeSignsArr[0]
         : '';
-      // console.log('formattingFunctions(): coverLeadingDecimalPoint() =', formula);
       return this;
     },
     coalesceToZero: function() {
-      // console.log('formattingFunctions().coalesceToZero() typeof formula =', typeof formula);
       formula = isNaN(Number(coalesceExpression(formula)))
         ? coalesceExpression(formula)
         : Number(coalesceExpression(formula)) === 0 ? '0' : coalesceExpression(formula);
       return this;
     },
     result: function() {
-      // console.log('formattingFunctions(): result =', formula);
-      // console.log('formattingFunctions().result typeof formula =', typeof formula);
       return formula;
     }
   }
 }
 
-const getSign = (formula) => formattingMethods(formula)
+const getSign = (formula) => formatMethods(formula)
   .dropLeadingChars('=')
   .getLeadingNegativeSign()
   .result();
 
-const getNumerical = (formula) => formattingMethods(formula)
+const getNumerical = (formula) => formatMethods(formula)
   .dropLeadingChars('=')
   .coverLeadingDecimalPoint()
   .result();
 
 const formatCalcResult = (formula) => {
-  return formattingMethods(getSign(formula) + getNumerical(formula))
+  return formatMethods(getSign(formula) + getNumerical(formula))
     .coalesceToZero()
     .result();
 }
@@ -326,7 +319,7 @@ const parseFormula = (formula, data) => {
   // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForReferences(formula)
-      ? formattingMethods(formula).dropLeadingChars('=').result().toString()
+      ? formatMethods(formula).dropLeadingChars('=').result().toString()
       : calcFormula(parseReferences(formatCalcResult(formula), data))
         // : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result(), doc))
       // : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
@@ -346,7 +339,6 @@ export const parseExpression = (expression, data) => {
   /** Coalesce the expression to a string or empty string */
   const coalescedExpression = coalesceExpression(expression);
   /** First check if the expression is just text: treat anything after `'` as plain text */
-  // console.log('coalescedExpression =', coalescedExpression, '; typeof coalescedExpression =', typeof coalescedExpression);
   if (testForText(coalescedExpression)) return coalescedExpression.substring(1);
   /** Check whether to expression is a not a formula */
   if (!testForFormula(coalescedExpression)) return coalescedExpression;
