@@ -46,36 +46,35 @@ const isNumber = (expression) => !isNaN(Number(expression));
 /**
   * Main basic calculator; converts a string into a calculation
   */
-const calcFormula = (formula) => {
-  const mod = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0 ? '+' : '-');
-  return Function(`'use strict'; return (${mod})`)().toString();
-}
+// const calcFormula = (formula) => {
+  // const mod = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0 ? '+' : '-');
+  // return Function(`'use strict'; return (${mod})`)().toString();
+// }
 
 /**
   * Parses the cell address references into array coordinates and looks up the 
   * on the grid input
   */
-const parseReferences = (formula, data) => {
+// const parseReferences = (formula, data) => {
   // console.log('parseReferences(): data =', data);
-  const res = !formula
-    ? 0
-    : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
+  // const res = !formula
+    // ? 0
+    // : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
         // console.log('parseReferences(): formula=', formula, '; match =', match, ';', toCellCoordinates(match));
-        const cellCoordinates = toCellCoordinates(match);
-        const elem = cellCoordinates && Array.isArray(cellCoordinates) 
-          ? parseFormula(
-              data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0],
-              data
-            )
-          : '#REF!'
+        // const cellCoordinates = toCellCoordinates(match);
+        // const elem = cellCoordinates && Array.isArray(cellCoordinates) 
+          // ? parseFormula(
+              // data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0],
+              // data
+            // )
+          // : '#REF!'
         // console.log('parseReferences(): elem =', elem);
         // const elem = doc.getElementById(toCellCoordinates(match).join('-'));
-        return elem //? !elem.value ? 0 : elem.value : '#REF!'
-      });
+        // return elem //? !elem.value ? 0 : elem.value : '#REF!'
+      // });
   // console.log('parseReferences(): res =', res);
-  return res;
-}
-
+  // return res;
+// }
 
 /**
   * Loops through the list of built-in functions in config.js and tests the formula for
@@ -87,33 +86,67 @@ const parseBuiltInFunctions = (formula, data) => {
     .toUpperCase()
     .replaceAll(
       functionRegExp(func.name),
-      (match) => builtInFunctionCalculator(match, data, func)
-        .getParamsStr()
+      (match) => calculatorMethods(match, data)
+        .getParamsStr(data)
         .getParamsRangeArr()
         .getParamsListArr()
-        .sum()
-        .count()
-        .average()
+        .sum(func, data)
+        .count(func, data)
+        .average(func, data)
         .result()
     ), formula)
 }
 
-function builtInFunctionCalculator(formula, data, func) {
+function calculatorMethods(formula) {
   let paramsStr = '';
   let paramsArr = [];
-  /**
-    * Determines if an experssion is a range, e.g. A2:C4
-    */
+  /** Determines if an experssion is a range, e.g. A2:C4 */
   const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,3}/
     .test(parameters.toUpperCase());
-  /**
-    * Chained methods for processing Formulae and their parameters
-    */
+  /** Chained methods for processing Formulae and their parameters */
   return {
-    /**
-      * Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4.
-      */
-    getParamsStr: function () {
+    /** Format the formula as much as possible first */
+    formatCalcResult: function() {
+      // console.log('1. formatCalcResult(): formula =', formula);
+      formula = formatCalcResult(formula);
+      // console.log('2. formatCalcResult(): formula =', formula);
+      return this;
+    },
+    /** Parse all cell references to values */
+    parseReferences: function(data) {
+      // console.log('1. parseReferences(): formula =', formula);
+      formula = !formula
+        ? 0
+        : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
+            const cellCoordinates = toCellCoordinates(match);
+            const elem = cellCoordinates && Array.isArray(cellCoordinates) 
+              ? parseFormula(
+                  data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0],
+                  data
+                )
+              : '#REF!'
+            return elem
+          });
+      // console.log('2. parseReferences(): formula =', formula);
+      return this;
+    },
+    /** Any multiple consecutive negative signs to be converted to a single signs */
+    combineNegativeSigns: function(showPlus) {
+      // console.log('1. combineMultipleNegativeSigns(): formula =', formula);
+      formula = formatMethods(formula).combineNegativeSigns(showPlus).result();
+      // console.log('2. combineMultipleNegativeSigns(): formula =', formula);
+      return this;
+    },
+    /** Evaluate the formula */
+    calculate: function() {
+      // console.log('1. calcFormula(): formula =', formula);
+      formula = Function(`'use strict'; return (${formula.toString()})`)()
+        .toString();
+      // console.log('2. calcFormula(): formula =', formula);
+      return this;
+    },
+    /** Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4. */
+    getParamsStr: function (data) {
       const paramsMatchArr = formula.match(/\(.+\)/g);
       // console.log('getParamsStr(): paramsMatchArr =', paramsMatchArr);
       const paramsMatchStr = paramsMatchArr && paramsMatchArr[0].slice(1, -1);
@@ -124,9 +157,7 @@ function builtInFunctionCalculator(formula, data, func) {
       // console.log('getParamsStr(): paramsStr =', paramsStr);
       return this;
     },
-    /**
-      * Converts function parameters representing an address range into a sequence of coordinates.
-      */
+    /** Converts function parameters representing an address range into a sequence of coordinates. */
     getParamsRangeArr: function() {
       if (isParamsRange(paramsStr)) {
         const rangeArr = paramsStr.match(/[A-Z]{1,2}[0-9]{1,3}/g);
@@ -141,10 +172,8 @@ function builtInFunctionCalculator(formula, data, func) {
       }
       return this;
     },
-    /**
-      * Converts a comma-separated list of addresses or numbers into a list of array
-      * coordinates or numbers
-      */
+    /** Converts a comma-separated list of addresses or numbers into a list of array
+    /** coordinates or numbers */
     getParamsListArr: function() {
       if (!isParamsRange(paramsStr)) {
         paramsArr = paramsStr
@@ -156,10 +185,8 @@ function builtInFunctionCalculator(formula, data, func) {
       }
       return this;
     },
-    /**
-      * Array sum function calculator
-      */
-    sum: function() {
+    /** Array sum function calculator */
+    sum: function(func, data) {
       if (func.name === 'SUM' && Array.isArray(paramsArr) && paramsArr.length) { 
         formula = paramsArr
           .reduce((r, param) => {
@@ -170,7 +197,8 @@ function builtInFunctionCalculator(formula, data, func) {
       }
       return this;
     },
-    count: function() {
+    /** Array count function calculator */
+    count: function(func, data) {
       if (func.name === 'COUNT' && Array.isArray(paramsArr) && paramsArr.length) {
         formula = paramsArr
           .filter(param => {
@@ -183,7 +211,8 @@ function builtInFunctionCalculator(formula, data, func) {
       }
       return this;
     },
-    average: function() {
+    /** Array average function calculator */
+    average: function(func, data) {
       if (func.name === 'AVERAGE' && Array.isArray(paramsArr) && paramsArr.length) {
         formula = count(paramsArr, data) ? sum(paramsArr, data) / count(paramsArr, data) : '#DIV0!';
       }
@@ -192,7 +221,7 @@ function builtInFunctionCalculator(formula, data, func) {
     result: function() {
       return formula;
     }
-  }
+  };
 }
 
 
@@ -207,13 +236,23 @@ function formatMethods(formula) {
         : coalesceExpression(formula).toString();
       return this;
     },
-    getLeadingNegativeSign: function() {
-      const getLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/^[\-]+/g);
-      formula = Array.isArray(getLeadingNegativeSignsArr)
-        && getLeadingNegativeSignsArr.length 
-        && getLeadingNegativeSignsArr[0].length % 2 !== 0
-          ? '-' 
-          : '';
+    combineNegativeSigns: function(showPlus) {
+      // console.log('combineNegativeSigns(): formula =', formula, '; showPlus =', showPlus);
+      formula = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0
+        ? showPlus ? '+' : '' 
+        : '-'
+      );
+      // console.log('combineNegativeSigns(): formula =', formula);
+      // const getLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/^[\-]+/g);
+      // formula = Array.isArray(getLeadingNegativeSignsArr)
+        // && getLeadingNegativeSignsArr.length 
+        // && getLeadingNegativeSignsArr[0].length % 2 !== 0
+          // ? '-' 
+          // : showPlus;
+      return this;
+    },
+    getLeadingNegativeSigns: function() {
+      formula = formula.substring(0, 1) === '-' ? '-' : '';
       return this;
     },
     coverLeadingDecimalPoint: function() {
@@ -234,12 +273,13 @@ function formatMethods(formula) {
     result: function() {
       return formula;
     }
-  }
+  };
 }
 
 const getSign = (formula) => formatMethods(formula)
   .dropLeadingChars('=')
-  .getLeadingNegativeSign()
+  .combineNegativeSigns(false)
+  .getLeadingNegativeSigns()
   .result();
 
 const getNumerical = (formula) => formatMethods(formula)
@@ -248,6 +288,7 @@ const getNumerical = (formula) => formatMethods(formula)
   .result();
 
 const formatCalcResult = (formula) => {
+  // console.log('formatCalcResult(): formula =', formula);
   return formatMethods(getSign(formula) + getNumerical(formula))
     .coalesceToZero()
     .result()
@@ -258,15 +299,13 @@ const parseFormula = (formula, data) => {
   /** Test to see if the formula contains a built in function; if it does, */
   /** process the formula, otherwise return empty*/
   const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
-    ? parseBuiltInFunctions(formula.toUpperCase(), data)
-    : '';
+    && parseBuiltInFunctions(formula.toUpperCase(), data);
   // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForReferences(formula)
       ? formatMethods(formula).dropLeadingChars('=').result().toString()
-      : calcFormula(parseReferences(formatCalcResult(formula), data))
-        // : calcFormula(parseReferences(formattingFunctions(formula).dropLeadingChars('=').result(), doc))
-      // : (!formula && formula !== 0 ? '' : formatCalcResult(formula));
+      : calculatorMethods(formula).formatCalcResult().parseReferences(data).combineNegativeSigns(true).calculate().result();
+      // : calcFormula(parseReferences(formatCalcResult(formula), data))
   }
   return formatCalcResult(parseFormula(functionResult, data));
 }
