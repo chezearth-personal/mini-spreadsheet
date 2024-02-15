@@ -44,39 +44,6 @@ const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
 const isNumber = (expression) => !isNaN(Number(expression));
 
 /**
-  * Main basic calculator; converts a string into a calculation
-  */
-// const calcFormula = (formula) => {
-  // const mod = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0 ? '+' : '-');
-  // return Function(`'use strict'; return (${mod})`)().toString();
-// }
-
-/**
-  * Parses the cell address references into array coordinates and looks up the 
-  * on the grid input
-  */
-// const parseReferences = (formula, data) => {
-  // console.log('parseReferences(): data =', data);
-  // const res = !formula
-    // ? 0
-    // : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
-        // console.log('parseReferences(): formula=', formula, '; match =', match, ';', toCellCoordinates(match));
-        // const cellCoordinates = toCellCoordinates(match);
-        // const elem = cellCoordinates && Array.isArray(cellCoordinates) 
-          // ? parseFormula(
-              // data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0],
-              // data
-            // )
-          // : '#REF!'
-        // console.log('parseReferences(): elem =', elem);
-        // const elem = doc.getElementById(toCellCoordinates(match).join('-'));
-        // return elem //? !elem.value ? 0 : elem.value : '#REF!'
-      // });
-  // console.log('parseReferences(): res =', res);
-  // return res;
-// }
-
-/**
   * Loops through the list of built-in functions in config.js and tests the formula for
   * each listed function. If the function is found, then it calls the function's parameters
   * handler
@@ -107,14 +74,11 @@ function calculatorMethods(formula) {
   return {
     /** Format the formula as much as possible first */
     formatCalcResult: function() {
-      // console.log('1. formatCalcResult(): formula =', formula);
       formula = formatCalcResult(formula);
-      // console.log('2. formatCalcResult(): formula =', formula);
       return this;
     },
     /** Parse all cell references to values */
     parseReferences: function(data) {
-      // console.log('1. parseReferences(): formula =', formula);
       formula = !formula
         ? 0
         : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
@@ -127,34 +91,26 @@ function calculatorMethods(formula) {
               : '#REF!'
             return elem
           });
-      // console.log('2. parseReferences(): formula =', formula);
       return this;
     },
     /** Any multiple consecutive negative signs to be converted to a single signs */
     combineNegativeSigns: function(showPlus) {
-      // console.log('1. combineMultipleNegativeSigns(): formula =', formula);
       formula = formatMethods(formula).combineNegativeSigns(showPlus).result();
-      // console.log('2. combineMultipleNegativeSigns(): formula =', formula);
       return this;
     },
     /** Evaluate the formula */
     calculate: function() {
-      // console.log('1. calcFormula(): formula =', formula);
       formula = Function(`'use strict'; return (${formula.toString()})`)()
         .toString();
-      // console.log('2. calcFormula(): formula =', formula);
       return this;
     },
     /** Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4. */
     getParamsStr: function (data) {
       const paramsMatchArr = formula.match(/\(.+\)/g);
-      // console.log('getParamsStr(): paramsMatchArr =', paramsMatchArr);
       const paramsMatchStr = paramsMatchArr && paramsMatchArr[0].slice(1, -1);
-      // console.log('getParamsStr(): paramsMatchStr =', paramsMatchStr);
       paramsStr = testForBuiltInFunction(paramsMatchStr, data.builtInFunctions)
         ? parseBuiltInFunctions(paramsMatchStr, data)
         : paramsMatchStr;
-      // console.log('getParamsStr(): paramsStr =', paramsStr);
       return this;
     },
     /** Converts function parameters representing an address range into a sequence of coordinates. */
@@ -237,18 +193,10 @@ function formatMethods(formula) {
       return this;
     },
     combineNegativeSigns: function(showPlus) {
-      // console.log('combineNegativeSigns(): formula =', formula, '; showPlus =', showPlus);
       formula = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0
         ? showPlus ? '+' : '' 
         : '-'
       );
-      // console.log('combineNegativeSigns(): formula =', formula);
-      // const getLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/^[\-]+/g);
-      // formula = Array.isArray(getLeadingNegativeSignsArr)
-        // && getLeadingNegativeSignsArr.length 
-        // && getLeadingNegativeSignsArr[0].length % 2 !== 0
-          // ? '-' 
-          // : showPlus;
       return this;
     },
     getLeadingNegativeSigns: function() {
