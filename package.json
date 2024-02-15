@@ -6,7 +6,7 @@
   "scripts": {
     "test:jest": "jest",
     "test:jest:watch": "jest --watchAll",
-    "test:mocha": "nyc mocha ./functions/addressConverter.test.js",
+    "test": "mocha './{,!(node_modules)/**/}*.test.js'",
     "test:vitest": "vitest --coverage",
     "dev": "vite",
     "build": "vite build",

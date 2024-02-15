@@ -21,14 +21,14 @@ const getSheetSize = () => configs.sheetSize;
 const getBuiltInFunctions = () => configs.builtInFunctions;
 
 /**
-  * Getter for the storage array
-  */
-const getStorageArr = () => storageArr;
-
-/**
   * Creates an array (2 dimesions: `sheetSize.columns` x `sheetSize.rows`) for storing formulae
   */
 const storageArr = createStorageArr(getSheetSize().columns, getSheetSize().rows);
+
+/**
+  * Getter for the storage array
+  */
+const getStorageArr = () => storageArr;
 
 /**
   * Creates the formula bar and grid on the page, with one additional row and column for the

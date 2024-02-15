@@ -174,7 +174,7 @@ export function refreshSheetValues (event) {
     this.storageArr.forEach((colArr, i) => {
       if (colArr && Array.isArray(colArr)) {
         colArr.forEach((cell, j) => {
-          if (cell[0]) {
+          if (cell[0] || cell[0] === 0) {
             const cellSheet = getParentDocument(event).getElementById(Array.of(i, j).join('-'));
             cellSheet.value = '';
             try {
@@ -206,15 +206,12 @@ export const clickCell = (event) => {
   * Choose navigation depending on the input
   */
 export function handleKeyDown(event) {
-  // console.log('handleKeyDown():handleKeyDown event');
-  // console.log('handleKeyDown():activeElement.id =', getParentDocument(event).activeElement.id);
   if (/[0-9]+-[0-9]+/.test(getParentDocument(event).activeElement.id)
     || getParentDocument(event).activeElement.id === 'body'
     || event.code === 'Enter'
     || getParentDocument(event).activeElement.id === 'formula-input' && event.code === 'Tab'
   ) {
     const oldCellCoordinatesArr = toCellCoordinates(getParentDocument(event).getElementById('address').value)
-    // console.log('event.code =', event.code, event.key, event.keyCode);
     if (event.code === 'Tab' ) {
       event.preventDefault();
     }
@@ -237,7 +234,6 @@ export function handleKeyDown(event) {
           : event.code === 'ArrowRight' || event.code === 'Tab'
             ? navRight(oldCellCoordinatesArr, this.sheetSize.columns)
             : navDown(oldCellCoordinatesArr, this.sheetSize.rows);
-      // console.log(newCellCoordinatesArr);
       const toId = newCellCoordinatesArr.join('-');
       getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
       const sheetValues = refreshSheetValues.bind(this);
@@ -272,7 +268,6 @@ export const refreshCell = (event) => {
   * Updates the formula in the storage array and recalculates all values
   */
 export function refreshStorage(event) {
-  // console.log('this =', this);
   const cellCoordinatesArr = event.target.id === 'formula-input'
     ? getCellCoordinatesArr()
     : event.target.id.split('-');
@@ -285,8 +280,6 @@ export function refreshStorage(event) {
   * Sets up the cell styling and saves it along with the formula
   */
 export function handleStyling(event) {
-  // console.log(this.style);
-  // console.log(this.storageArr);
   const cellCoordinatesArr = getAddress(event);
   const styling = getStyling(this.storageArr, cellCoordinatesArr);
   const regexp = new RegExp('[' + this.style[0].toUpperCase() + this.style[0].toLowerCase() + ']', 'g');

@@ -8,12 +8,14 @@ import { toCellCoordinates } from './addressConverter.js';
 const coalesceExpression = (expression) => (expression || '').toString();
 
 /**
-  * Determine if the expression is text
+  * Creates a RegExp based on the function's name (e.g. SUM, COUNT, etc.)
   */
-const testForText = (expression) => {
-  // console.log(expression, expression.substring(0, 1) === `'`);
-  expression.substring(0, 1) === `'`;
-}
+const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\\(\\)]*\\)`, 'g');
+
+/**
+  * Determine if the expression is declared text (begins with a single quote)
+  */
+const testForText = (expression) => expression.substring(0, 1) === `'`;
 
 /**
   * Determine if the cell expression is a formula, i.e. starts with '='
@@ -21,11 +23,6 @@ const testForText = (expression) => {
 const testForFormula = (expression) => expression.substring(0, 1) === '='
   || expression.substring(0, 1) === '+'
   || expression.substring(0, 1) === '-';
-
-/**
-  * Creates a RegExp based on the function's name (e.g. SUM, COUNT, etc.)
-  */
-const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\\(\\)]*\\)`, 'g');
 
 /**
   * Determine if there are cell references (addresses) in the formula
@@ -40,6 +37,11 @@ const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
   return builtInFunctionsArr
   .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
 }
+
+/**
+  * Determine if the expression is a number
+  */
+const isNumber = (expression) => !isNaN(Number(expression));
 
 /**
   * Main basic calculator; converts a string into a calculation
@@ -222,7 +224,7 @@ function builtInFunctionCalculator(formula, data, func) {
           .reduce((r, param) => {
             const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
             const cellValue = !cellFormula && cellFormula !== 0 ? '' : parseFormula(cellFormula, data);
-            return !cellValue || isNaN(Number(cellValue)) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
+            return !cellValue || !isNumber(cellValue) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
           }, 0);
       }
       return this;
@@ -337,11 +339,13 @@ const parseFormula = (formula, data) => {
   */
 export const parseExpression = (expression, data) => {
   /** Coalesce the expression to a string or empty string */
-  const coalescedExpression = coalesceExpression(expression);
+  const coalesced = coalesceExpression(expression);
   /** First check if the expression is just text: treat anything after `'` as plain text */
-  if (testForText(coalescedExpression)) return coalescedExpression.substring(1);
+  if (testForText(coalesced)) return coalesced.substring(1);
   /** Check whether to expression is a not a formula */
-  if (!testForFormula(coalescedExpression)) return coalescedExpression;
+  if (!testForFormula(coalesced)) return isNumber(coalesced)
+    ? formatCalcResult(coalesced)
+    : coalesced ;
   /** Determine whether the expression contains a Built-in Function or not */
-  return parseFormula(coalescedExpression, data);
+  return parseFormula(coalesced, data);
 }
