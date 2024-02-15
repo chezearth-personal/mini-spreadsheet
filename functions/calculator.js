@@ -46,69 +46,10 @@ const isNumber = (expression) => !isNaN(Number(expression));
 /**
   * Main basic calculator; converts a string into a calculation
   */
-const calcFormula = (formula) => Function(`'use strict'; return (${formula.toString()})`)();
-
-/**
-  * Array average function calculator
-  */
-// const average = (paramsArr, data) => {
-  // return Array.isArray(paramsArr) && count(paramsArr, data) !== 0
-    // ? sum(paramsArr, data) / count(paramsArr, data)
-    // : '#DIV0!';
-// }
-
-/**
-  * Array count function calculator
-  */
-// const count = (paramsArr, data) => {
-  // return Array.isArray(paramsArr) && paramsArr
-    // .filter(param => {
-      // const cellValue = Array.isArray(param) 
-        // ? parseFormula(data.storageArr[param[0]][param[1]][0], data)
-        // : param
-      // return !!cellValue || cellValue === 0;
-    // })
-    // .length;
-// }
-
-
-
-/**
-  * Based on the function name, executes the required calculation function
-  */
-// const functionHandler = (paramsArr, data, func) => {
-  // // console.log('functionHandler(): paramsArr =', paramsArr, '; func =', func);
-  // if (Array.isArray(paramsArr)) {
-    // if (func.name === 'AVERAGE') {
-      // return average(paramsArr, data);
-    // } else if (func.name === 'COUNT') {
-      // return count(paramsArr, data);
-    // } else {
-      // return sum(paramsArr, data);
-    // }
-  // }
-  // return '#REF!';
-// }
-
-
-/**
-  * Tests to see if the parameters are a comma-separated list or a range (e.g. A2:B15)
-  * and calls the appropriate processing function to obtain an array of rwo-column
-  * coordinates
-  */
-// const functionParametersHandler = (formula, data, func) => {
-  // // console.log('functionParametersHandler(): formula =', formula, '; func =', func);
-  // const parametersMatchArr = formula.match(/\(.+\)/g);
-  // // console.log('parametersMatchArr =', formula.match(/\(.+\)/g));
-  // const parameters = !parametersMatchArr ? '' : parametersMatchArr[0].slice(1, -1);
-  // // console.log('parameters =', parameters);
-  // const resolvedParameters = testForBuiltInFunction(parameters, data.builtInFunctions)
-    // ? parseBuiltInFunctions(parameters, data)
-    // : parameters;
-  // // console.log('resolvedParameters =', resolvedParameters);
-  // const parameterssArr = isParamsRange(resolvedParameters) ? paramsRangeHandler(resolvedParameters) : paramsListHandler(resolvedParameters);
-  // return functionHandler(parameterssArr, data, func);
-// }
+const calcFormula = (formula) => {
+  const mod = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0 ? '+' : '-');
+  return Function(`'use strict'; return (${mod})`)().toString();
+}
 
 /**
   * Parses the cell address references into array coordinates and looks up the 
@@ -285,7 +226,7 @@ function formatMethods(formula) {
       return this;
     },
     coalesceToZero: function() {
-      formula = isNaN(Number(coalesceExpression(formula)))
+      formula = !isNumber(coalesceExpression(formula))
         ? coalesceExpression(formula)
         : Number(coalesceExpression(formula)) === 0 ? '0' : coalesceExpression(formula);
       return this;
@@ -309,7 +250,8 @@ const getNumerical = (formula) => formatMethods(formula)
 const formatCalcResult = (formula) => {
   return formatMethods(getSign(formula) + getNumerical(formula))
     .coalesceToZero()
-    .result();
+    .result()
+    .toString();
 }
 
 const parseFormula = (formula, data) => {
