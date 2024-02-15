@@ -57,7 +57,27 @@ describe('It must handle basic inputs', function() {
     it('Must ignore a formula that starts with -', function() {
       expect(parseExpression(`1*3`, dataObj)).to.equal(`1*3`);
     });
-  })
+  });
+  describe('It must handle formulae with numbers', function() {
+    it('Must handle a simple positive integer', function() {
+      expect(parseExpression(`=1`, dataObj)).to.equal(`1`);
+    });
+    it('Must handle a simple negative integer', function() {
+      expect(parseExpression(`=-1`, dataObj)).to.equal(`-1`);
+    });
+    it('Must handle a simple positive decimal', function() {
+      expect(parseExpression(`=1.1`, dataObj)).to.equal(`1.1`);
+    });
+    it('Must handle a simple negative decimal', function() {
+      expect(parseExpression(`=-1.1`, dataObj)).to.equal(`-1.1`);
+    });
+    it('Must handle a simple positive decimal with a leading decimal', function() {
+      expect(parseExpression(`=.1`, dataObj)).to.equal(`0.1`);
+    });
+    it('Must handle a simple negative decimal with a leading decimal', function() {
+      expect(parseExpression(`=-.1`, dataObj)).to.equal(`-0.1`);
+    });
+  });
   describe('It must handle basic formulae', function() {
     it('Must handle a simple addition', function() {
       expect(parseExpression(`=1+1`, dataObj)).to.equal(`2`);

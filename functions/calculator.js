@@ -35,7 +35,7 @@ const testForReferences = (formula) => /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula)
 const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
   const formulaUpper = !formula ? '' : formula.toUpperCase();
   return builtInFunctionsArr
-  .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
+    .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
 }
 
 /**
@@ -64,12 +64,16 @@ const parseBuiltInFunctions = (formula, data) => {
     ), formula)
 }
 
-function calculatorMethods(formula) {
+/**
+  * Remove the '=', handle negative signs, handle decimal points, handle zeros
+  */
+function formulaMethods(formula) {
   let paramsStr = '';
   let paramsArr = [];
   /** Determines if an experssion is a range, e.g. A2:C4 */
   const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,3}/
-    .test(parameters.toUpperCase());
+    .test(parameters
+    .toUpperCase());
   /** Chained methods for processing Formulae and their parameters */
   return {
     /** Format the formula as much as possible first */
@@ -95,7 +99,9 @@ function calculatorMethods(formula) {
     },
     /** Any multiple consecutive negative signs to be converted to a single signs */
     combineNegativeSigns: function(showPlus) {
-      formula = formatMethods(formula).combineNegativeSigns(showPlus).result();
+      formula = formulaMethods(formula)
+        .combineNegativeSigns(showPlus)
+        .result();
       return this;
     },
     /** Evaluate the formula */
@@ -174,37 +180,35 @@ function calculatorMethods(formula) {
       }
       return this;
     },
-    result: function() {
-      return formula;
-    }
-  };
-}
-
-
-/**
-  * Remove the '=', handle negative signs, handle decimal points, handle zeros
-  */
-function formatMethods(formula) {
-  return {
+    /** Drop the first character if it is equal to that supplied*/
     dropLeadingChars: function(ch) {
-      formula = coalesceExpression(formula).substring(0, 1) === ch.toString().substring(0, 1)
-        ? formatMethods(coalesceExpression(formula).substring(1)).dropLeadingChars(ch).result()
-        : coalesceExpression(formula).toString();
+      formula = !!ch && coalesceExpression(formula).substring(0, 1) === ch.toString().substring(0, 1)
+        ? formulaMethods(formula.substring(1))
+            .dropLeadingChars(ch)
+            .result()
+        : formula;
       return this;
     },
+    /**  */
     combineNegativeSigns: function(showPlus) {
-      formula = formula.toString().replaceAll(/-{2,}/g, (match) => match.length % 2 === 0
-        ? showPlus ? '+' : '' 
-        : '-'
-      );
+      formula = formula
+        .toString()
+        .replaceAll(/-{2,}/g, (match) => match.length % 2 === 0
+          ? showPlus ? '+' : '' 
+          : '-'
+        );
       return this;
     },
+    /**  */
     getLeadingNegativeSigns: function() {
       formula = formula.substring(0, 1) === '-' ? '-' : '';
       return this;
     },
+    /**  */
     coverLeadingDecimalPoint: function() {
-      const dropLeadingNegativeSignsArr = coalesceExpression(formula).toString().match(/[^\-].*/g);
+      const dropLeadingNegativeSignsArr = coalesceExpression(formula)
+        .toString()
+        .match(/[^\-].*/g);
       formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
         ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
           ? '0' + dropLeadingNegativeSignsArr[0]
@@ -212,32 +216,33 @@ function formatMethods(formula) {
         : '';
       return this;
     },
+    /**  */
     coalesceToZero: function() {
       formula = !isNumber(coalesceExpression(formula))
         ? coalesceExpression(formula)
         : Number(coalesceExpression(formula)) === 0 ? '0' : coalesceExpression(formula);
       return this;
     },
+    /**  */
     result: function() {
       return formula;
     }
   };
 }
 
-const getSign = (formula) => formatMethods(formula)
+const getSign = (formula) => formulaMethods(formula)
   .dropLeadingChars('=')
   .combineNegativeSigns(false)
   .getLeadingNegativeSigns()
   .result();
 
-const getNumerical = (formula) => formatMethods(formula)
+const getNumerical = (formula) => formulaMethods(formula)
   .dropLeadingChars('=')
   .coverLeadingDecimalPoint()
   .result();
 
 const formatCalcResult = (formula) => {
-  // console.log('formatCalcResult(): formula =', formula);
-  return formatMethods(getSign(formula) + getNumerical(formula))
+  return formulaMethods(getSign(formula) + getNumerical(formula))
     .coalesceToZero()
     .result()
     .toString();
@@ -251,9 +256,16 @@ const parseFormula = (formula, data) => {
   // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     return testForReferences(formula)
-      ? formatMethods(formula).dropLeadingChars('=').result().toString()
-      : calculatorMethods(formula).formatCalcResult().parseReferences(data).combineNegativeSigns(true).calculate().result();
-      // : calcFormula(parseReferences(formatCalcResult(formula), data))
+      ? formulaMethods(formula)
+        .dropLeadingChars('=')
+        .result()
+        .toString()
+      : formulaMethods(formula)
+        .formatCalcResult()
+        .parseReferences(data)
+        .combineNegativeSigns(true)
+        .calculate()
+        .result();
   }
   return formatCalcResult(parseFormula(functionResult, data));
 }
