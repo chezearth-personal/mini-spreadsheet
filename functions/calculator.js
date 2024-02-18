@@ -53,7 +53,7 @@ const parseBuiltInFunctions = (formula, data) => {
     .toUpperCase()
     .replaceAll(
       functionRegExp(func.name),
-      (match) => calculatorMethods(match, data)
+      (match) => formulaMethods(match, data)
         .getParamsStr(data)
         .getParamsRangeArr()
         .getParamsListArr()
