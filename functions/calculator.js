@@ -182,7 +182,7 @@ function formulaMethods(formula) {
     },
     /** Drop the first character if it is equal to that supplied*/
     dropLeadingChars: function(ch) {
-      formula = !!ch && coalesceExpression(formula).substring(0, 1) === ch.toString().substring(0, 1)
+      formula = !!ch && formula.substring(0, 1) === ch.toString().substring(0, 1)
         ? formulaMethods(formula.substring(1))
             .dropLeadingChars(ch)
             .result()
@@ -206,8 +206,7 @@ function formulaMethods(formula) {
     },
     /**  */
     coverLeadingDecimalPoint: function() {
-      const dropLeadingNegativeSignsArr = coalesceExpression(formula)
-        .toString()
+      const dropLeadingNegativeSignsArr = formula.toString()
         .match(/[^\-].*/g);
       formula = Array.isArray(dropLeadingNegativeSignsArr) && dropLeadingNegativeSignsArr.length
         ? dropLeadingNegativeSignsArr[0].substring(0, 1) === '.'
@@ -218,9 +217,9 @@ function formulaMethods(formula) {
     },
     /**  */
     coalesceToZero: function() {
-      formula = !isNumber(coalesceExpression(formula))
-        ? coalesceExpression(formula)
-        : Number(coalesceExpression(formula)) === 0 ? '0' : coalesceExpression(formula);
+      formula = !isNumber(formula)
+        ? formula
+        : Number(formula) === 0 ? '0' : formula;
       return this;
     },
     /**  */
