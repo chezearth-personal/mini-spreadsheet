@@ -224,28 +224,37 @@ function formulaMethods(formula) {
       return this;
     },
     /**  */
+    getSign: function() {
+      formula = formulaMethods(formula)
+        .dropLeadingChars('=')
+        .combineNegativeSigns(false)
+        .getLeadingNegativeSigns()
+        .result();
+      return this;
+    },
+    /**  */
+    getNumerical: function() {
+      formula = formulaMethods(formula)
+        .dropLeadingChars('=')
+        .coverLeadingDecimalPoint()
+        .result();
+      return this;
+    },
+    /**  */
+    formatCalcResult: function() {
+      formula = formulaMethods(
+        formulaMethods(formula).getSign().result() + formulaMethods(formula).getNumerical().result()
+      )
+        .coalesceToZero()
+        .result()
+        .toString();
+      return this;
+    },
+    /**  */
     result: function() {
-      return formula;
+      return formula.toString();
     }
   };
-}
-
-const getSign = (formula) => formulaMethods(formula)
-  .dropLeadingChars('=')
-  .combineNegativeSigns(false)
-  .getLeadingNegativeSigns()
-  .result();
-
-const getNumerical = (formula) => formulaMethods(formula)
-  .dropLeadingChars('=')
-  .coverLeadingDecimalPoint()
-  .result();
-
-const formatCalcResult = (formula) => {
-  return formulaMethods(getSign(formula) + getNumerical(formula))
-    .coalesceToZero()
-    .result()
-    .toString();
 }
 
 const parseFormula = (formula, data) => {
@@ -258,6 +267,7 @@ const parseFormula = (formula, data) => {
     return testForReferences(formula)
       ? formulaMethods(formula)
         .dropLeadingChars('=')
+        .formatCalcResult()
         .result()
         .toString()
       : formulaMethods(formula)
@@ -265,9 +275,12 @@ const parseFormula = (formula, data) => {
         .parseReferences(data)
         .combineNegativeSigns(true)
         .calculate()
+        .formatCalcResult()
         .result();
   }
-  return formatCalcResult(parseFormula(functionResult, data));
+  return formulaMethods(parseFormula(functionResult, data))
+    .formatCalcResult()
+    .result();
 }
 
 /**
@@ -285,7 +298,9 @@ export const parseExpression = (expression, data) => {
   if (testForText(coalesced)) return coalesced.substring(1);
   /** Check whether to expression is a not a formula */
   if (!testForFormula(coalesced)) return isNumber(coalesced)
-    ? formatCalcResult(coalesced)
+    ? formulaMethods(coalesced)
+      .formatCalcResult()
+      .result()
     : coalesced ;
   /** Determine whether the expression contains a Built-in Function or not */
   return parseFormula(coalesced, data);

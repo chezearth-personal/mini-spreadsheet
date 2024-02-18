@@ -96,4 +96,40 @@ describe('It must handle basic inputs', function() {
       expect(parseExpression(`=2+-3`, dataObj)).to.equal(`-1`);
     });
   });
+  describe('It must handle formulae with parentheses', function() {
+    it('Must handle a simple addition', function() {
+      expect(parseExpression(`=(1+1)`, dataObj)).to.equal(`2`);
+    });
+    it('Must handle a simple subtraction', function() {
+      expect(parseExpression(`=(1-1)`, dataObj)).to.equal(`0`);
+    });
+    it('Must handle a simple multiplication', function() {
+      expect(parseExpression(`=(2*2)`, dataObj)).to.equal(`4`);
+    });
+    it('Must handle a simple division', function() {
+      expect(parseExpression(`=(4/2)`, dataObj)).to.equal(`2`);
+    });
+    it('Must handle simple double operations', function() {
+      expect(parseExpression(`=(2--3)`, dataObj)).to.equal(`5`);
+      expect(parseExpression(`=(2+-3)`, dataObj)).to.equal(`-1`);
+    });
+  });
+  describe('It must handle formulae with parentheses and numbers', function() {
+    it('Must handle a simple addition', function() {
+      expect(parseExpression(`=1+(1+1)`, dataObj)).to.equal(`3`);
+    });
+    it('Must handle a simple subtraction', function() {
+      expect(parseExpression(`=1-(1-1)`, dataObj)).to.equal(`1`);
+    });
+    it('Must handle a simple multiplication', function() {
+      expect(parseExpression(`=2*(2*2)`, dataObj)).to.equal(`8`);
+    });
+    it('Must handle a simple division', function() {
+      expect(parseExpression(`=4/(4/2)`, dataObj)).to.equal(`2`);
+    });
+    it('Must handle simple double operations', function() {
+      expect(parseExpression(`=2-(2--3)`, dataObj)).to.equal(`-3`);
+      expect(parseExpression(`=2+(2+-3)`, dataObj)).to.equal(`1`);
+    });
+  });
 });
