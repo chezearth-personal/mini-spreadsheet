@@ -96,6 +96,11 @@ function formulaMethods(formula) {
           });
       return this;
     },
+    /** Remove whitespaces */
+    removeWhitespaces: function() {
+      formula = formula.replace(/\s/g, '');
+      return this;
+    },
     /** Any multiple consecutive negative signs to be converted to a single signs */
     combineNegativeSigns: function(showPlus) {
       formula = formulaMethods(formula)
@@ -282,6 +287,7 @@ const parseFormula = (formula, data) => {
       : formulaMethods(formula)
         .formatCalcResult()
         .parseReferences(data)
+        .removeWhitespaces()
         .combineNegativeSigns(true)
         .calculate()
         .formatCalcResult()

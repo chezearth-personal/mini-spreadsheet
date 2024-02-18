@@ -137,4 +137,39 @@ describe('It must handle basic inputs', function() {
       expect(parseExpression(`=2+(2+-3)`, dataObj)).to.equal(`1`);
     });
   });
+  describe('It must handle formulae with references', function() {
+    dataObj.storageArr[0][1][0] = '=1'; /** A2 */
+    dataObj.storageArr[0][2][0] = '=a2*2'; /** A3 */
+    dataObj.storageArr[0][3][0] = '=A2 + a3'; /** A4 */
+    dataObj.storageArr[0][4][0] = '4'; /** A5 */
+    describe('It must handle formula with simple references', function() {
+      it('Must resolve a reference to an empty cell', function() {
+        expect(parseExpression(`=b5`, dataObj)).to.equal(`0`);
+      });
+      it('Must resolve a reference to a cell with a number', function() {
+        expect(parseExpression(`=a2`, dataObj)).to.equal(`1`);
+      });
+    });
+    describe('It must handle formulae with references and numbers', function() {
+      it('Must resolve a reference to a cell with a simple formula', function() {
+        expect(parseExpression(`=a3`, dataObj)).to.equal(`2`);
+      });
+      it('Must resolve a reference to a cell with a simple formula containing whitespaces', function() {
+        expect(parseExpression(`= a4`, dataObj)).to.equal(`3`);
+      });
+    });
+  });
+  describe('It must handle formulae with built-in functions', function() {
+    describe('It must sum a range numbers and place the result in a cell', function() {
+      dataObj.storageArr[0][5][0] = '=SUM(A2:a4)'; /** A6 */
+      it('Must retrieve a cell containg a simple sum', function() {
+        expect(parseExpression(`=A6`, dataObj)).to.equal(`6`);
+      });
+    });
+    describe('It must perform a complex combination of operations and SUM functions over a range', function() {
+      it('Must add a reference to a SUM() of listed refs containing a SUM() of a range', function() {
+        expect(parseExpression(`=A1 + A2 + SUM(A3, SUM(A4:A6))`, dataObj)).to.equal(`16`);
+      });
+    });
+  });
 });
