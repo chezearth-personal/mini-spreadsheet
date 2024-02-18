@@ -1,8 +1,5 @@
 'use strict';
 
-// import { configs } from './config.js';
-// import Yaml from 'js-yaml';
-// import { read } from 'file-reader';
 import configs from './config.json' assert {type: 'json'};
 import { parse } from 'yaml';
 import { createFormulaBar,
@@ -19,13 +16,8 @@ import { createSheet,
 import { createStorageArr } from './controllers/storageManager.js';
 
 /**
-  * Get the main configuration settings as objects
+  * Getters for the main configuration settings
   */
-// const fileContents = parse('./config.yaml');
-// console.log(fileContents);
-// const configs = yaml.load(fileContents);
-console.log(configs);
- 
 const getSheetSize = () => configs.sheetSize;
 const getBuiltInFunctions = () => configs.builtInFunctions;
 
