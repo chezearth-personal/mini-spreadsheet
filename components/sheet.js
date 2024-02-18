@@ -1,14 +1,17 @@
 'use strict';
 
 import { getParentDocument } from './main.js';
-import { getCellCoordinatesArr, zeroArray, refreshFormulaBar } from './formulaBar.js';
+import {
+  getCellCoordinatesArr,
+  zeroArray,
+  refreshFormulaBar } from './formulaBar.js';
 import {
   linearToColHeader,
   linearToRowHeader,
   linearToGrid,
   toCellAddress,
   toCellCoordinates } from '../functions/addressConverter.js';
-import { parseExpression } from '../functions/calculator.js';
+import { parseExpression, isNumber } from '../functions/calculator.js';
 import {
   getFormula,
   saveFormula,
@@ -30,7 +33,11 @@ const getValue = () => 'value';
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
   */
 const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${linearToColHeader(i, getId())}">
-        <input class="col-header" id="${linearToColHeader(i, getId())}" disabled="true" type="text" value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
+        <input class="col-header" `
+          + `id="${linearToColHeader(i, getId())}" `
+          + `disabled="true" `
+          + `type="text" `
+          + `value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
         <div class="col-marker" id="col-marker-${linearToColHeader(i, getId())}"></div>`}
       </div>`;
 
@@ -38,7 +45,10 @@ const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${linearToColHeader(i,
   * Makes the HTML text for the cell at the left of the sheet with the row number header
   */
 const makeRowHeaderCell = (e, i, columns) => `${e}"row" id="row-${linearToRowHeader(i, columns)}">
-      <input class="row-header" id="${linearToRowHeader(i, columns)}" disabled="true" type="text"value="${linearToRowHeader(i, columns)}" />
+      <input class="row-header" `
+        + `id="${linearToRowHeader(i, columns)}" `
+        + `disabled="true" `
+        + `type="text"value="${linearToRowHeader(i, columns)}" />
       <div class="row-marker" id="row-marker-${linearToRowHeader(i, columns)}"></div>
     </div>`;
 
@@ -58,11 +68,6 @@ const makeRowCell = (e, i, sheetSize) => i % (sheetSize.columns + 1) === 0
   * Creates a new 2-element array with the same element values
   */
 const newArray = (arr) => Array.of(arr[0], arr[1]);
-
-/**
-  * Tests for a string that is purely numerical
-  */
-const testForNumericalValue = (str) => /^[\-\+\.0-9][\.0-9]*$/.test(str);
 
 /**
   * Creates the grid cells, with the header row and header columns identified in
@@ -90,7 +95,7 @@ function arrayTest(arr) {
   * Sets up the alignment based on whether the data are text or numbers
   */
 function setAlignment(elem, formula) {
-  elem.style.textAlign = testForNumericalValue(elem.value) && formula.substring(0, 1) !== `'`
+  elem.style.textAlign = isNumber(elem.value) && formula.substring(0, 1) !== `'`
     ? 'right'
     : 'left';
 }

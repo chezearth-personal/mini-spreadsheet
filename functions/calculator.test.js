@@ -78,6 +78,11 @@ describe('It must handle basic inputs', function() {
       expect(parseExpression(`=-.1`, dataObj)).to.equal(`-0.1`);
     });
   });
+  describe('It must return errors for formulae with invalid expressions', function() {
+    it(`Must return a '#NAME?' error for an invalid formula with a text quote`, function() {
+      expect(parseExpression(`='1`, dataObj)).to.equal(`#NAME?`);
+    });
+  });
   describe('It must handle basic formulae', function() {
     it('Must handle a simple addition', function() {
       expect(parseExpression(`=1+1`, dataObj)).to.equal(`2`);

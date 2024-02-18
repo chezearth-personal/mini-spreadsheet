@@ -41,7 +41,7 @@ const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
 /**
   * Determine if the expression is a number
   */
-const isNumber = (expression) => !isNaN(Number(expression));
+export const isNumber = (expression) => !isNaN(Number(expression));
 
 /**
   * Loops through the list of built-in functions in config.js and tests the formula for
@@ -87,13 +87,12 @@ function formulaMethods(formula) {
         ? 0
         : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
             const cellCoordinates = toCellCoordinates(match);
-            const elem = cellCoordinates && Array.isArray(cellCoordinates) 
+            return cellCoordinates && Array.isArray(cellCoordinates) 
               ? parseFormula(
-                  data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0],
+                  data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0] || 0,
                   data
                 )
               : '#REF!'
-            return elem
           });
       return this;
     },
@@ -106,8 +105,10 @@ function formulaMethods(formula) {
     },
     /** Evaluate the formula */
     calculate: function() {
-      formula = Function(`'use strict'; return (${formula.toString()})`)()
-        .toString();
+      formula = /^[(-+\--9]+$/.test(formula)
+        ? Function(`'use strict'; return (${formula.toString()})`)()
+          .toString()
+        : '#NAME?'
       return this;
     },
     /** Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4. */
@@ -182,16 +183,18 @@ function formulaMethods(formula) {
     },
     /** Drop the first character if it is equal to that supplied*/
     dropLeadingChars: function(ch) {
-      formula = !!ch && formula.substring(0, 1) === ch.toString().substring(0, 1)
-        ? formulaMethods(formula.substring(1))
+      formula = !ch || !formula || formula.substring(0, 1) !== ch.toString().substring(0, 1)
+        ? formula
+        : formulaMethods(formula.substring(1))
             .dropLeadingChars(ch)
             .result()
-        : formula;
       return this;
     },
     /**  */
     combineNegativeSigns: function(showPlus) {
-      formula = formula
+      formula = !formula
+        ? formula
+        : formula
         .toString()
         .replaceAll(/-{2,}/g, (match) => match.length % 2 === 0
           ? showPlus ? '+' : '' 
@@ -201,7 +204,7 @@ function formulaMethods(formula) {
     },
     /**  */
     getLeadingNegativeSigns: function() {
-      formula = formula.substring(0, 1) === '-' ? '-' : '';
+      formula = !formula ? formula : formula.substring(0, 1) === '-' ? '-' : '';
       return this;
     },
     /**  */
@@ -263,6 +266,14 @@ const parseFormula = (formula, data) => {
     && parseBuiltInFunctions(formula.toUpperCase(), data);
   // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
+    // console.log('testForReferences(formula) =', testForReferences(formula));
+    // console.log('formulaMethods(formula)\n.formatCalcResult()\n.parseReferences(data)\n.combineNegativeSigns(true)\n.calculate() =', formulaMethods(formula)
+      // .formatCalcResult()
+      // .parseReferences(data)
+      // .combineNegativeSigns(true)
+      // .calculate()
+      // .result()
+    // );
     return testForReferences(formula)
       ? formulaMethods(formula)
         .dropLeadingChars('=')
