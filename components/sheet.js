@@ -19,36 +19,40 @@ const getId = () => 'id';
 
 const getValue = () => 'value';
 
-/**
-  * Adds an autocomplete attribute
-  */
-const getAutocomplete = (i) => i === 0 ? ' autocomplete="none"' : '';
+/**  */
+// const calculateWidth = (i, sheetSize) => (
+  // i % (sheetSize.columns + 1) === 0
+    // ? sheetSize.cells.rowHeaderWidth 
+    // : sheetSize.cells.width
+  // ).toString();
 
 /**
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
   */
-const makeColumnHeaderCell = (e, i) => `${e}col-header" id="${linearToColHeader(i, getId())}"`
-  + `${getAutocomplete(i)} disabled="true" type="text" `
-  + `value="${linearToColHeader(i, getValue())}" />`;
+const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${linearToColHeader(i, getId())}">
+        <input class="col-header" id="${linearToColHeader(i, getId())}" disabled="true" type="text" value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
+        <div class="col-marker" id="col-marker-${linearToColHeader(i, getId())}"></div>`}
+      </div>`;
 
 /**
-  * Makes the HTML text for the cell at the left of the sheet with the rown number header
+  * Makes the HTML text for the cell at the left of the sheet with the row number header
   */
-const makeRowHeaderCell = (e, i, columns) => `${e}row-header" id="${linearToRowHeader(i, columns)}"`
-  + ` disabled="true" type="text"`
-  + ` value="${linearToRowHeader(i, columns)}" />`;
+const makeRowHeaderCell = (e, i, columns) => `${e}"row" id="row-${linearToRowHeader(i, columns)}">
+      <input class="row-header" id="${linearToRowHeader(i, columns)}" disabled="true" type="text"value="${linearToRowHeader(i, columns)}" />
+      <div class="row-marker" id="row-marker-${linearToRowHeader(i, columns)}"></div>
+    </div>`;
 
 /**
   * Makes the blank cells in the body of the sheet
   */
-const makeSheetCell = (e, i, columns) => `${e}cell" id=${linearToGrid(i, columns)} type="text" />`;
+const makeSheetCell = (i, columns) => `    <input class="cell" id=${linearToGrid(i, columns)} type="text" />`;
 
 /**
   * Decides whether to make row header cell (left-most column) or a sheet cell
   */
-const makeRowCell = (e, i, columns) => i % (columns + 1) === 0 
-  ? makeRowHeaderCell(e, i, columns)
-  : makeSheetCell(e, i, columns)
+const makeRowCell = (e, i, sheetSize) => i % (sheetSize.columns + 1) === 0 
+  ? makeRowHeaderCell(e, i, sheetSize.columns)
+  : makeSheetCell(i, sheetSize.columns);
 
 /**
   * Creates a new 2-element array with the same element values
@@ -64,10 +68,12 @@ const testForNumericalValue = (str) => /^[\-\+\.0-9][\.0-9]*$/.test(str);
   * Creates the grid cells, with the header row and header columns identified in
   * separate classes
   */
-function createCells(columns, rows) {
-  return Array((columns + 1) * (rows + 1))
-    .fill(`<input class="`)
-    .map((e, i) => i < (columns + 1) ? makeColumnHeaderCell(e, i) : makeRowCell(e, i, columns))
+function createCells(sheetSize) {
+  return Array((sheetSize.columns + 1) * (sheetSize.rows + 1))
+    .fill(`      <div class=`)
+    .map((e, i) => i < (sheetSize.columns + 1)
+      ? makeColumnHeaderCell(e, i)
+      : makeRowCell(e, i, sheetSize))
     .join('\n');
 }
 
@@ -140,7 +146,6 @@ const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
   : zeroArray();
 
 export function handleDoubleClick(event) {
-  // console.log('\'DoubleClick\' pressed.');
   setFocus(event);
   const formula = getFormula(this, getAddress(event));
   getParentDocument(event).getElementById(getAddress(event).join('-')).value = !formula && formula !== 0 ? '' : formula;
@@ -295,9 +300,10 @@ export function handleStyling(event) {
   */
 export const createSheet = (sheetSize) => `
   <main>
-    <div id="sheet"
-      style="grid-template-columns:${sheetSize.cells.rowHeaderWidth} repeat(${sheetSize.columns}, ${sheetSize.cells.width});grid-template-rows:repeat(${sheetSize.rows + 1}, 2ch)">
-      ${createCells(sheetSize.columns, sheetSize.rows)}
+    <div id="sheet" style="grid-template-columns:${sheetSize.cells.rowHeaderWidth} `
+        + `repeat(${sheetSize.columns}, ${sheetSize.cells.width});`
+        + `grid-template-rows:repeat(${sheetSize.rows + 1}, ${sheetSize.cells.height})">
+${createCells(sheetSize)}
     </div>
   </main>
 `;

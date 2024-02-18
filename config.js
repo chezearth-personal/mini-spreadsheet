@@ -3,8 +3,9 @@ export const configs = {
     columns: 100,
     rows: 100,
     cells: {
-      rowHeaderWidth: '4ch',
-      width : '8ch'
+      rowHeaderWidth: '40px',
+      width : '80px',
+      height: '20px'
     }
   },
   builtInFunctions: [

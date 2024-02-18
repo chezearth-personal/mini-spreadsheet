@@ -58,10 +58,10 @@ export const zeroArray = () => Array.of('0', '0');
   */
 export const createFormulaBar = () => `
   <header id="formula-bar">
-    <input class="button" type="button" id="refresh" value=" = " />
+    <input class="button" type="button" id="refresh" value="=" />
     <input type="text" id="formula-input" name="f"  size="100%" />
-    <input class="button format-button" type="button" id="format-bold" value=" B " />
-    <input class="button format-button" type="button" id="format-italic" value=" I " />
+    <input class="button format-button" type="button" id="format-bold" value="B" />
+    <input class="button format-button" type="button" id="format-italic" value="I" />
     <input class="button format-button" type="button" id="format-underline" value="U" />
     <p class="author">© Charles Rethman</p>
   </header>
