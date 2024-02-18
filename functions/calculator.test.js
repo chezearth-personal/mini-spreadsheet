@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 import { parseExpression } from './calculator.js';
-import { configs } from '../config.js';
+import configs from '../config.json' assert {type: 'json'};
 import { createStorageArr } from '../controllers/storageManager.js';
 
 const dataObj = {
