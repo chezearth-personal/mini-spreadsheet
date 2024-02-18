@@ -264,7 +264,6 @@ const parseFormula = (formula, data) => {
   /** process the formula, otherwise return empty*/
   const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
     && parseBuiltInFunctions(formula.toUpperCase(), data);
-  // console.log('functionResult =', functionResult);
   if (!functionResult && functionResult !== 0) {
     // console.log('testForReferences(formula) =', testForReferences(formula));
     // console.log('formulaMethods(formula)\n.formatCalcResult()\n.parseReferences(data)\n.combineNegativeSigns(true)\n.calculate() =', formulaMethods(formula)
