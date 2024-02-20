@@ -8,10 +8,14 @@ import { createFormulaBar,
 import { createSheet,
   refreshSheetValues,
   clickCell,
-  handleKeyDown,
-  handleStyling,
   refreshCell,
   refreshStorage,
+  handleKeyDown,
+  handleStyling,
+  handleColumnWidth,
+  releaseColumnWidth,
+  handleRowHeight,
+  releaseRowHeight,
   handleDoubleClick} from './components/sheet.js';
 import { createStorageArr } from './controllers/storageManager.js';
 
@@ -53,13 +57,27 @@ const createBoundObj = (cell) => ({
 /**
   * Create listeners on all the sheet cells for data entry, data updates and keystrokes
   */
-const sheet = document.querySelectorAll('input.cell');
 document.addEventListener('keydown', handleKeyDown.bind(createBoundObj()));
-sheet.forEach(cell => cell.addEventListener('click', clickCell));
-sheet.forEach(cell => cell.addEventListener('change', refreshStorage.bind(createBoundObj())));
-sheet.forEach(cell => cell.addEventListener('input', refreshFormulaBar.bind(createBoundObj(cell))));
-sheet.forEach(cell => cell.addEventListener('dblclick', handleDoubleClick.bind(getStorageArr())));
-sheet.forEach(cell => cell.addEventListener('focus', refreshFormulaBar.bind(createBoundObj(cell))));
+const sheet = document.querySelectorAll('input.cell-input');
+sheet.forEach(cellInput => cellInput.addEventListener('click', clickCell));
+sheet.forEach(cellInput => cellInput
+  .addEventListener('change', refreshStorage.bind(createBoundObj()))
+);
+sheet.forEach(cellInput => cellInput
+  .addEventListener('input', refreshFormulaBar.bind(createBoundObj(cellInput)))
+);
+sheet.forEach(cellInput => cellInput
+  .addEventListener('dblclick', handleDoubleClick.bind(getStorageArr()))
+);
+sheet.forEach(cellInput => cellInput
+  .addEventListener('focus', refreshFormulaBar.bind(createBoundObj(cellInput)))
+);
+const colAdjust = document.querySelectorAll('div.col-marker');
+colAdjust.forEach(width => width.addEventListener('mousedown', handleColumnWidth));
+colAdjust.forEach(width => width.addEventListener('mouseup', releaseColumnWidth));
+const rowAdjust = document.querySelectorAll('div.row-marker');
+rowAdjust.forEach(height => height.addEventListener('mousedown', handleRowHeight));
+rowAdjust.forEach(height => height.addEventListener('mouseup', releaseRowHeight));
 document
   .getElementById('formula-input')
   .addEventListener('change', updateFormulaBar.bind(createBoundObj()));
