@@ -68,3 +68,20 @@ To build and run the app locally on your machine, clone this repo and `cd` into
 the working directory. Then `npm run build` will have Vite install the 
 dependencies and build the code. To run it on your local machine, use 
 `npm run dev`. To run the few tests that have been written, use `npm run test`.
+
+## ToDo
+
+- Make the column width and row height adjustment work. Store the column
+  width and row height in an array that is used to build the sheet grid up.
+- Reduce the memory requirment (currently 300MB+) to under 100MB. Do this by
+  reducing the number of elements on the page (e.g. the cell input text box's
+  border can be highlighted rather than having extra, separate div elements---
+  100 x 100 x 2 = 20,000 extra elements)
+- Create a separate IAM service, to allow authentication and role assignment
+  for app authorisation. The service will return JWTs for auth on any app.
+- Use the IAM service to store the spreadsheet arrays in a cloud-based database.
+- Alllow selection of multiple cells, whole columns and rows. Show the
+  selection range on a widget on nthe formula bar.
+- Build a generic function processor that take data from the config to 
+  calculate built-in function results, rather than having hard-coded function
+  calculators.
