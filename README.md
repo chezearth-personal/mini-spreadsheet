@@ -82,6 +82,6 @@ dependencies and build the code. To run it on your local machine, use
 - Use the IAM service to store the spreadsheet arrays in a cloud-based database.
 - Alllow selection of multiple cells, whole columns and rows. Show the
   selection range on a widget on nthe formula bar.
-- Build a generic function processor that take data from the config to 
+- Build a generic function processor that take data from the config to
   calculate built-in function results, rather than having hard-coded function
   calculators.
