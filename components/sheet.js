@@ -165,6 +165,9 @@ const navLeft = (cellCoordinatesArr) => arrayTest(cellCoordinatesArr)
     : newArray(cellCoordinatesArr)
   : zeroArray();
 
+/**
+  * Set the focus on the clicked cell enter the input 
+  */
 export function handleDoubleClick(event) {
   setFocus(event);
   const formula = getFormula(this, getAddress(event));
