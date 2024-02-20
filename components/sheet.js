@@ -29,16 +29,17 @@ const calculateWidth = (i, sheetSize) => (
     : sheetSize.cells.width - sheetSize.cells.borderWidth * 2
   ).toString();
 
-const calculateHeight = (sheetSize) => (
-  sheetSize.cells.height - sheetSize.cells.borderWidth * 2
-).toString();
+// const calculateHeight = (sheetSize) => (
+  // sheetSize.cells.height - sheetSize.cells.borderWidth * 2
+// ).toString();
 
 const colReference = (i) => i === 0 ? 'address' : i - 1;
 
 /**
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
   */
-const makeColumnHeaderCell = (e, i, sheetSize) => `${e}"col" id="col-${colReference(i)}" style="width:${calculateWidth(i, sheetSize)}${sheetSize.unit}">
+const makeColumnHeaderCell = (e, i, sheetSize) => `${e}"col" id="col-${colReference(i)}" `
+        + `style="width:${calculateWidth(i, sheetSize)}${sheetSize.unit}">
         <input class="col-header" `
           + `id="col-header-${colReference(i)}" `
           + `disabled="true" `
@@ -308,13 +309,10 @@ export function handleKeyDown(event) {
   *
   */
 export function handleColumnWidth(event) {
-  // console.log('handleColumnWidth(): event.target.id =', event.target.id);
   const col = event.target.id.split('-')[2];
-  // console.log('handleColumnWidth(): col =', col);
   const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-right');
   cellMarkersArr.forEach(cellMarker => {
     if (cellMarker.getAttribute('id').split('-')[3] === col) {
-      // console.log('handleColumnWidth(): cellMarker.id =', cellMarker.id.split('-'));
       cellMarker.style.borderRight = '2px solid #2a2a2a';
     }
   });
@@ -322,13 +320,10 @@ export function handleColumnWidth(event) {
 
 export function releaseColumnWidth(event) {
   const col = event.target.id.split('-')[2];
-  // console.log('releaseColumnWidth(): col =', col);
   const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-right');
   cellMarkersArr.forEach(cellMarker => {
     if (cellMarker.getAttribute('id').split('-')[3] === col) {
-      // console.log('handleColumnWidth(): cellMarker.id =', cellMarker.id.split('-'));
       cellMarker.style.borderRightStyle = 'initial';
-      // console.log(cellMarker.style.borderRight);
     }
   });
 }
@@ -337,13 +332,10 @@ export function releaseColumnWidth(event) {
   *
   */
 export function handleRowHeight(event) {
-  // console.log('handleColumnWidth(): event.target.id =', event.target.id);
   const col = event.target.id.split('-')[2];
-  // console.log('handleColumnWidth(): col =', col);
   const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-bottom');
   cellMarkersArr.forEach(cellMarker => {
     if (cellMarker.getAttribute('id').split('-')[4] === col) {
-      // console.log('handleColumnWidth(): cellMarker.id =', cellMarker.id.split('-'));
       cellMarker.style.borderBottom = '2px solid #2a2a2a';
     }
   });
@@ -351,13 +343,10 @@ export function handleRowHeight(event) {
 
 export function releaseRowHeight(event) {
   const col = event.target.id.split('-')[2];
-  // console.log('releaseColumnWidth(): col =', col);
   const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-bottom');
   cellMarkersArr.forEach(cellMarker => {
     if (cellMarker.getAttribute('id').split('-')[4] === col) {
-      // console.log('handleColumnWidth(): cellMarker.id =', cellMarker.id.split('-'));
       cellMarker.style.borderBottomStyle = 'initial';
-      // console.log(cellMarker.style.borderRight);
     }
   });
 }
