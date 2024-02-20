@@ -1,7 +1,7 @@
 {
   "sheetSize": {
-    "columns": 10,
-    "rows": 10,
+    "columns": 100,
+    "rows": 100,
     "unit": "px",
     "cells": {
       "rowHeaderWidth": 40,
