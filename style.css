@@ -201,47 +201,48 @@ main {
   z-index: 3;
 }
 
-.cell-row {
-  display: flex;
-  flex-flow: column nowrap;
-  position: relative;
-  border: 0.5px solid #b7b7b7;
-  background-color: #f9f9f9;
-}
+/* .cell-row { */
+  /* display: flex; */
+  /* flex-flow: column nowrap; */
+  /* position: relative; */
+  /* border: 0.5px solid #b7b7b7; */
+  /* background-color: #f9f9f9; */
+/* } */
 
-.cell-col {
-  display: flex;
-  flex-flow: row nowrap;
-  position: relative;
-  height: 100%;
-}
+/* .cell-col { */
+  /* display: flex; */
+  /* flex-flow: row nowrap; */
+  /* position: relative; */
+  /* height: 100%; */
+/* } */
 
 .cell-input {
   overflow: auto;
-  border: 0;
+  border: 0.5px solid #b7b7b7;
+  /* border: 0; */
   border-radius: 0;
   text-align: left;
   cursor: default;
   z-index: 2;
 }
 
-.cell-marker-right {
-  height: 100%;
-  width: 0;
-  border-right: 2px transparent #f9f9f9;
-  position: absolute;
-  right: 0;
-  z-index: 3;
-}
+/* .cell-marker-right { */
+  /* height: 100%; */
+  /* width: 0; */
+  /* border-right: 2px transparent #f9f9f9; */
+  /* position: absolute; */
+  /* right: 0; */
+  /* z-index: 3; */
+/* } */
 
-.cell-marker-bottom {
-  height: 0;
-  width: 100%;
-  border-bottom: 2px transparent #f9f9f9;
-  position: absolute;
-  bottom: 0;
-  z-index: 3;
-}
+/* .cell-marker-bottom { */
+  /* height: 0; */
+  /* width: 100%; */
+  /* border-bottom: 2px transparent #f9f9f9; */
+  /* position: absolute; */
+  /* bottom: 0; */
+  /* z-index: 3; */
+/* } */
 
 @media (prefers-color-scheme: light) {
   :root {

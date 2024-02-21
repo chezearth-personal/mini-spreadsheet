@@ -85,3 +85,5 @@ dependencies and build the code. To run it on your local machine, use
 - Build a generic function processor that take data from the config to
   calculate built-in function results, rather than having hard-coded function
   calculators.
+- Create test using Selenium and a headless browser to test the page layout:
+  `sheet.test.js`

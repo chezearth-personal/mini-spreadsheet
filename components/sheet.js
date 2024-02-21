@@ -22,6 +22,8 @@ const getId = () => 'id';
 
 const getValue = () => 'value';
 
+const getElemetsbyClass = (event, className) => getParentDocument(event).querySelectorAll(className);
+
 /**  */
 const calculateWidth = (i, sheetSize) => (
   i % (sheetSize.columns + 1) === 0
@@ -62,20 +64,14 @@ const makeRowHeaderCell = (e, i, columns) => `${e}"row" id="row-${linearToRowHea
 /**
   * Makes the blank cells in the body of the sheet
   */
-const makeSheetCell = (e, i, columns) => `${e}"cell-row" id="cell-row-${linearToGrid(i, columns)}">
-        <div class="cell-col" id="cell-col-${linearToGrid(i, columns)}">
-          <input class="cell-input" id=${linearToGrid(i, columns)} type="text" />
-          <div class="cell-marker-right" id="cell-marker-right-${linearToGrid(i, columns)}"></div>
-        </div>
-        <div class="cell-marker-bottom" id="cell-marker-bottom-${linearToGrid(i, columns)}"></div>
-      </div>`;
+const makeSheetCell = (i, columns) => `<input class="cell-input" id=${linearToGrid(i, columns)} type="text" />`;
 
 /**
   * Decides whether to make row header cell (left-most column) or a sheet cell
   */
 const makeRowCell = (e, i, sheetSize) => i % (sheetSize.columns + 1) === 0 
   ? makeRowHeaderCell(e, i, sheetSize.columns)
-  : makeSheetCell(e, i, sheetSize.columns);
+  : makeSheetCell(i, sheetSize.columns);
 
 /**
   * Creates a new 2-element array with the same element values
@@ -127,7 +123,7 @@ function setStyling(styling, elem) {
 }
 
 function setBorderFocusRing(elem, selectCell) {
-  elem.style.border = selectCell ? '2px solid #2361C5' : '0';
+  elem.style.border = selectCell ? '2px solid #2361C5' : '0.5px solid #b7b7b7';
 }
 /**
   * Increment the rows coordinate if not at the limit
@@ -313,20 +309,24 @@ export function handleKeyDown(event) {
   */
 export function handleColumnWidth(event) {
   const col = event.target.id.split('-')[2];
-  const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-right');
-  cellMarkersArr.forEach(cellMarker => {
-    if (cellMarker.getAttribute('id').split('-')[3] === col) {
-      cellMarker.style.borderRight = '2px solid #2a2a2a';
+  const cellInputsArr = getElemetsbyClass(event, 'input.cell-input');
+  cellInputsArr.forEach(cellInput => {
+    if (cellInput.getAttribute('id').split('-')[0] === col) {
+      cellInput.style.borderRight = '2px solid #2a2a2a';
     }
   });
 }
 
 export function releaseColumnWidth(event) {
   const col = event.target.id.split('-')[2];
-  const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-right');
-  cellMarkersArr.forEach(cellMarker => {
-    if (cellMarker.getAttribute('id').split('-')[3] === col) {
-      cellMarker.style.borderRightStyle = 'initial';
+  const cellInputsArr = getElemetsbyClass(event, 'input.cell-input');
+  cellInputsArr.forEach(cellInput => {
+    if (cellInput.getAttribute('id').split('-')[0] === col) {
+      if (cellInput.getAttribute('id') === getAddress(event).join('-')) {
+        setBorderFocusRing(cellInput, true);
+      } else {
+        cellInput.style.borderRightStyle = 'initial';
+      }
     }
   });
 }
@@ -336,20 +336,24 @@ export function releaseColumnWidth(event) {
   */
 export function handleRowHeight(event) {
   const col = event.target.id.split('-')[2];
-  const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-bottom');
-  cellMarkersArr.forEach(cellMarker => {
-    if (cellMarker.getAttribute('id').split('-')[4] === col) {
-      cellMarker.style.borderBottom = '2px solid #2a2a2a';
+  const cellInputsArr = getElemetsbyClass(event, 'input.cell-input');
+  cellInputsArr.forEach(cellInput => {
+    if (cellInput.getAttribute('id').split('-')[1] === col) {
+      cellInput.style.borderBottom = '2px solid #2a2a2a';
     }
   });
 }
 
 export function releaseRowHeight(event) {
   const col = event.target.id.split('-')[2];
-  const cellMarkersArr = getParentDocument(event).querySelectorAll('div.cell-marker-bottom');
-  cellMarkersArr.forEach(cellMarker => {
-    if (cellMarker.getAttribute('id').split('-')[4] === col) {
-      cellMarker.style.borderBottomStyle = 'initial';
+  const cellInputsArr = getElemetsbyClass(event, 'input.cell-input');
+  cellInputsArr.forEach(cellInput => {
+    if (cellInput.getAttribute('id').split('-')[1] === col) {
+      if (cellInput.getAttribute('id') === getAddress(event).join('-')) {
+        setBorderFocusRing(cellInput, true);
+      } else {
+        cellInput.style.borderBottomStyle = 'initial';
+      }
     }
   });
 }
