@@ -124,8 +124,6 @@ main {
 }
 
 .col {
-  /* display: flex; */
-  /* flex-flow: row nowrap; */
   border: 0.5px solid #b7b7b7;
   background-color: #ddd;
   text-align: center;
@@ -135,25 +133,12 @@ main {
   z-index: 3;
 }
 
-/* .col-header { */
-  /* font-size: 12px; */
-  /* background-color: transparent; */
-  /* border-radius: 0; */
-  /* border: 0; */
-  /* text-align: center; */
-  /* left: 0; */
-  /* top: 0; */
-  /* width: 100%; */
-/* } */
-
 #col-address {
   position: sticky;
   position: -webkit-sticky;
   z-index: 1;
   top: 0;
   left: 0;
-  /* width: 96%; */
-  /* height: 96%; */
   z-index: 4;
 }
 
@@ -173,8 +158,6 @@ main {
 }
 
 .row {
-  /* display: flex; */
-  /* flex-flow: column nowrap; */
   border: 0.5px solid #b7b7b7;
   background-color: #ddd;
   text-align: center;
@@ -183,17 +166,6 @@ main {
   left: 0;
   z-index: 3;
 }
-
-/* .row-header { */
-  /* font-size: 12px; */
-  /* background-color: transparent; */
-  /* border-radius: 0; */
-  /* border: 0; */
-  /* text-align: center; */
-  /* left: 0; */
-  /* top: 0; */
-  /* height: 100%; */
-/* } */
 
 .row-marker {
   height: 0;
@@ -208,21 +180,6 @@ main {
   z-index: 3;
 }
 
-/* .cell-row { */
-  /* display: flex; */
-  /* flex-flow: column nowrap; */
-  /* position: relative; */
-  /* border: 0.5px solid #b7b7b7; */
-  /* background-color: #f9f9f9; */
-/* } */
-
-/* .cell-col { */
-  /* display: flex; */
-  /* flex-flow: row nowrap; */
-  /* position: relative; */
-  /* height: 100%; */
-/* } */
-
 .cell-input {
   overflow: auto;
   border: 0.5px solid #b7b7b7;
@@ -231,24 +188,6 @@ main {
   cursor: default;
   z-index: 2;
 }
-
-/* .cell-marker-right { */
-  /* height: 100%; */
-  /* width: 0; */
-  /* border-right: 2px transparent #f9f9f9; */
-  /* position: absolute; */
-  /* right: 0; */
-  /* z-index: 3; */
-/* } */
-
-/* .cell-marker-bottom { */
-  /* height: 0; */
-  /* width: 100%; */
-  /* border-bottom: 2px transparent #f9f9f9; */
-  /* position: absolute; */
-  /* bottom: 0; */
-  /* z-index: 3; */
-/* } */
 
 @media (prefers-color-scheme: light) {
   :root {

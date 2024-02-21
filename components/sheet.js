@@ -40,17 +40,10 @@ const colReference = (i) => i === 0 ? 'address' : i - 1;
 /**
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
   */
-const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${colReference(i)}" `
-        + /*`style="width:${calculateWidth(i, sheetSize)}${sheetSize.unit};"*/`>${linearToColHeader(i, getValue())}${i === 0 ? `` : `
+const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${colReference(i)}">`
+        + `${linearToColHeader(i, getValue())}${i === 0 ? `` : `
         <div class="col-marker" id="col-marker-${colReference(i)}"></div>
       `}</div>`;
-        // <input class="col-header" `
-          // + `id="col-header-${colReference(i)}" `
-          // + `disabled="true" `
-          // + `type="text" `
-          // + `value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
-        // <div class="col-marker" id="col-marker-${colReference(i)}"></div>`}
-      // </div>`;
 
 /**
   * Makes the HTML text for the cell at the left of the sheet with the row number header
@@ -58,13 +51,6 @@ const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${colReference(i)}" `
 const makeRowHeaderCell = (e, i, columns) => `${e}"row" id="row-${linearToRowHeader(i, columns) - 1}">
         ${linearToRowHeader(i, columns)}<div class="row-marker" id="row-marker-${linearToRowHeader(i, columns) - 1}"></div>
       </div>`;
-      // <input class="row-header" `
-        // + `id="row-header-${linearToRowHeader(i, columns) - 1}" `
-        // + `disabled="true" `
-        // + `type="text"value="${linearToRowHeader(i, columns)}" />
-      // <div class="row-marker" id="row-marker-${linearToRowHeader(i, columns) - 1}"></div>
-      // ${linearToRowHeader(i, columns) - 1}
-    // </div>`;
 
 /**
   * Makes the blank cells in the body of the sheet
@@ -94,7 +80,7 @@ function createCells(sheetSize) {
       ? makeColumnHeaderCell(e, i)
       : makeRowCell(e, i, sheetSize.columns))
     .join('\n');
-  console.log(sheet);
+  // console.log(sheet);
   return sheet;
 }
 
