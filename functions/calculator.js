@@ -8,12 +8,13 @@ import { toCellCoordinates } from './addressConverter.js';
 export const coalesceExpression = (expression) => (expression || '').toString();
 
 /**
-  * Creates a RegExp based on the function's name (e.g. SUM, COUNT, etc.)
+  * Creates a Regular Expression based on the function's name (e.g. SUM, COUNT, etc.)
   */
 const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\\(\\)]*\\)`, 'g');
 
-// const colRefsRegExp = () => new RegExp(`[A-Za-z]$|[A-Za-z][^0-9]`, 'g');
-
+/**
+  * Creates a Regular Expression for cell range (e.g. A1:B2, etc.)
+  */
 const cellRangeRegExp = () => new RegExp(`^[A-Z]{1,2}[0-9]{1,3}\\:[A-Z]{1,2}[0-9]{1,3}$`, 'g');
 /**
   * Determine if the expression is declared text (begins with a single quote)
@@ -26,11 +27,6 @@ const testForText = (expression) => expression.substring(0, 1) === `'`;
 const testForFormula = (expression) => expression.substring(0, 1) === '='
   || expression.substring(0, 1) === '+'
   || expression.substring(0, 1) === '-';
-
-/**
-  * Determine if there are cell references (addresses) in the formula
-  */
-// const testForColRefs = (formula) => colRefsRegExp().test(formula);
 
 /**
   * Determine if at least one ocurrance of the formula is present
@@ -287,40 +283,6 @@ function formulaMethods(formula) {
   };
 }
 
-// const parseFormula = (formula, data) => {
-  /** Test to see if the formula contains a built in function; if it does, */
-  /** process the formula, otherwise return empty*/
-  // const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
-    // && parseBuiltInFunctions(formula.toUpperCase(), data);
-  // if (!functionResult && functionResult !== 0) {
-    // return formulaMethods(formula)
-      // .formatCalcResult()
-      // .parseReferences(data)
-      // .removeWhitespaces()
-      // .combineNegativeSigns(true)
-      // .calculate()
-      // .formatCalcResult()
-      // .result();
-    // return testForColRefs(formula)
-      // ? formulaMethods(formula)
-        // .dropLeadingChars('=')
-        // .formatCalcResult()
-        // .result()
-        // .toString()
-      // : formulaMethods(formula)
-        // .formatCalcResult()
-        // .parseReferences(data)
-        // .removeWhitespaces()
-        // .combineNegativeSigns(true)
-        // .calculate()
-        // .formatCalcResult()
-        // .result();
-  // }
-  // return formulaMethods(parseFormula(functionResult, data))
-    // .formatCalcResult()
-    // .result();
-// }
-
 /**
   * The main function for calling the calculator that parses the spreadsheet
   * expressions into text expressions of formula functions, defined as beginning 
@@ -342,5 +304,4 @@ export const parseExpression = (expression, data) => {
     : coalesced ;
   /** Determine whether the expression contains a Built-in Function or not */
   return formulaMethods(expression).parseFormula(data).result();
-  // return parseFormula(coalesced, data);
 }
