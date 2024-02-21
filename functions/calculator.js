@@ -28,14 +28,6 @@ const testForFormula = (expression) => expression.substring(0, 1) === '='
   || expression.substring(0, 1) === '+'
   || expression.substring(0, 1) === '-';
 
-/**
-  * Determine if at least one ocurrance of the formula is present
-  */
-const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
-  const formulaUpper = !formula ? '' : formula.toUpperCase();
-  return builtInFunctionsArr
-    .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
-}
 
 /**
   * Determine if the expression is a number
@@ -71,6 +63,13 @@ function formulaMethods(formula) {
   let paramsArr = [];
   /** Determines if an experssion is a range, e.g. A2:C4 */
   const isParamsRange = (parameters) => cellRangeRegExp().test(parameters);
+  /** Determine if at least one ocurrance of the formula is present */
+  const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
+    const formulaUpper = !formula ? '' : formula.toUpperCase();
+    return builtInFunctionsArr
+      .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
+  }
+
   /** Chained methods for processing Formulae and their parameters */
   return {
     /** Format the formula as much as possible first */
