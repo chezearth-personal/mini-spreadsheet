@@ -5,13 +5,16 @@ import { toCellCoordinates } from './addressConverter.js';
 /**
   * Coalesce the formula to an empty string if it is undefined or null
   */
-const coalesceExpression = (expression) => (expression || '').toString();
+export const coalesceExpression = (expression) => (expression || '').toString();
 
 /**
   * Creates a RegExp based on the function's name (e.g. SUM, COUNT, etc.)
   */
 const functionRegExp = (funcName) => new RegExp(`${funcName.toUpperCase()}\\([^\\(\\)]*\\)`, 'g');
 
+// const colRefsRegExp = () => new RegExp(`[A-Za-z]$|[A-Za-z][^0-9]`, 'g');
+
+const cellRangeRegExp = () => new RegExp(`^[A-Z]{1,2}[0-9]{1,3}\\:[A-Z]{1,2}[0-9]{1,3}$`, 'g');
 /**
   * Determine if the expression is declared text (begins with a single quote)
   */
@@ -27,7 +30,7 @@ const testForFormula = (expression) => expression.substring(0, 1) === '='
 /**
   * Determine if there are cell references (addresses) in the formula
   */
-const testForReferences = (formula) => /[A-Za-z]$|[A-Za-z][^0-9]/g.test(formula);
+// const testForColRefs = (formula) => colRefsRegExp().test(formula);
 
 /**
   * Determine if at least one ocurrance of the formula is present
@@ -71,9 +74,7 @@ function formulaMethods(formula) {
   let paramsStr = '';
   let paramsArr = [];
   /** Determines if an experssion is a range, e.g. A2:C4 */
-  const isParamsRange = (parameters) => /^[A-Z]{1,2}[0-9]{1,3}\:[A-Z]{1,2}[0-9]{1,3}/
-    .test(parameters
-    .toUpperCase());
+  const isParamsRange = (parameters) => cellRangeRegExp().test(parameters);
   /** Chained methods for processing Formulae and their parameters */
   return {
     /** Format the formula as much as possible first */
@@ -270,28 +271,28 @@ const parseFormula = (formula, data) => {
   const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
     && parseBuiltInFunctions(formula.toUpperCase(), data);
   if (!functionResult && functionResult !== 0) {
-    // console.log('testForReferences(formula) =', testForReferences(formula));
-    // console.log('formulaMethods(formula)\n.formatCalcResult()\n.parseReferences(data)\n.combineNegativeSigns(true)\n.calculate() =', formulaMethods(formula)
-      // .formatCalcResult()
-      // .parseReferences(data)
-      // .combineNegativeSigns(true)
-      // .calculate()
-      // .result()
-    // );
-    return testForReferences(formula)
-      ? formulaMethods(formula)
-        .dropLeadingChars('=')
-        .formatCalcResult()
-        .result()
-        .toString()
-      : formulaMethods(formula)
-        .formatCalcResult()
-        .parseReferences(data)
-        .removeWhitespaces()
-        .combineNegativeSigns(true)
-        .calculate()
-        .formatCalcResult()
-        .result();
+    return formulaMethods(formula)
+      .formatCalcResult()
+      .parseReferences(data)
+      .removeWhitespaces()
+      .combineNegativeSigns(true)
+      .calculate()
+      .formatCalcResult()
+      .result();
+    // return testForColRefs(formula)
+      // ? formulaMethods(formula)
+        // .dropLeadingChars('=')
+        // .formatCalcResult()
+        // .result()
+        // .toString()
+      // : formulaMethods(formula)
+        // .formatCalcResult()
+        // .parseReferences(data)
+        // .removeWhitespaces()
+        // .combineNegativeSigns(true)
+        // .calculate()
+        // .formatCalcResult()
+        // .result();
   }
   return formulaMethods(parseFormula(functionResult, data))
     .formatCalcResult()
