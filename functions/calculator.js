@@ -89,10 +89,9 @@ function formulaMethods(formula) {
         : formula.toUpperCase().replaceAll(/[A-Z]{1,2}[0-9]{1,3}/g, (match) => {
             const cellCoordinates = toCellCoordinates(match);
             return cellCoordinates && Array.isArray(cellCoordinates) 
-              ? parseFormula(
-                  data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0] || 0,
-                  data
-                )
+              ? formulaMethods(data.storageArr[cellCoordinates[0]][cellCoordinates[1]][0] || 0)
+                .parseFormula(data)
+                .result()
               : '#REF!'
           });
       return this;
@@ -160,8 +159,12 @@ function formulaMethods(formula) {
         formula = paramsArr
           .reduce((r, param) => {
             const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
-            const cellValue = !cellFormula && cellFormula !== 0 ? '' : parseFormula(cellFormula, data);
-            return !cellValue || !isNumber(cellValue) || cellFormula.substring(0, 1) === `'` ? r : r + Number(cellValue);
+            const cellValue = !cellFormula && cellFormula !== 0
+              ? ''
+              : formulaMethods(cellFormula).parseFormula(data).result();
+            return !cellValue || !isNumber(cellValue) || cellFormula.substring(0, 1) === `'`
+              ? r
+              : r + Number(cellValue);
           }, 0);
       }
       return this;
@@ -259,26 +262,45 @@ function formulaMethods(formula) {
       return this;
     },
     /**  */
+    parseFormula: function(data) {
+      const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
+        && parseBuiltInFunctions(formula.toUpperCase(), data);
+      formula = !functionResult && functionResult !== 0
+        ? formulaMethods(formula)
+          .formatCalcResult()
+          .parseReferences(data)
+          .removeWhitespaces()
+          .combineNegativeSigns(true)
+          .calculate()
+          .formatCalcResult()
+          .result()
+        : formulaMethods(functionResult)
+          .parseFormula(data)
+          .formatCalcResult()
+          .result();
+      return this;
+    },
+    /** Finally, return the formula, as the result */
     result: function() {
       return formula.toString();
     }
   };
 }
 
-const parseFormula = (formula, data) => {
+// const parseFormula = (formula, data) => {
   /** Test to see if the formula contains a built in function; if it does, */
   /** process the formula, otherwise return empty*/
-  const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
-    && parseBuiltInFunctions(formula.toUpperCase(), data);
-  if (!functionResult && functionResult !== 0) {
-    return formulaMethods(formula)
-      .formatCalcResult()
-      .parseReferences(data)
-      .removeWhitespaces()
-      .combineNegativeSigns(true)
-      .calculate()
-      .formatCalcResult()
-      .result();
+  // const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
+    // && parseBuiltInFunctions(formula.toUpperCase(), data);
+  // if (!functionResult && functionResult !== 0) {
+    // return formulaMethods(formula)
+      // .formatCalcResult()
+      // .parseReferences(data)
+      // .removeWhitespaces()
+      // .combineNegativeSigns(true)
+      // .calculate()
+      // .formatCalcResult()
+      // .result();
     // return testForColRefs(formula)
       // ? formulaMethods(formula)
         // .dropLeadingChars('=')
@@ -293,11 +315,11 @@ const parseFormula = (formula, data) => {
         // .calculate()
         // .formatCalcResult()
         // .result();
-  }
-  return formulaMethods(parseFormula(functionResult, data))
-    .formatCalcResult()
-    .result();
-}
+  // }
+  // return formulaMethods(parseFormula(functionResult, data))
+    // .formatCalcResult()
+    // .result();
+// }
 
 /**
   * The main function for calling the calculator that parses the spreadsheet
@@ -319,5 +341,6 @@ export const parseExpression = (expression, data) => {
       .result()
     : coalesced ;
   /** Determine whether the expression contains a Built-in Function or not */
-  return parseFormula(coalesced, data);
+  return formulaMethods(expression).parseFormula(data).result();
+  // return parseFormula(coalesced, data);
 }

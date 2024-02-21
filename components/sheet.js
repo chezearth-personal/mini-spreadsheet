@@ -114,6 +114,7 @@ function setStyling(styling, elem) {
 }
 
 function setBorderFocusRing(elem, selectCell) {
+  // console.log('setBorderFocusRing(): elem =', elem, 'selectCell =', selectCell);
   elem.style.border = selectCell ? '2px solid #2361C5' : '0.5px solid #b7b7b7';
 }
 /**
@@ -267,6 +268,7 @@ export function handleKeyDown(event) {
     ) {
       return;
     } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
+      console.log('handleKeyDown(): event.code =', event.code, 'oldCellCoordinatesArr =', oldCellCoordinatesArr);
       event.target.blur();
       const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
         ? navUp(oldCellCoordinatesArr)
@@ -276,11 +278,11 @@ export function handleKeyDown(event) {
             ? navRight(oldCellCoordinatesArr, this.sheetSize.columns)
             : navDown(oldCellCoordinatesArr, this.sheetSize.rows);
       const toId = newCellCoordinatesArr.join('-');
-      getParentDocument(event).querySelectorAll('input.cell').forEach(elem => setBorderFocusRing(elem, false));
+      getParentDocument(event).querySelectorAll('input.cell-input').forEach(elem => setBorderFocusRing(elem, false));
+      setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
       const sheetValues = refreshSheetValues.bind(this);
       sheetValues(event);
-      setBorderFocusRing(getParentDocument(event).getElementById(toId), true);
-      getParentDocument(event).getElementById('address').value = toCellAddress(newCellCoordinatesArr);
+      getParentDocument(event).getElementById('col-address').value = toCellAddress(newCellCoordinatesArr);
       const boundObj = {
         storageArr: this.storageArr,
         cellCoordinatesArr: newCellCoordinatesArr
