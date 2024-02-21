@@ -18,18 +18,18 @@ import {
   getStyling,
   saveStyling } from '../controllers/storageManager.js';
 
-const getId = () => 'id';
+// const getId = () => 'id';
 
 const getValue = () => 'value';
 
 const getElemetsbyClass = (event, className) => getParentDocument(event).querySelectorAll(className);
 
 /**  */
-const calculateWidth = (i, sheetSize) => (
-  i % (sheetSize.columns + 1) === 0
-    ? sheetSize.cells.rowHeaderWidth - sheetSize.cells.borderWidth * 2
-    : sheetSize.cells.width - sheetSize.cells.borderWidth * 2
-  ).toString();
+// const calculateWidth = (i, sheetSize) => (
+  // i % (sheetSize.columns + 1) === 0
+    // ? sheetSize.cells.rowHeaderWidth - sheetSize.cells.borderWidth * 2
+    // : sheetSize.cells.width - sheetSize.cells.borderWidth * 2
+  // ).toString();
 
 // const calculateHeight = (sheetSize) => (
   // sheetSize.cells.height - sheetSize.cells.borderWidth * 2
@@ -40,38 +40,43 @@ const colReference = (i) => i === 0 ? 'address' : i - 1;
 /**
   * Makes the HTML text for the cell at the top of the sheet with the column letter header
   */
-const makeColumnHeaderCell = (e, i, sheetSize) => `${e}"col" id="col-${colReference(i)}" `
-        + `style="width:${calculateWidth(i, sheetSize)}${sheetSize.unit}">
-        <input class="col-header" `
-          + `id="col-header-${colReference(i)}" `
-          + `disabled="true" `
-          + `type="text" `
-          + `value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
-        <div class="col-marker" id="col-marker-${colReference(i)}"></div>`}
-      </div>`;
+const makeColumnHeaderCell = (e, i) => `${e}"col" id="col-${colReference(i)}" `
+        + /*`style="width:${calculateWidth(i, sheetSize)}${sheetSize.unit};"*/`>${linearToColHeader(i, getValue())}${i === 0 ? `` : `
+        <div class="col-marker" id="col-marker-${colReference(i)}"></div>
+      `}</div>`;
+        // <input class="col-header" `
+          // + `id="col-header-${colReference(i)}" `
+          // + `disabled="true" `
+          // + `type="text" `
+          // + `value="${linearToColHeader(i, getValue())}" />${i === 0 ? `` : `
+        // <div class="col-marker" id="col-marker-${colReference(i)}"></div>`}
+      // </div>`;
 
 /**
   * Makes the HTML text for the cell at the left of the sheet with the row number header
   */
 const makeRowHeaderCell = (e, i, columns) => `${e}"row" id="row-${linearToRowHeader(i, columns) - 1}">
-      <input class="row-header" `
-        + `id="row-header-${linearToRowHeader(i, columns) - 1}" `
-        + `disabled="true" `
-        + `type="text"value="${linearToRowHeader(i, columns)}" />
-      <div class="row-marker" id="row-marker-${linearToRowHeader(i, columns) - 1}"></div>
-    </div>`;
+        ${linearToRowHeader(i, columns)}<div class="row-marker" id="row-marker-${linearToRowHeader(i, columns) - 1}"></div>
+      </div>`;
+      // <input class="row-header" `
+        // + `id="row-header-${linearToRowHeader(i, columns) - 1}" `
+        // + `disabled="true" `
+        // + `type="text"value="${linearToRowHeader(i, columns)}" />
+      // <div class="row-marker" id="row-marker-${linearToRowHeader(i, columns) - 1}"></div>
+      // ${linearToRowHeader(i, columns) - 1}
+    // </div>`;
 
 /**
   * Makes the blank cells in the body of the sheet
   */
-const makeSheetCell = (i, columns) => `<input class="cell-input" id=${linearToGrid(i, columns)} type="text" />`;
+const makeSheetCell = (i, columns) => `    <input class="cell-input" id=${linearToGrid(i, columns)} type="text" />`;
 
 /**
   * Decides whether to make row header cell (left-most column) or a sheet cell
   */
-const makeRowCell = (e, i, sheetSize) => i % (sheetSize.columns + 1) === 0 
-  ? makeRowHeaderCell(e, i, sheetSize.columns)
-  : makeSheetCell(i, sheetSize.columns);
+const makeRowCell = (e, i, columns) => i % (columns + 1) === 0 
+  ? makeRowHeaderCell(e, i, columns)
+  : makeSheetCell(i, columns);
 
 /**
   * Creates a new 2-element array with the same element values
@@ -86,10 +91,10 @@ function createCells(sheetSize) {
   const sheet = Array((sheetSize.columns + 1) * (sheetSize.rows + 1))
     .fill(`      <div class=`)
     .map((e, i) => i < (sheetSize.columns + 1)
-      ? makeColumnHeaderCell(e, i, sheetSize)
-      : makeRowCell(e, i, sheetSize))
+      ? makeColumnHeaderCell(e, i)
+      : makeRowCell(e, i, sheetSize.columns))
     .join('\n');
-  // console.log(sheet);
+  console.log(sheet);
   return sheet;
 }
 
@@ -215,7 +220,7 @@ export function refreshSheetValues (event) {
   }
 }
 
-export const getAddress = (event) => toCellCoordinates(getParentDocument(event).getElementById('col-header-address').value);
+export const getAddress = (event) => toCellCoordinates(getParentDocument(event).getElementById('col-address').value);
 
 export const setFocus = (event) => event.target.focus();
 
@@ -248,7 +253,7 @@ export function refreshStorage(event) {
 export const clickCell = (event) => {
   event.target.blur();
   getParentDocument(event).querySelectorAll('input.cell-input').forEach(cellInput => setBorderFocusRing(cellInput, false));
-  getParentDocument(event).getElementById('col-header-address').value = toCellAddress(event.target.id.split('-'));
+  getParentDocument(event).getElementById('col-address').value = toCellAddress(event.target.id.split('-'));
   setBorderFocusRing(event.target, true);
 }
 
@@ -325,7 +330,7 @@ export function releaseColumnWidth(event) {
       if (cellInput.getAttribute('id') === getAddress(event).join('-')) {
         setBorderFocusRing(cellInput, true);
       } else {
-        cellInput.style.borderRightStyle = 'initial';
+        cellInput.style.borderRight = '0.5px solid #b7b7b7';
       }
     }
   });
@@ -352,7 +357,7 @@ export function releaseRowHeight(event) {
       if (cellInput.getAttribute('id') === getAddress(event).join('-')) {
         setBorderFocusRing(cellInput, true);
       } else {
-        cellInput.style.borderBottomStyle = 'initial';
+        cellInput.style.borderBottom = '0.5px solid #b7b7b7';
       }
     }
   });
