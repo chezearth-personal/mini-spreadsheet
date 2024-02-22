@@ -11,8 +11,42 @@
     }
   },
   "builtInFunctions": [
-    { "name": "SUM" },
-    { "name": "COUNT" },
-    { "name": "AVERAGE" }
+    { 
+      "name": "SUM",
+      "ftype": "primitive",
+      "process": [
+        {
+          "method": "reduce",
+          "operation": [ "add" ]
+        }
+      ]
+    },
+    { 
+      "name": "COUNT" ,
+      "ftype": "primitive",
+      "process": [
+        {
+          "method": "filter",
+          "condition": [ "notEmpty", "isZero" ]
+        }
+      ]
+    },
+    { "name": "AVERAGE",
+      "ftype": "combined",
+      "process": [
+        {
+          "method": "COUNT",
+          "condition": []
+        },
+        {
+          "method": "SUM",
+          "condition": []
+        },
+        {
+          "operation": [ "divide" ],
+          "condition": [ "notZero" ]
+        }
+      ]
+    }
   ]
 }
