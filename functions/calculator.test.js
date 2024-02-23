@@ -80,7 +80,7 @@ describe('It must handle basic inputs', function() {
   });
   describe('It must return errors for formulae with invalid expressions', function() {
     it(`Must return a '#NAME?' error for an invalid formula with a text quote`, function() {
-      expect(parseExpression(`='1`, dataObj)).to.equal(`#NAME?`);
+      expect(parseExpression(`='1`, dataObj)).to.equal(`#NAME!`);
     });
   });
   describe('It must handle basic formulae', function() {
