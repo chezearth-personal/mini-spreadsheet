@@ -13,38 +13,77 @@
   "builtInFunctions": [
     { 
       "name": "SUM",
-      "ftype": "primitive",
-      "process": [
+      "type": "primitive",
+      "params": [
+        "list"
+      ],
+      "processes": [
         {
           "method": "reduce",
-          "operation": [ "add" ]
+          "operation": "add",
+          "initiate": 0
         }
       ]
     },
     { 
       "name": "COUNT" ,
-      "ftype": "primitive",
-      "process": [
+      "type": "primitive",
+      "params": [
+        "list"
+      ],
+      "processes": [
         {
           "method": "filter",
-          "condition": [ "notEmpty", "isZero" ]
+          "operation": "isNotEmpty"
+        },
+        {
+          "method": "combine",
+          "operation": "length"
         }
       ]
     },
     { "name": "AVERAGE",
-      "ftype": "combined",
-      "process": [
+      "type": "combined",
+      "params": [
+        "list"
+      ],
+      "processes": [
         {
-          "method": "COUNT",
-          "condition": []
+          "method": "COUNT"
         },
         {
-          "method": "SUM",
-          "condition": []
+          "method": "filter",
+          "operation": "notZero"
         },
         {
-          "operation": [ "divide" ],
-          "condition": [ "notZero" ]
+          "method": "SUM"
+        },
+        {
+          "method": "divide"
+        }
+      ]
+    },
+    { "name": "PRODUCT",
+      "type": "primitive",
+      "params": [
+        "list"
+      ],
+      "processes": [
+        {
+          "method": "reduce",
+          "operation": "multiply",
+          "initiate": 1
+        }
+      ]
+    },
+    {
+      "name": "PI",
+      "type": "constant",
+      "params": [],
+      "processes" : [
+        {
+          "method": "constant",
+          "value": 3.141592653589793
         }
       ]
     }

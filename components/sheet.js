@@ -268,7 +268,7 @@ export function handleKeyDown(event) {
     ) {
       return;
     } else if (/^Arrow/.test(event.code) || event.code === 'Enter' || event.code === 'Tab') {
-      console.log('handleKeyDown(): event.code =', event.code, 'oldCellCoordinatesArr =', oldCellCoordinatesArr);
+      // console.log('handleKeyDown(): event.code =', event.code, 'oldCellCoordinatesArr =', oldCellCoordinatesArr);
       event.target.blur();
       const newCellCoordinatesArr = event.code === 'ArrowUp' || (event.code === 'Enter' && event.shiftKey)
         ? navUp(oldCellCoordinatesArr)

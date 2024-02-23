@@ -48,8 +48,8 @@ const parseBuiltInFunctions = (formula, data) => {
         .getParamsStr(data)
         .getParamsRangeArr()
         .getParamsListArr()
-        .sum(func, data)
-        .count(func, data)
+        .processFunction(func, data)
+        // .count(func, data)
         .average(func, data)
         .result()
     ), formula)
@@ -65,6 +65,7 @@ function formulaMethods(formula) {
   const isParamsRange = (parameters) => cellRangeRegExp().test(parameters);
   /** Determine if at least one ocurrance of the formula is present */
   const testForBuiltInFunction = (formula, builtInFunctionsArr) => {
+    // console.log('testForBuiltInFunction(): formula =', formula);
     const formulaUpper = !formula ? '' : formula.toUpperCase();
     return builtInFunctionsArr
       .reduce((result, func) => result || functionRegExp(func.name).test(formulaUpper), false);
@@ -108,7 +109,15 @@ function formulaMethods(formula) {
       formula = /^[(-+\--9]+$/.test(formula)
         ? Function(`'use strict'; return (${formula.toString()})`)()
           .toString()
-        : '#NAME?'
+        : '#NAME!'
+      return this;
+    },
+    testForInfinity: function() {
+      // console.log('testForInfinity(): formula =', formula, !!formula, formula.toString().toUpperCase());
+      formula = !!formula && formula.toString().toUpperCase() === 'INFINITY'
+        ? '#DIV0!'
+        : formula;
+      // console.log('testForInfinity(): formula =', formula);
       return this;
     },
     /** Gets the parameters list and returns it as a string, e.g. A2:B15 or A2, B3, C4. */
@@ -149,40 +158,129 @@ function formulaMethods(formula) {
       return this;
     },
     /** Array sum function calculator */
-    sum: function(func, data) {
-      if (func.name === 'SUM' && Array.isArray(paramsArr) && paramsArr.length) { 
-        formula = paramsArr
-          .reduce((r, param) => {
-            const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
-            const cellValue = !cellFormula && cellFormula !== 0
-              ? ''
-              : formulaMethods(cellFormula).parseFormula(data).result();
-            return !cellValue || !isNumber(cellValue) || cellFormula.substring(0, 1) === `'`
-              ? r
-              : r + Number(cellValue);
-          }, 0);
-      }
-      return this;
-    },
+    // sum: function(func, data) {
+      // if (func.name === 'SUM' && Array.isArray(paramsArr) && paramsArr.length) { 
+        // formula = paramsArr
+          // .reduce((r, param) => {
+            // const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
+            // const cellValue = !cellFormula && cellFormula !== 0
+              // ? ''
+              // : formulaMethods(cellFormula).parseFormula(data).result();
+            // return !cellValue || !isNumber(cellValue) || cellFormula.substring(0, 1) === `'`
+              // ? r
+              // : r + Number(cellValue);
+          // }, 0);
+      // }
+      // return this;
+    // },
     /** Array count function calculator */
-    count: function(func, data) {
-      if (func.name === 'COUNT' && Array.isArray(paramsArr) && paramsArr.length) {
-        formula = paramsArr
-          .filter(param => {
-            const cellValue = Array.isArray(param) 
-              ? parseFormula(data.storageArr[param[0]][param[1]][0], data)
-              : param
-            return !!cellValue || cellValue === 0;
-          })
-          .length;
-      }
-      return this;
-    },
+    // count: function(func, data) {
+      // if (func.name === 'COUNT' && Array.isArray(paramsArr) && paramsArr.length) {
+        // formula = paramsArr
+          // .filter(param => {
+            // const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
+            // const cellValue = Array.isArray(param) 
+              // ? formulaMethods(cellFormula).parseFormula(data.storageArr[param[0]][param[1]][0], data).result()
+              // : param
+            // return !!cellValue || cellValue === 0;
+          // })
+          // .length;
+      // }
+      // return this;
+    // },
     /** Array average function calculator */
     average: function(func, data) {
       if (func.name === 'AVERAGE' && Array.isArray(paramsArr) && paramsArr.length) {
         formula = count(paramsArr, data) ? sum(paramsArr, data) / count(paramsArr, data) : '#DIV0!';
       }
+      return this;
+    },
+    /** function type */
+    processFunction: function(func, data) {
+      if (func.type.toLowerCase() === 'primitive' && Array.isArray(paramsArr) && paramsArr.length && func.processes) {
+        formula = func.processes.reduce((r, process) => {
+          // console.log('processFunction(): process.method =', process.method, '; ', r);
+          if (process.method === 'reduce') {
+            // console.log('processFunction(): r =', r);
+            return formulaMethods(formula).reducer(process.operation, process.initiate, r, data).result();
+          } else if (process.method === 'filter') {
+            // console.log('processFunction(): r =', r);
+            return formulaMethods(formula).filter(process.operation, r, data).result();
+          } else if (process.method === 'combine') {
+            // console.log('processFunction(): r =', r);
+            return formulaMethods(formula).combine(process.operation, r).result();
+          }
+        }, paramsArr);
+        // console.log('processFunction(): formula =', formula);
+      }
+      return this;
+    },
+    /** function process: reduce */
+    reducer: function(operation, initiate, paramsArr, data) {
+      function operate(a, b) {
+        switch (operation) {
+          case 'multiply':
+            return a * b;
+          case 'concatenate':
+            return a.toString() + b.toString();
+          default: /** add */
+            return a + b;
+        }
+      }
+      formula = paramsArr
+        .reduce((r, param) => {
+          const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
+          const cellValue = Array.isArray(param)
+            ? !cellFormula && cellFormula !== 0
+              ? ''
+              : formulaMethods(cellFormula).parseFormula(data).result()
+            : param;
+          return !cellValue || cellValue === 0
+            ? r
+            : operate(r, Number(cellValue));
+        }, initiate);
+      return this;
+    },
+    filter: function(operation, paramsArr, data) {
+      function choose(a) {
+        switch (operation) {
+          default: /** IsNotEmpty */
+            // const result = !!a;
+            const result = !(!a && a !== 0) && a !== '#DIV0!' && a !== '#NAME!' && a !== '#REF!';
+            // const result = !(!a && a !== 0) && a === '#REF!' && a !== '#NAME!' && a !== '#DIV0!';
+            // console.log('filter(): choose(): result =', result);
+            return result;
+        }
+      }
+      // console.log('filter(): condition =', operation);
+      formula = paramsArr
+        .map(param => {
+          // console.log('filter(): [before map()] param =', param);
+          const cellFormula = Array.isArray(param) ? data.storageArr[param[0]][param[1]][0] : param;
+          // console.log('filter(): [before map()] cellFormula =', cellFormula);
+          const cellValue = Array.isArray(param)
+            ? !cellFormula && cellFormula !== 0
+              ? ''
+              : formulaMethods(cellFormula).parseFormula(data).result()
+            : param
+          // console.log('filter(): [before map()] cellValue =', cellValue);
+          return cellValue;
+        })
+        .filter(param => choose(param));
+      // console.log('filter(): [after filter()] formula =', formula);
+      return this;
+    },
+    combine: function(operation, paramsArr) {
+      function operate(arr) {
+        switch (operation) {
+          default:
+            return arr.length;
+        }
+      }
+      // console.log('combine(): operation =', operation);
+      // console.log('combine(): paramsArr =', paramsArr);
+      formula = operate(paramsArr);
+      // console.log('combine(): formula =', formula);
       return this;
     },
     /** Drop the first character if it is equal to that supplied*/
@@ -258,6 +356,7 @@ function formulaMethods(formula) {
     },
     /**  */
     parseFormula: function(data) {
+      // console.log('parseFormula(): formula =', formula);
       const functionResult = testForBuiltInFunction(formula, data.builtInFunctions)
         && parseBuiltInFunctions(formula.toUpperCase(), data);
       formula = !functionResult && functionResult !== 0
@@ -267,6 +366,7 @@ function formulaMethods(formula) {
           .removeWhitespaces()
           .combineNegativeSigns(true)
           .calculate()
+          .testForInfinity()
           .formatCalcResult()
           .result()
         : formulaMethods(functionResult)
@@ -277,7 +377,7 @@ function formulaMethods(formula) {
     },
     /** Finally, return the formula, as the result */
     result: function() {
-      return formula.toString();
+      return formula;
     }
   };
 }
